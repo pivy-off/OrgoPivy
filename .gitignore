@@ -1,0 +1,17 @@
+api/.venv/
+api/storage/uploads/
+api/storage/index/
+
+__pycache__/
+*.pyc
+
+web/node_modules/
+web/.next/
+web/.turbo/
+
+.env
+.env.local
+.env.*.local
+
+.DS_Store
+Thumbs.db
