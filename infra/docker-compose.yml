@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: orgo
+      POSTGRES_PASSWORD: orgo
+      POSTGRES_DB: orgopivy
+    ports:
+      - "5432:5432"
+    volumes:
+      - orgopivy_db:/var/lib/postgresql/data
+
+volumes:
+  orgopivy_db:

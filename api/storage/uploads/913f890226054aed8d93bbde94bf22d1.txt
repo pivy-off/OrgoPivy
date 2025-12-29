@@ -1,0 +1,32 @@
+ORGO TEST NOTES V1
+
+Carbonyl basics
+Aldehydes are generally more reactive than ketones toward nucleophilic addition because they have less steric hindrance and less electron donation.
+
+Aldol reaction
+Base removes an alpha hydrogen to form an enolate.
+Enolate attacks a carbonyl to form a beta hydroxy carbonyl aldol addition product.
+Aldol condensation happens when dehydration occurs often with heat to give an alpha beta unsaturated carbonyl.
+
+Claisen condensation
+Requires an ester with an alpha hydrogen.
+Use an alkoxide base that matches the ester OR group to avoid transesterification.
+After C C bond formation, the beta keto ester product is deprotonated then acid workup reprotonates.
+
+Michael addition
+A Michael donor is an enolate or other stabilized nucleophile.
+A Michael acceptor is an alpha beta unsaturated carbonyl.
+The nucleophile adds to the beta carbon 1,4 addition rather than 1,2 addition.
+
+Nucleophilic acyl substitution
+Acid chlorides are very reactive and can form esters or amides.
+Leaving group ability matters Cl minus is a good leaving group.
+
+Redox quick rules
+NaBH4 reduces aldehydes and ketones to alcohols.
+LiAlH4 reduces esters to primary alcohols.
+PCC oxidizes primary alcohols to aldehydes without overoxidation.
+
+Common traps
+Choose base strength carefully strong bulky base can favor kinetic enolate.
+Heat can push elimination or dehydration steps.
