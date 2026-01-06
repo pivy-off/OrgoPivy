@@ -1,0 +1,41 @@
+CHM311 F25  |  Exam 3 Study Guide
+Briefly describe what a polyprotic acid/base is.
+What does it mean for a molecule to be amphiprotic?
+The fully protonated form of a polyprotic acid/base behaves as a monoprotic _________________.
+Briefly state the strategy for dealing with the fully protonated form of a polyprotic acid/base.
+The fully deprotonated form of a polyprotic acid/base behaves as a monoprotic __________________.
+Briefly state the strategy for dealing with the fully deprotonated form of a polyprotic acid/base.
+Why can’t we make simple assumptions about the intermediate forms of polyprotic acids/bases and treat them as monoprotic species?
+Label each of the following forms of histidine as fully protonated, fully deprotonated, intermediate 1 (associated with Ka1), or intermediate 2 (associated with Ka2).
+H2His+  : _____________________________________
+H3His2+ : _____________________________________
+	HHis     : _____________________________________
+	His-       : ______________________________________
+Find the pH and concentrations of H2SO3 , HSO3 - and SO3 2- in each of the following solutions. Use the ‘shortcut’ only to check your calculations for the intermediate species.
+(a) 0.050 M H2SO3
+(b) 0.050 M NaHSO3
+(c) 0.050 M Na2SO3
+Find the pH of each of the following solutions. Use the ‘shortcut’ only to check your calculations for the intermediate species.
+0.025 M H3AsO4
+0.025 M NaH2AsO4
+0.025 M Na2HAsO4
+0.025 M Na3AsO4
+What fraction of 1,2 ethanedithiol is in each form (H2A, HA, and A2-) at pH 8.00? At pH 10.00?   pKa1=8.96 and pKa2=10.54
+Balance the following redox reactions:
+MnO4¯ + H2O2 ---> Mn2+ + O2
+TcO4¯ + Sn2+ ---> Tc4+ + Sn4+
+Explain the difference between electric charge (C), electric current (A), and electric potential (V).
+For the following reaction:
+I2 + S2O32– ⇌ I– + S4O62–
+Identify the oxidizing agent on the left side of the reaction and write the balanced reduction half-reaction.
+Identify the reducing agent on the left side of the reaction and write the balanced oxidation half-reaction.
+How many coulombs of charge are transferred from reductant to oxidant when 2.00 g of thiosulfate (FW 112.127) is oxidized?
+If 1.45 g thiosulfate is oxidized per minute, what is the current flow in amperes?
+How much work can be done by 4.2 mmol of electrons moving from a region with a potential of 0 V to a region with a potential of 0.36 V?
+Suppose a rechargeable zinc-carbon battery operates on the following reactions:
+Zn + 2 Cl− → ZnCl2 + 2 e−
++
+2 MnO2 + ZnCl2 + H2O + 2 e− → Mn2O3 + Zn(OH)2 + 2 Cl−
+For an overall reaction of
+Zn + 2 MnO2 + H2O → Mn2O3 + Zn(OH)2
+If the battery delivers a constant current of 1.00 x 103 A for 1.00 h, how many kg of Cl2 will be consumed?

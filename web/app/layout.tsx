@@ -28,10 +28,6 @@ function SideNav() {
               Uploads <span className="subtle">Files</span>
             </Link>
 
-            <Link className="navLink" href="/search">
-              Search <span className="subtle">Chunks</span>
-            </Link>
-
             <Link className="navLink" href="/ask">
               Ask <span className="subtle">QA</span>
             </Link>
@@ -45,31 +41,6 @@ function SideNav() {
             </Link>
           </div>
 
-          <div className="divider" />
-
-          <div className="stackSm">
-            <div className="cardTitle">Shortcuts</div>
-            <div className="row">
-              <span className="subtle">Undo</span>
-              <span className="kbd">Ctrl Z</span>
-            </div>
-            <div className="row">
-              <span className="subtle">Redo</span>
-              <span className="kbd">Ctrl Y</span>
-            </div>
-            <div className="row">
-              <span className="subtle">Peak tool</span>
-              <span className="kbd">P</span>
-            </div>
-            <div className="row">
-              <span className="subtle">Calibrate</span>
-              <span className="kbd">C</span>
-            </div>
-            <div className="row">
-              <span className="subtle">Atom tool</span>
-              <span className="kbd">A</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -111,11 +82,21 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
         <div className="topbar">
           <div className="topbarInner">
-            <div className="brand">
-              <span className="brandDot" />
-              <span>OrgoPivy</span>
-              <span className="badge">Orgo Studio</span>
-            </div>
+            <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
+              <div className="brand">
+                <span className="brandDot" style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 6,
+                  background: "linear-gradient(135deg, #007AFF 0%, #5856D6 100%)",
+                  display: "inline-block",
+                  marginRight: 8,
+                  verticalAlign: "middle"
+                }} />
+                <span>OrgoPivy</span>
+                <span className="badge">Orgo Studio</span>
+              </div>
+            </Link>
 
             <TopNavClient />
           </div>

@@ -1,0 +1,181 @@
+
+--- Slide 1 ---
+
+1. What is the IUPAC name for the following compound?
+
+--- Slide 2 ---
+
+1. What is the IUPAC name for the following compound?
+
+
+
+
+
+NAME: 2,2,4-trimethylpentane
+
+
+--- Slide 3 ---
+
+2. What is the IUPAC name for the following compound
+
+--- Slide 4 ---
+
+2. What is the IUPAC name for the following compound
+
+
+
+
+
+
+NAME: 1,3-dimethylcyclohexane
+
+
+--- Slide 5 ---
+
+3. Show the most stable Newman Projection for the following compound
+
+--- Slide 6 ---
+
+3. Show the most stable Newman Projection for the following compound
+
+--- Slide 7 ---
+
+4. What functional group is present in terpene camphor?
+
+--- Slide 8 ---
+
+4. What functional group is present in terpene camphor?
+
+
+
+
+
+
+Answer: Ketone (Carbonyl)
+
+
+--- Slide 9 ---
+
+5. What functional group (class) is represented by the alkaloid coniine?
+
+--- Slide 10 ---
+
+5. What functional group (class) is represented by the alkaloid coniine?
+
+
+
+
+
+Answer: Amine (Secondary Amine)
+
+
+--- Slide 11 ---
+
+6. What is the relationship between the following compounds? ((Same, Isomers, Resonance)
+
+--- Slide 12 ---
+
+6. What is the relationship between the following compounds? ((Same, Isomers, Resonance)
+
+
+
+
+
+
+Answer: Isomers
+
+
+--- Slide 13 ---
+
+7. What nonzero formal charges are present in the following compound? Assume octets on all heavy atoms
+
+--- Slide 14 ---
+
+7. What nonzero formal charges are present in the following compound? Assume octets on all heavy atoms
+
+
+
+
+
+
+Answer N=+1 and O = -1
+
+
+--- Slide 15 ---
+
+8. Draw a proper resonance contributor for the following compound?
+
+--- Slide 16 ---
+
+8. Draw a proper resonance contributor for the following compound?
+
+--- Slide 17 ---
+
+9. Draw the major resonance contributor for the following structure.
+
+--- Slide 18 ---
+
+9. Draw the major resonance contributor for the following structure.
+
+--- Slide 19 ---
+
+10. Triethylamine  (CH3CH2)3N is a molecule in which the nitrogen atom is ___________ hybridized and the CNC angle is ________________.
+
+--- Slide 20 ---
+
+10. Triethylamine  (CH3CH2)3N is a molecule in which the nitrogen atom is ___________ hybridized and the CNC angle is ________________.
+Answer: sp3, 109°
+
+
+--- Slide 21 ---
+
+11. Which of the following molecules below is an ester?
+A) CH3CH2CH(CH3)2
+B) CH3OCH2CH2CH3
+C) CH3COOCH3
+D) HCCCH3
+
+
+--- Slide 22 ---
+
+11. Which of the following molecules below is an ester?
+A) CH3CH2CH(CH3)2
+B) CH3OCH2CH2CH3
+C) CH3COOCH3
+D) HCCCH3
+
+Answer: C
+
+
+
+--- Slide 23 ---
+
+12. Draw an acceptable structure for 4-isopropyl-2-methylheptane.
+
+--- Slide 24 ---
+
+12. Draw an acceptable structure for 4-isopropyl-2-methylheptane.
+
+--- Slide 25 ---
+
+13. Which of the following are capable of geometric (cis-trans) isomerism? (Yes/No)
+A) 3-ethyl-1,1-dimethylcyclopentane  
+B) 2-pentene (name means double bond is between carbon 2 and 3) 
+
+
+
+--- Slide 26 ---
+
+13. Which of the following are capable of geometric (cis-trans) isomerism? (Yes/No)
+A) 3-ethyl-1,1-dimethylcyclopentane (NO) 
+B) 2-pentene (name means double bond is between carbon 2 and 3) (YES)
+
+
+
+--- Slide 27 ---
+
+14. For 2-methylbutane, draw the Newman projection looking down the C2–C3 bond. Identify all staggered conformations and rank them in order of increasing steric strain.
+
+--- Slide 28 ---
+
+15. A Newman projection along the C2–C3 bond of 2-bromo-3-methylbutane shows the largest groups anti to each other. Draw the full 3D structure of 2-bromo-3-methylbutane that corresponds to this Newman projection.

@@ -1,0 +1,68 @@
+CHM311 F25  |  Exam 3 Study Guide
+Briefly describe what a polyprotic acid/base is.
+Polyprotic acids and bases are compounds that can donate or accept more than one proton.
+What does it mean for a molecule to be amphiprotic?
+Amphiprotic molecules are those that can behave as an acid and a base by being capable of donating a proton and accepting a proton. The intermediate forms of polyprotic acids and bases are amphiprotic because they are only partially protonated.
+The fully protonated form of a polyprotic acid/base behaves as a monoprotic acid.
+Briefly state the strategy for dealing with the fully protonated form of a polyprotic acid/base.
+For a weak polyprotic acid, or if there is a large degree of separation between Ka1 and Ka2, we know that the first dissociation will usually happen to some extent upon dissolution and the pH will be somewhat acidic, making the second dissociation unlikely. As a result, we can treat the fully protonated form as monoprotic acid, focusing our attention on Ka1 and ignoring Ka2.
+The fully deprotonated form of a polyprotic acid/base behaves as a monoprotic base.
+Briefly state the strategy for dealing with the fully deprotonated form of a polyprotic acid/base.
+For a weak polyprotic base, or if there is a large degree of separation between Kb1 and Kb2, we know that the completely deprotonated form will be incompletely hydrolyzed upon dissolution, and the second form is unlikely to hydroloyze at all. As a result, we can treat the fully deprotonated form as monoprotic base, focusing our attention on Kb1 and ignoring Kb2.
+Why can’t we make simple assumptions about the intermediate forms of polyprotic acids/bases and treat them as monoprotic species?
+The intermediate forms of polyprotics are amphiprotic, and so behave as both an acid and a base is solution. As a result, we must consider both the dissociation of at least one proton, along with the hydrolysis reaction with water. We can no longer assume the molecule will behave as a monoprotic species, and we resort to using systematic equilibrium.
+Label each of the following forms of histidine as fully protonated, fully deprotonated, intermediate 1 (associated with Ka1), or intermediate 2 (associated with Ka2).
+H2His+  : Intermediate 1
+H3His2+ : Fully protonated
+	HHis     : Intermediate 2
+	His-       : Fully deprotonated
+Find the pH and concentrations of H2SO3 , HSO3 - and SO3 2- in each of the following solutions. Use the ‘shortcut’ only to check your calculations for the intermediate species.
+(a) 0.050 M H2SO3
+(b) 0.050 M NaHSO3
+(c) 0.050 M Na2SO3
+Treat like monoprotic species and take Ka1 as Ka
+Intermediate form, use equation for systematic treatment of equilibrium
+Fully deprotonated form, treat as monoprotic base
+Kb1 = KW/Ka2 = 1.0 x 10-14/6.6 x 10-8 = 1.52 x 10-7
+Find the pH of each of the following solutions. Use the ‘shortcut’ only to check your calculations for the intermediate species.
+0.025 M H3AsO4
+0.025 M NaH2AsO4
+0.025 M Na2HAsO4
+0.025 M Na3AsO4
+Treat as monoprotic acid; [H+]=9.3 x 10-3 ; pH=2.0
+Intermediate, first dissociation, use
+[H+]=2.8 x 10-5 ; pH=4.6
+c. Intermediate, second dissociation, use
+[H+]=9.7 x 10-10 ; pH=9.01
+Fully deprotonated form, treat as monoprotic base
+Kb = Kb1 = Kw/Ka3 = 1.0 x 10-14/5.1 x 10-12 = 1.96 x 10-3
+What fraction of 1,2 ethanedithiol is in each form (H2A, HA, and A2-) at pH 8.00? At pH 10.00?   pKa1=8.96 and pKa2=10.54
+Use:
+Ka1 = 1.1 x 10-9      Ka2 = 2.9 x 10-11
+Results make sense –  pH 8.00 is less than pKa1 and the majority should be protonated. At pH 10.00, we are in between pKa1 and pKa2, but closer to pKa2, so our intermediate species makes up the majority, with the deprotonated species becoming more prominent as we approach pKa2.
+Balance the following redox reactions:
+MnO4¯ + H2O2  Mn2+ + O2
+6H+ + 2MnO4¯ + 5H2O2  2Mn2+ + 5O2 + 8H2O
+TcO4¯ + Sn2+  Tc4+ + Sn4+
+16H+ + 2TcO4¯ + 3Sn2+  2Tc4+ + 3Sn4+ + 8H2O
+Explain the difference between electric charge (C), electric current (A), and electric potential (V).
+Electric charge is a positive or negative quantity that has the capacity to generate current in a circuit, where current is the ‘flow’ of charge per time. Electric potential refers to the amount of work needed, or the amount of work that can be done, when a unit of charge moves from one point to another. 
+For the following reaction:
+I2 + S2O32– ⇌ I– + S4O62–
+Identify the oxidizing agent on the left side of the reaction and write the balanced reduction half-reaction.
+I2 is the oxidant;  I2 + 2e-  2I-
+Identify the reducing agent on the left side of the reaction and write the balanced oxidation half-reaction.
+S2O32– is reductant;  2 S2O32–  S4O62– + 2e-
+How many coulombs of charge are transferred from reductant to oxidant when 2.00 g of thiosulfate (FW 112.127) is oxidized?
+1721 C
+If 1.45 g thiosulfate is oxidized per minute, what is the current flow in amperes?
+20.8 A
+How much work can be done by 4.2 mmol of electrons moving from a region with a potential of 0 V to a region with a potential of 0.36 V?
+W = E x Q = 0.36 x (0.0042 x 9.649 x 104) = 146 J
+Suppose a rechargeable zinc-carbon battery operates on the following reactions:
+Zn + 2 Cl− → ZnCl2 + 2 e−
++
+2 MnO2 + ZnCl2 + H2O + 2 e− → Mn2O3 + Zn(OH)2 + 2 Cl−
+For an overall reaction of
+Zn + 2 MnO2 + H2O → Mn2O3 + Zn(OH)2
+If the battery delivers a constant current of 1.00 x 103 A for 1.00 h, how many kg of Cl2 will be consumed?

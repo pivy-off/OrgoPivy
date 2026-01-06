@@ -180,7 +180,18 @@ function medianStep(xs: number[]) {
   return diffs[Math.floor(diffs.length / 2)] || 1;
 }
 
+import NMRStudio from "../components/NMRStudio";
+
 export default function SpectraPage() {
+  return (
+    <main style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>
+      <NMRStudio />
+    </main>
+  );
+}
+
+// Keep old implementation for reference
+export function SpectraPageOld() {
   const [spectrumUrl, setSpectrumUrl] = useState<string>("");
   const [spectrumName, setSpectrumName] = useState<string>("spectrum");
 
