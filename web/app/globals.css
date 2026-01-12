@@ -104,6 +104,27 @@ a {
   }
 }
 
+@media (max-width: 768px) {
+  .courseCard {
+    padding: 32px 24px;
+    min-height: 320px;
+  }
+}
+
+/* Ensure course cards stay side by side on homepage */
+@media (max-width: 1000px) {
+  main > div > div[style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 24px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  main > div > div[style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 .card {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -364,19 +385,24 @@ a {
 /* Apple-style Course Cards */
 .courseCard {
   display: block;
-  padding: 32px;
+  padding: 48px;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  position: relative;
 }
 
 .courseCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 122, 255, 0.3);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(0, 122, 255, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 122, 255, 0.4);
+}
+
+[data-theme="dark"] .courseCard:hover {
+  box-shadow: 0 20px 60px rgba(0, 122, 255, 0.25), 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .courseCardTop {
