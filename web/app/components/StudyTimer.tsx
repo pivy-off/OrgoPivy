@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import type { CourseId } from "../lib/curriculum";
 import { startStudySession, endStudySession } from "../lib/progress";
+import { updateStreak } from "../lib/streak";
 
 type Props = {
   course: CourseId;
@@ -43,7 +44,11 @@ export default function StudyTimer({ course, topic }: Props) {
 
   function handleStop() {
     if (sessionId) {
+      const minutes = Math.floor(elapsed / 60);
       endStudySession(sessionId);
+      if (minutes > 0) {
+        updateStreak(minutes);
+      }
       setSessionId(null);
     }
     setIsRunning(false);

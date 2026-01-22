@@ -8,6 +8,8 @@ import BookmarkButton from "../../components/BookmarkButton";
 import StudyNotes from "../../components/StudyNotes";
 import TopicIllustrationClient from "../../components/TopicIllustrationClient";
 import MemorizationSection from "../../components/MemorizationSection";
+import MemorizationFlashcards from "../../components/MemorizationFlashcards";
+import ExportStudyGuide from "../../components/ExportStudyGuide";
 function TopicIllustration({ slug, title, imageUrl, imageAlt }: { slug: string; title: string; imageUrl?: string; imageAlt?: string }) {
   // Use client component for images with SVG fallback
   if (imageUrl) {
@@ -442,6 +444,7 @@ export default async function OrgoChem1TopicPage({
             </div>
 
             <MemorizationSection slug={topic.slug} />
+            <MemorizationFlashcards slug={topic.slug} />
 
             <Section title="Study steps">
               <StudyStepsChecklist items={topic.howToStudy} course="orgochem-1" topic={topic.slug} />
@@ -496,13 +499,14 @@ export default async function OrgoChem1TopicPage({
               <div className="topicSummaryText" style={{ marginBottom: 12 }}>
                 Download study guides and practice exam problems for this specific topic.
               </div>
-              <div className="topicToolRow">
+              <ExportStudyGuide course="orgochem-1" topicSlug={topic.slug} />
+              <div className="topicToolRow" style={{ marginTop: 12 }}>
                 <a 
                   className="btn btnPrimary" 
                   href={`/api/exam-guide?course=orgochem-1&topic=${encodeURIComponent(topic.slug)}`}
                   download
                 >
-                  Download study guide
+                  Download Word Doc
                 </a>
                 <Link 
                   className="btn" 

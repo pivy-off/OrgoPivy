@@ -8,6 +8,8 @@ import BookmarkButton from "../../components/BookmarkButton";
 import StudyNotes from "../../components/StudyNotes";
 import TopicIllustrationClient from "../../components/TopicIllustrationClient";
 import MemorizationSection from "../../components/MemorizationSection";
+import MemorizationFlashcards from "../../components/MemorizationFlashcards";
+import ExportStudyGuide from "../../components/ExportStudyGuide";
 
 function createSVGIllustration(slug: string, title: string) {
   const common = {
@@ -382,6 +384,7 @@ export default async function OrgoChem2TopicPage({
             </div>
 
             <MemorizationSection slug={topic.slug} />
+            <MemorizationFlashcards slug={topic.slug} />
 
             <Section title="Study steps">
               <StudyStepsChecklist items={topic.howToStudy} course="orgochem-2" topic={topic.slug} />
@@ -431,7 +434,8 @@ export default async function OrgoChem2TopicPage({
               <div className="topicSummaryText" style={{ marginBottom: 12 }}>
                 Download study guides and practice exam problems for this specific topic.
               </div>
-              <div className="topicToolRow">
+              <ExportStudyGuide course="orgochem-2" topicSlug={topic.slug} />
+              <div className="topicToolRow" style={{ marginTop: 12 }}>
                 <a 
                   className="btn btnPrimary" 
                   href={`/api/exam-guide?course=orgochem-2&topic=${encodeURIComponent(topic.slug)}`}

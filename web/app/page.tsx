@@ -3,6 +3,9 @@
 import Link from "next/link";
 import HomeStats, { RecentActivity, AchievementsDisplay } from "./components/HomeStats";
 import HomeSearch from "./components/HomeSearch";
+import StudyStreak from "./components/StudyStreak";
+import QuickReview from "./components/QuickReview";
+import ProgressChart from "./components/ProgressChart";
 
 export default function HomePage() {
   return (
@@ -52,6 +55,18 @@ export default function HomePage() {
 
         {/* Stats */}
         <HomeStats />
+
+        {/* Study Tools Grid */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: 24,
+          marginBottom: 40,
+        }}>
+          <StudyStreak />
+          <QuickReview />
+          <ProgressChart />
+        </div>
 
         {/* Course Cards Grid */}
         <div style={{

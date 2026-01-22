@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import TopNavClient from "./components/TopNavClient";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ThemeToggle from "./components/ThemeToggle";
+import CommandPalette from "./components/CommandPalette";
 
 export const metadata = {
   title: "OrgoPivy",
@@ -91,6 +92,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeBootScript />
+        <CommandPalette />
 
         <div className="topbar">
           <div className="topbarInner">

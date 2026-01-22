@@ -109,6 +109,35 @@ a {
     padding: 32px 24px;
     min-height: 320px;
   }
+
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .topbarInner {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .topNav {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  /* Better touch targets */
+  button, .btn, .navLink {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .topicHero {
+    margin: -20px -20px 20px -20px;
+  }
 }
 
 /* Ensure course cards stay side by side on homepage */
