@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getStats } from "../lib/progress";
 import { getStreakData } from "../lib/streak";
+import { getCourseTopics } from "../lib/curriculum";
 
 export default function ProgressChart() {
   const [stats, setStats] = useState<ReturnType<typeof getStats> | null>(null);
@@ -15,8 +16,11 @@ export default function ProgressChart() {
 
   if (!stats) return null;
 
-  const completionRate = stats.totalTopics > 0 
-    ? Math.round((stats.totalCompleted / stats.totalTopics) * 100) 
+  const orgochem1Topics = getCourseTopics("orgochem-1");
+  const orgochem2Topics = getCourseTopics("orgochem-2");
+  const totalTopics = orgochem1Topics.length + orgochem2Topics.length;
+  const completionRate = totalTopics > 0 
+    ? Math.round((stats.totalCompleted / totalTopics) * 100) 
     : 0;
 
   return (
@@ -34,7 +38,7 @@ export default function ProgressChart() {
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
             <span style={{ fontSize: 14, fontWeight: 600 }}>Topics Completed</span>
             <span style={{ fontSize: 14, color: "var(--muted)" }}>
-              {stats.totalCompleted} / {stats.totalTopics}
+              {stats.totalCompleted} / {totalTopics}
             </span>
           </div>
           <div style={{
