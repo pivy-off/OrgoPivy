@@ -34,6 +34,14 @@ type AnswerResponse = {
 };
 
 export default function PracticePage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 40, textAlign: "center" }}>Loading...</div>}>
+      <PracticePageContent />
+    </Suspense>
+  );
+}
+
+function PracticePageContent() {
   const searchParams = useSearchParams();
   const courseParam = searchParams?.get("course") || "";
   const topicParam = searchParams?.get("topic") || "";
