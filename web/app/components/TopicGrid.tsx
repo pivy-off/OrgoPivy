@@ -15,7 +15,7 @@ export default function TopicGrid({
         <TopicCard
           key={t.slug}
           topic={t}
-          href={`/${course}/topic/${t.slug}`}
+          courseId={course}
         />
       ))}
     </div>
