@@ -18,7 +18,7 @@ export default function ExportStudyGuide({ course, topicSlug }: Props) {
   if (!topic) return null;
 
   function handlePrint() {
-    if (!printRef.current) return;
+    if (!printRef.current || !topic) return;
 
     const printWindow = window.open("", "_blank");
     if (!printWindow) return;

@@ -6,6 +6,11 @@ import Link from "next/link";
 import { getCourseTopics, findTopic } from "../lib/curriculum";
 import type { CourseId, Topic } from "../lib/curriculum";
 
+type SearchResult = 
+  | { type: "course"; id: string; title: string; href: string }
+  | { type: "page"; id: string; title: string; href: string }
+  | { type: "topic"; topic: Topic; courseId: CourseId; href: string };
+
 export default function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -16,7 +21,7 @@ export default function CommandPalette() {
   const orgochem2Topics = getCourseTopics("orgochem-2");
   const allTopics = [...orgochem1Topics, ...orgochem2Topics];
 
-  const results = useMemo(() => {
+  const results = useMemo((): SearchResult[] => {
     if (!query.trim()) {
       return [
         { type: "course" as const, id: "orgochem-1", title: "OrgoChem I", href: "/orgochem-1" },
@@ -30,7 +35,7 @@ export default function CommandPalette() {
     }
 
     const q = query.toLowerCase();
-    const topicResults: Array<{ type: "topic" as const; topic: Topic; courseId: CourseId; href: string }> = [];
+    const topicResults: SearchResult[] = [];
 
     allTopics.forEach((topic) => {
       const searchText = `${topic.title} ${topic.shortDesc}`.toLowerCase();
