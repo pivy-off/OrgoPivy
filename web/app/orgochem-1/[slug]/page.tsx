@@ -10,6 +10,7 @@ import TopicIllustrationClient from "../../components/TopicIllustrationClient";
 import MemorizationSection from "../../components/MemorizationSection";
 import MemorizationFlashcards from "../../components/MemorizationFlashcards";
 import ExportStudyGuide from "../../components/ExportStudyGuide";
+import AchieveHomework from "../../components/AchieveHomework";
 function TopicIllustration({ slug, title, imageUrl, imageAlt }: { slug: string; title: string; imageUrl?: string; imageAlt?: string }) {
   // Use client component for images with SVG fallback
   if (imageUrl) {
@@ -485,14 +486,7 @@ export default async function OrgoChem1TopicPage({
             </Section>
 
             <Section title="Practice">
-              <div className="topicPracticeRow">
-                <div className="topicPracticeText">
-                  Practice problems for this topic. Get instant feedback and track your progress.
-                </div>
-                <Link className="btn btnPrimary" href={`/orgochem-1/exams?topic=${encodeURIComponent(topic.slug)}`}>
-                  Open practice
-                </Link>
-              </div>
+              <AchieveHomework course="orgochem-1" topic={topic.slug} />
             </Section>
 
             <Section title="Exam prep">

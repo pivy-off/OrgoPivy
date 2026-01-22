@@ -3,11 +3,20 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { getCourseTopics } from "../lib/curriculum";
-import type { CourseId, Topic } from "../lib/curriculum";
+import type { Topic } from "../lib/curriculum";
+
+type AnswerData = {
+  curriculumAnswer: string;
+  curriculumSources: { title: string; href: string; courseId: string }[];
+  notesAnswer: string | null;
+  notesContexts: { snippet?: string; stored_filename?: string }[];
+};
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<"all" | "orgochem-1" | "orgochem-2">("all");
+  const [answer, setAnswer] = useState<AnswerData | null>(null);
+  const [answerLoading, setAnswerLoading] = useState(false);
 
   const orgochem1Topics = getCourseTopics("orgochem-1");
   const orgochem2Topics = getCourseTopics("orgochem-2");
@@ -36,12 +45,37 @@ export default function SearchPage() {
       });
   }, [query, selectedCategory, allTopics, orgochem1Topics, orgochem2Topics]);
 
+  // Fetch AI/curriculum answer when query changes (debounced)
+  useEffect(() => {
+    if (!query.trim()) {
+      setAnswer(null);
+      return;
+    }
+    setAnswerLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams({ q: query });
+        if (selectedCategory !== "all") params.set("course", selectedCategory);
+        const res = await fetch(`/api/search-answer?${params}`);
+        if (res.ok) {
+          const data = (await res.json()) as AnswerData;
+          setAnswer(data);
+        } else {
+          setAnswer(null);
+        }
+      } catch {
+        setAnswer(null);
+      } finally {
+        setAnswerLoading(false);
+      }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [query, selectedCategory]);
+
   // Focus search input on mount
   useEffect(() => {
     const input = document.querySelector<HTMLInputElement>('input[type="text"]');
-    if (input) {
-      input.focus();
-    }
+    if (input) input.focus();
   }, []);
 
   return (
@@ -123,12 +157,51 @@ export default function SearchPage() {
         {/* Results */}
         {query.trim() && (
           <div>
+            {/* AI / Curriculum answer — actual result, not just links */}
+            <div className="card" style={{ marginBottom: 24, padding: 20 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: "var(--text)" }}>
+                Answer
+              </div>
+              {answerLoading ? (
+                <div className="subtle" style={{ fontSize: 14 }}>Getting answer…</div>
+              ) : (
+                <>
+                  {answer?.curriculumAnswer && (
+                    <div style={{ whiteSpace: "pre-wrap", fontSize: 15, lineHeight: 1.65, color: "var(--text)", marginBottom: answer?.notesAnswer ? 16 : 0 }}>
+                      {answer.curriculumAnswer}
+                    </div>
+                  )}
+                  {answer?.notesAnswer && (
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: "var(--muted)" }}>From your uploaded notes</div>
+                      <div style={{ whiteSpace: "pre-wrap", fontSize: 14, lineHeight: 1.6, color: "var(--text)" }}>{answer.notesAnswer}</div>
+                    </div>
+                  )}
+                  {!answerLoading && answer && !answer.curriculumAnswer && !answer.notesAnswer && (
+                    <div className="subtle" style={{ fontSize: 14 }}>No direct answer from curriculum or your notes. Try the Ask page with uploaded notes, or browse related topics below.</div>
+                  )}
+                  {answer && (answer.curriculumSources?.length > 0 || (answer.notesContexts?.length ?? 0) > 0) && (
+                    <div style={{ marginTop: 12, fontSize: 13, color: "var(--muted)" }}>
+                      Sources:{" "}
+                      {answer.curriculumSources?.map((s, i) => (
+                        <span key={s.href}>
+                          {i > 0 && ", "}
+                          <Link href={s.href} style={{ color: "var(--blue)" }}>{s.title}</Link>
+                        </span>
+                      ))}
+                      {answer.notesContexts?.length ? `; from your notes` : ""}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
             <div style={{ marginBottom: 16, fontSize: 14, color: "var(--muted)" }}>
               {results.length === 0 ? (
                 <>No results found for "{query}"</>
               ) : (
                 <>
-                  Found {results.length} result{results.length !== 1 ? "s" : ""} for "{query}"
+                  Related topics: {results.length} result{results.length !== 1 ? "s" : ""}
                 </>
               )}
             </div>

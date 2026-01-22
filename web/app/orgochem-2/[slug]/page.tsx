@@ -10,6 +10,7 @@ import TopicIllustrationClient from "../../components/TopicIllustrationClient";
 import MemorizationSection from "../../components/MemorizationSection";
 import MemorizationFlashcards from "../../components/MemorizationFlashcards";
 import ExportStudyGuide from "../../components/ExportStudyGuide";
+import AchieveHomework from "../../components/AchieveHomework";
 
 function createSVGIllustration(slug: string, title: string) {
   const common = {
@@ -420,14 +421,7 @@ export default async function OrgoChem2TopicPage({
             </Section>
 
             <Section title="Practice">
-              <div className="topicPracticeRow">
-                <div className="topicPracticeText">
-                  Practice problems for this topic. Get instant feedback and track your progress.
-                </div>
-                <Link className="btn btnPrimary" href={`/orgochem-2/exams?topic=${encodeURIComponent(topic.slug)}`}>
-                  Open practice
-                </Link>
-              </div>
+              <AchieveHomework course="orgochem-2" topic={topic.slug} />
             </Section>
 
             <Section title="Exam prep">
