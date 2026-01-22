@@ -1,6 +1,7 @@
 // app/orgochem-1/page.tsx
 import Link from "next/link";
 import { getCourseTopics } from "../lib/curriculum";
+import CourseProgressClient from "../components/CourseProgressClient";
 
 export default function OrgoChem1Page() {
   const topics = getCourseTopics("orgochem-1");
@@ -27,12 +28,7 @@ export default function OrgoChem1Page() {
 
             <div className="divider" />
 
-            <div className="card" style={{ boxShadow: "none" }}>
-              <div className="cardInner" style={{ display: "grid", gap: 10 }}>
-                <div style={{ fontWeight: 950 }}>Progress</div>
-                <div className="subtle">0 of {topics.length} topics completed</div>
-              </div>
-            </div>
+            <CourseProgressClient course="orgochem-1" topics={topics} />
 
             <div className="divider" />
 
@@ -43,27 +39,6 @@ export default function OrgoChem1Page() {
               <Link className="btn" href="/orgochem-1/exams">
                 Exam Mode
               </Link>
-            </div>
-
-            <div className="divider" />
-
-            <div className="stack">
-              {topics.map((t, idx) => (
-                <div key={t.slug} className="progressRow">
-                  <div className="progressRowLeft">
-                    <div className="progressRowTitle">
-                      {idx + 1}. {t.title}
-                    </div>
-                    <div className="progressRowDesc">{t.shortDesc}</div>
-                  </div>
-
-                  <div className="progressRowAction">
-                    <Link className="btn btnPrimary" href={`/orgochem-1/${t.slug}`}>
-                      Open
-                    </Link>
-                  </div>
-                </div>
-              ))}
             </div>
 
             <div className="divider" />

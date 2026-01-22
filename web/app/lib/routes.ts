@@ -5,4 +5,5 @@ export const ROUTES = {
   course: (courseId: CourseId) => `/courses/${encodeURIComponent(courseId)}`,
   topic: (courseId: CourseId, topicId: string) =>
     `/courses/${encodeURIComponent(courseId)}/topics/${encodeURIComponent(topicId)}`,
+  courseTopics: (courseId: CourseId) => `/courses/${encodeURIComponent(courseId)}`,
 }

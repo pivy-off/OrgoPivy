@@ -34,7 +34,7 @@ export default function TopicQueryPage({ searchParams }: Props) {
               <Link className="btn" href={ROUTES.home}>
                 Home
               </Link>
-              {courseId ? (
+              {courseId && course ? (
                 <Link className="btn" href={ROUTES.courseTopics(course.id as CourseId)}>
                   Back to topics
                 </Link>

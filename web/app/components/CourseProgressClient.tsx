@@ -98,30 +98,41 @@ export default function CourseProgressClient({
         <div style={{ display: "grid", gap: 10 }}>
           {topics.map((t, idx) => {
             const checked = Boolean(progress[t.slug]);
+            const isNext = nextTopic?.slug === t.slug;
 
             return (
-              <div key={t.slug} className="progressRow">
+              <div 
+                key={t.slug} 
+                className="progressRow"
+                style={{
+                  borderColor: isNext ? "rgba(0, 122, 255, 0.4)" : undefined,
+                  background: isNext ? "rgba(0, 122, 255, 0.04)" : undefined,
+                }}
+              >
                 <button
                   type="button"
                   className={checked ? "progressCheck progressCheckOn" : "progressCheck"}
                   aria-label={checked ? "Mark incomplete" : "Mark complete"}
                   onClick={() => toggle(t.slug)}
+                  style={{ flexShrink: 0 }}
                 >
                   {checked ? "✓" : ""}
                 </button>
 
-                <div style={{ display: "grid", gap: 2 }}>
-                  <div style={{ fontWeight: 950, opacity: checked ? 0.6 : 1 }}>
+                <div className="progressRowLeft">
+                  <div className="progressRowTitle" style={{ opacity: checked ? 0.6 : 1 }}>
                     {idx + 1}. {t.title}
                   </div>
-                  <div className="subtle" style={{ fontSize: 12, opacity: checked ? 0.7 : 1 }}>
+                  <div className="progressRowDesc" style={{ opacity: checked ? 0.7 : 1 }}>
                     {t.shortDesc}
                   </div>
                 </div>
 
-                <Link className="btn" href={`/${course}/${t.slug}`}>
-                  Open
-                </Link>
+                <div className="progressRowAction">
+                  <Link className="btn" href={`/${course}/${t.slug}`}>
+                    Open
+                  </Link>
+                </div>
               </div>
             );
           })}

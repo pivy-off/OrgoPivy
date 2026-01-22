@@ -1,4 +1,5 @@
 import Link from "next/link"
+// @ts-ignore - Legacy file
 import { getCourse } from "../../../../lib/courses"
 
 type Props = {
@@ -7,7 +8,7 @@ type Props = {
 
 export default function TopicPage({ params }: Props) {
   const course = getCourse(params.courseId)
-  const topic = course?.topics.find((t) => t.id === params.topicId) ?? null
+  const topic = course?.topics.find((t: { id: string; title: string; description: string; hasMechanism?: boolean }) => t.id === params.topicId) ?? null
 
   if (!course || !topic) {
     return (

@@ -3,14 +3,38 @@ import { notFound } from "next/navigation";
 import { findTopic } from "../../lib/curriculum";
 import MustKnowChecklist from "../../components/MustKnowChecklist";
 import StudyStepsChecklist from "../../components/StudyStepsChecklist";
+import StudyTimer from "../../components/StudyTimer";
+import BookmarkButton from "../../components/BookmarkButton";
+import StudyNotes from "../../components/StudyNotes";
+import TopicIllustrationClient from "../../components/TopicIllustrationClient";
+import MemorizationSection from "../../components/MemorizationSection";
+function TopicIllustration({ slug, title, imageUrl, imageAlt }: { slug: string; title: string; imageUrl?: string; imageAlt?: string }) {
+  // Use client component for images with SVG fallback
+  if (imageUrl) {
+    return (
+      <div style={{ position: "relative", width: "100%" }}>
+        <div style={{ position: "absolute", width: "100%", zIndex: 2 }}>
+          <TopicIllustrationClient slug={slug} title={title} imageUrl={imageUrl} imageAlt={imageAlt} />
+        </div>
+        <div style={{ position: "relative", width: "100%", zIndex: 1 }}>
+          {createSVGIllustration(slug, title)}
+        </div>
+      </div>
+    );
+  }
 
-function TopicIllustration({ slug, title }: { slug: string; title: string }) {
+  // Fallback to SVG illustrations
+  return createSVGIllustration(slug, title);
+}
+
+function createSVGIllustration(slug: string, title: string) {
   const common = {
     width: "100%",
-    height: 240,
-    viewBox: "0 0 900 240",
+    height: 320,
+    viewBox: "0 0 900 320",
     role: "img" as const,
     "aria-label": `${title} illustration`,
+    style: { display: "block" },
   };
 
   if (slug === "alkanes") {
@@ -22,7 +46,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
             <stop offset="1" stopColor="var(--accent)" stopOpacity="0.22" />
           </linearGradient>
         </defs>
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g1)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g1)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           Newman projection mindset
         </text>
@@ -60,7 +84,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
             <stop offset="1" stopColor="var(--accent)" stopOpacity="0.18" />
           </linearGradient>
         </defs>
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g2)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g2)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           Chair flips
         </text>
@@ -100,7 +124,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
             <stop offset="1" stopColor="var(--accent)" stopOpacity="0.18" />
           </linearGradient>
         </defs>
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g3)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g3)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           R and S quickly
         </text>
@@ -133,7 +157,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
             <stop offset="1" stopColor="var(--accent)" stopOpacity="0.2" />
           </linearGradient>
         </defs>
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g4)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g4)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           Pathway decision
         </text>
@@ -171,7 +195,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
             <stop offset="1" stopColor="var(--accent)" stopOpacity="0.18" />
           </linearGradient>
         </defs>
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g5)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g5)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           Alkene additions
         </text>
@@ -201,7 +225,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
             <stop offset="1" stopColor="var(--accent)" stopOpacity="0.18" />
           </linearGradient>
         </defs>
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g6)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g6)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           Spectroscopy analysis
         </text>
@@ -239,7 +263,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
           <stop offset="1" stopColor="var(--accent)" stopOpacity="0.14" />
         </linearGradient>
       </defs>
-      <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+      <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g0)" />
       <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
         {title}
       </text>
@@ -369,6 +393,7 @@ export default async function OrgoChem1TopicPage({
               </div>
 
               <div className="topicTopActions">
+                <BookmarkButton course="orgochem-1" topic={topic.slug} />
                 <Link className="btn" href="/orgochem-1">
                   Back
                 </Link>
@@ -376,7 +401,7 @@ export default async function OrgoChem1TopicPage({
             </div>
 
             <div className="topicHero">
-              <TopicIllustration slug={topic.slug} title={topic.title} />
+              <TopicIllustration slug={topic.slug} title={topic.title} imageUrl={topic.imageUrl} imageAlt={topic.imageAlt} />
             </div>
 
             <div className="divider" />
@@ -416,8 +441,17 @@ export default async function OrgoChem1TopicPage({
               </Section>
             </div>
 
+            <MemorizationSection slug={topic.slug} />
+
             <Section title="Study steps">
               <StudyStepsChecklist items={topic.howToStudy} course="orgochem-1" topic={topic.slug} />
+            </Section>
+
+            <Section title="Study Tools">
+              <div style={{ display: "grid", gap: 16 }}>
+                <StudyTimer course="orgochem-1" topic={topic.slug} />
+                <StudyNotes course="orgochem-1" topic={topic.slug} />
+              </div>
             </Section>
 
             <Section title="Tools">

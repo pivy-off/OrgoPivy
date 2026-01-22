@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import HomeStats, { RecentActivity, AchievementsDisplay } from "./components/HomeStats";
+import HomeSearch from "./components/HomeSearch";
 
 export default function HomePage() {
   return (
@@ -15,7 +19,7 @@ export default function HomePage() {
         {/* Hero Section */}
         <div style={{
           textAlign: "center",
-          marginBottom: 80
+          marginBottom: 60
         }}>
           <h1 style={{
             fontSize: 64,
@@ -35,13 +39,19 @@ export default function HomePage() {
             color: "var(--muted)",
             fontWeight: 400,
             maxWidth: 640,
-            margin: "0 auto",
+            margin: "0 auto 32px",
             lineHeight: 1.5
           }}>
             Your student-centered Organic Chemistry learning platform. 
             Understand concepts clearly, practice effectively, and prepare for exams with confidence.
           </p>
+          
+          {/* Search */}
+          <HomeSearch />
         </div>
+
+        {/* Stats */}
+        <HomeStats />
 
         {/* Course Cards Grid */}
         <div style={{
@@ -153,6 +163,10 @@ export default function HomePage() {
             </div>
           </Link>
         </div>
+
+        {/* Recent Activity & Achievements */}
+        <RecentActivity />
+        <AchievementsDisplay />
       </div>
     </main>
   );

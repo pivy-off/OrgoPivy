@@ -3,14 +3,20 @@ import { notFound } from "next/navigation";
 import { findTopic } from "../../lib/curriculum";
 import MustKnowChecklist from "../../components/MustKnowChecklist";
 import StudyStepsChecklist from "../../components/StudyStepsChecklist";
+import StudyTimer from "../../components/StudyTimer";
+import BookmarkButton from "../../components/BookmarkButton";
+import StudyNotes from "../../components/StudyNotes";
+import TopicIllustrationClient from "../../components/TopicIllustrationClient";
+import MemorizationSection from "../../components/MemorizationSection";
 
-function TopicIllustration({ slug, title }: { slug: string; title: string }) {
+function createSVGIllustration(slug: string, title: string) {
   const common = {
     width: "100%",
-    height: 240,
-    viewBox: "0 0 900 240",
+    height: 320,
+    viewBox: "0 0 900 320",
     role: "img" as const,
     "aria-label": `${title} illustration`,
+    style: { display: "block" },
   };
 
   const bg = (
@@ -26,7 +32,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
     return (
       <svg {...common}>
         {bg}
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g0)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           Alcohol oxidation
         </text>
@@ -50,7 +56,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
     return (
       <svg {...common}>
         {bg}
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g0)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           Epoxide opening
         </text>
@@ -74,7 +80,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
     return (
       <svg {...common}>
         {bg}
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g0)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           Carbonyl logic
         </text>
@@ -102,7 +108,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
     return (
       <svg {...common}>
         {bg}
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g0)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           Acyl substitution
         </text>
@@ -127,7 +133,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
     return (
       <svg {...common}>
         {bg}
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g0)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           Enolate chemistry
         </text>
@@ -153,7 +159,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
     return (
       <svg {...common}>
         {bg}
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g0)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           EAS directing
         </text>
@@ -177,7 +183,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
     return (
       <svg {...common}>
         {bg}
-        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#g0)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
           Amine basicity
         </text>
@@ -210,6 +216,25 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
       </text>
     </svg>
   );
+}
+
+function TopicIllustration({ slug, title, imageUrl, imageAlt }: { slug: string; title: string; imageUrl?: string; imageAlt?: string }) {
+  // Use client component for images with SVG fallback
+  if (imageUrl) {
+    return (
+      <div style={{ position: "relative", width: "100%" }}>
+        <div style={{ position: "absolute", width: "100%", zIndex: 2 }}>
+          <TopicIllustrationClient slug={slug} title={title} imageUrl={imageUrl} imageAlt={imageAlt} />
+        </div>
+        <div style={{ position: "relative", width: "100%", zIndex: 1 }}>
+          {createSVGIllustration(slug, title)}
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback to SVG
+  return createSVGIllustration(slug, title);
 }
 
 function Section({
@@ -303,6 +328,7 @@ export default async function OrgoChem2TopicPage({
               </div>
 
               <div className="topicTopActions">
+                <BookmarkButton course="orgochem-2" topic={topic.slug} />
                 <Link className="btn" href="/orgochem-2">
                   Back
                 </Link>
@@ -310,7 +336,7 @@ export default async function OrgoChem2TopicPage({
             </div>
 
             <div className="topicHero">
-              <TopicIllustration slug={topic.slug} title={topic.title} />
+              <TopicIllustration slug={topic.slug} title={topic.title} imageUrl={topic.imageUrl} imageAlt={topic.imageAlt} />
             </div>
 
             <div className="divider" />
@@ -355,8 +381,17 @@ export default async function OrgoChem2TopicPage({
               </Section>
             </div>
 
+            <MemorizationSection slug={topic.slug} />
+
             <Section title="Study steps">
               <StudyStepsChecklist items={topic.howToStudy} course="orgochem-2" topic={topic.slug} />
+            </Section>
+
+            <Section title="Study Tools">
+              <div style={{ display: "grid", gap: 16 }}>
+                <StudyTimer course="orgochem-2" topic={topic.slug} />
+                <StudyNotes course="orgochem-2" topic={topic.slug} />
+              </div>
             </Section>
 
             <Section title="Tools">

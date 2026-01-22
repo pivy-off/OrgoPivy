@@ -1,4 +1,5 @@
 import Link from "next/link"
+// @ts-ignore - Legacy file
 import { getCourse } from "../../lib/courses"
 
 type Props = {
@@ -42,7 +43,7 @@ export default function CourseTopicsPage({ params }: Props) {
           <div className="divider" />
 
           <div className="stackSm">
-            {course.topics.map((t) => (
+            {course.topics.map((t: { id: string; title: string; description: string; hasMechanism?: boolean }) => (
               <Link
                 key={t.id}
                 className="navLink"
