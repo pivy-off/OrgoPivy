@@ -77,25 +77,31 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
     },
     {
       id: "hw-alk-3",
-      question: "Rank the following alkanes in order of increasing boiling point: hexane, 2-methylpentane, 3-methylpentane, 2,2-dimethylbutane. Explain your reasoning.",
-      type: "short-answer",
-      correctAnswer: "2,2-dimethylbutane < 2-methylpentane < 3-methylpentane < hexane. Boiling point increases with surface area and decreases with branching due to reduced London dispersion forces.",
+      question: "Rank the following alkanes in order of increasing boiling point: hexane, 2-methylpentane, 3-methylpentane, 2,2-dimethylbutane.",
+      type: "multiple-choice",
+      options: [
+        "2,2-dimethylbutane < 2-methylpentane < 3-methylpentane < hexane",
+        "hexane < 3-methylpentane < 2-methylpentane < 2,2-dimethylbutane",
+        "2-methylpentane < 2,2-dimethylbutane < hexane < 3-methylpentane",
+        "All have the same boiling point"
+      ],
+      correctAnswer: "2,2-dimethylbutane < 2-methylpentane < 3-methylpentane < hexane",
       explanation: "Straight-chain alkanes have higher boiling points than branched isomers because they have more surface area for London dispersion forces. More branching reduces surface area and decreases boiling point. Hexane (straight chain) has the highest, while 2,2-dimethylbutane (most branched) has the lowest.",
       points: 12,
       difficulty: "medium",
       topic: "alkanes",
       courseId: "orgochem-1",
       rubric: {
-        fullCredit: "Correct order and explains relationship between branching and intermolecular forces",
+        fullCredit: "Correctly orders alkanes based on branching and understands relationship between branching and intermolecular forces",
         partialCredit: [
-          "Correct order but incomplete explanation",
+          "Correct order but doesn't understand why",
           "Correct concept but wrong order",
-          "Mentions surface area but doesn't connect to London forces"
+          "Identifies straight chain vs branched but wrong order"
         ],
         commonMistakes: [
           "Thinking molecular weight alone determines boiling point",
           "Not understanding effect of branching",
-          "Confusing intermolecular forces"
+          "Reversing the order"
         ]
       }
     }
@@ -129,20 +135,26 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
     },
     {
       id: "hw-sub-2",
-      question: "Which reaction will proceed faster: CH₃CH₂Br + NaI in acetone, or CH₃CH₂Br + NaI in ethanol? Explain using the concepts of solvent effects.",
-      type: "short-answer",
-      correctAnswer: "Acetone (polar aprotic) will be faster. Polar aprotic solvents don't solvate nucleophiles, keeping them more reactive for SN2 reactions.",
+      question: "Which reaction will proceed faster: CH₃CH₂Br + NaI in acetone, or CH₃CH₂Br + NaI in ethanol?",
+      type: "multiple-choice",
+      options: [
+        "Acetone (polar aprotic) will be faster",
+        "Ethanol (polar protic) will be faster",
+        "Both will proceed at the same rate",
+        "Cannot determine without more information"
+      ],
+      correctAnswer: "Acetone (polar aprotic) will be faster",
       explanation: "Acetone is a polar aprotic solvent, while ethanol is polar protic. In SN2 reactions, polar aprotic solvents don't solvate nucleophiles strongly, keeping them 'naked' and more reactive. Polar protic solvents solvate nucleophiles, reducing their nucleophilicity. Since I⁻ is a strong nucleophile and CH₃CH₂Br is a primary substrate (favoring SN2), the reaction in acetone will be faster.",
       points: 12,
       difficulty: "medium",
       topic: "substitution-elimination",
       courseId: "orgochem-1",
       rubric: {
-        fullCredit: "Correctly identifies acetone as faster, explains polar aprotic vs protic, and connects to nucleophile solvation",
+        fullCredit: "Correctly identifies acetone as faster and understands polar aprotic vs protic solvent effects",
         partialCredit: [
-          "Correct answer but incomplete explanation",
-          "Mentions solvent type but doesn't explain mechanism",
-          "Correct concept but wrong conclusion"
+          "Correct answer but doesn't understand why",
+          "Mentions solvent type but wrong conclusion",
+          "Correct concept but wrong answer"
         ],
         commonMistakes: [
           "Confusing polar aprotic with polar protic",
@@ -208,25 +220,30 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
     },
     {
       id: "hw-stereo-2",
-      question: "Are the following pairs enantiomers, diastereomers, identical, or constitutional isomers? Explain: (a) (R)-2-butanol and (S)-2-butanol, (b) meso-tartaric acid and (R,R)-tartaric acid.",
-      type: "short-answer",
-      correctAnswer: "(a) Enantiomers - non-superimposable mirror images. (b) Diastereomers - stereoisomers that are not mirror images.",
-      explanation: "(a) (R)-2-butanol and (S)-2-butanol are enantiomers because they are non-superimposable mirror images with opposite configurations at the stereocenter. (b) meso-tartaric acid has a plane of symmetry (achiral despite having stereocenters), while (R,R)-tartaric acid is chiral. They are diastereomers because they are stereoisomers but not mirror images.",
-      points: 12,
-      difficulty: "medium",
+      question: "What is the relationship between (R)-2-butanol and (S)-2-butanol?",
+      type: "multiple-choice",
+      options: [
+        "Enantiomers",
+        "Diastereomers",
+        "Identical",
+        "Constitutional isomers"
+      ],
+      correctAnswer: "Enantiomers",
+      explanation: "(R)-2-butanol and (S)-2-butanol are enantiomers because they are non-superimposable mirror images with opposite configurations at the stereocenter.",
+      points: 10,
+      difficulty: "easy",
       topic: "stereochemistry",
       courseId: "orgochem-1",
       rubric: {
-        fullCredit: "Correctly identifies both pairs and explains the relationship with proper terminology",
+        fullCredit: "Correctly identifies as enantiomers and understands mirror image relationship",
         partialCredit: [
-          "Correct identification but incomplete explanation",
-          "One correct, one incorrect",
+          "Correct identification but incomplete understanding",
+          "Confuses with diastereomers",
           "Correct concept but wrong terminology"
         ],
         commonMistakes: [
           "Confusing enantiomers with diastereomers",
-          "Not understanding meso compounds",
-          "Missing the mirror image concept",
+          "Not understanding mirror image concept",
           "Confusing with constitutional isomers"
         ]
       }
@@ -262,27 +279,31 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
     },
     {
       id: "hw-alkene-2",
-      question: "Compare and contrast syn addition vs anti addition in alkene reactions. Give one example of each and explain why each occurs.",
-      type: "short-answer",
-      correctAnswer: "Syn addition: both groups add from same face (e.g., catalytic hydrogenation). Anti addition: groups add from opposite faces (e.g., halogen addition). Syn occurs with concerted mechanisms, anti with cyclic intermediates.",
-      explanation: "Syn addition means both new groups add from the same side of the double bond (e.g., catalytic hydrogenation with H₂/Pd, where both H atoms add from the same face in a concerted mechanism). Anti addition means groups add from opposite sides (e.g., Br₂ addition forms a bromonium ion intermediate, then Br⁻ attacks from the backside, resulting in anti addition). The difference comes from the mechanism: concerted (syn) vs cyclic intermediate (anti).",
-      points: 15,
-      difficulty: "hard",
+      question: "Which type of addition occurs in catalytic hydrogenation (H₂/Pd)?",
+      type: "multiple-choice",
+      options: [
+        "Syn addition",
+        "Anti addition",
+        "Both syn and anti",
+        "Neither - no stereochemistry"
+      ],
+      correctAnswer: "Syn addition",
+      explanation: "Catalytic hydrogenation proceeds via a concerted mechanism where both H atoms add from the same face of the double bond, resulting in syn addition.",
+      points: 10,
+      difficulty: "medium",
       topic: "alkenes",
       courseId: "orgochem-1",
       rubric: {
-        fullCredit: "Correctly defines both, gives appropriate examples, and explains mechanistic basis for each",
+        fullCredit: "Correctly identifies syn addition and understands concerted mechanism",
         partialCredit: [
-          "Correct definitions but weak examples",
-          "Correct examples but incomplete explanation",
-          "One correct, one incorrect",
-          "Missing mechanistic explanation"
+          "Correct answer but doesn't understand mechanism",
+          "Confuses syn with anti",
+          "Correct concept but wrong answer"
         ],
         commonMistakes: [
           "Confusing syn with anti",
-          "Wrong examples",
           "Not understanding mechanistic basis",
-          "Missing stereochemistry"
+          "Thinking it's anti addition"
         ]
       }
     }
@@ -314,20 +335,26 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
     },
     {
       id: "hw-cyclo-2",
-      question: "Explain why cyclohexane adopts a chair conformation rather than a planar hexagon. Include discussion of angle strain and torsional strain.",
-      type: "short-answer",
-      correctAnswer: "Chair conformation minimizes both angle strain (109.5° angles) and torsional strain (staggered bonds). Planar hexagon would have severe angle strain (120° vs 109.5°) and eclipsed bonds.",
+      question: "Why does cyclohexane adopt a chair conformation rather than a planar hexagon?",
+      type: "multiple-choice",
+      options: [
+        "Chair minimizes both angle strain and torsional strain",
+        "Planar hexagon has lower energy",
+        "Chair has more steric strain",
+        "Planar hexagon is more stable"
+      ],
+      correctAnswer: "Chair minimizes both angle strain and torsional strain",
       explanation: "Cyclohexane adopts a chair conformation to minimize strain. In the chair, all C-C-C angles are close to the ideal 109.5° (no angle strain), and all bonds are staggered (minimal torsional strain). A planar hexagon would force 120° angles (angle strain) and eclipsed bonds (torsional strain), making it much higher in energy.",
-      points: 12,
+      points: 10,
       difficulty: "medium",
       topic: "cycloalkanes",
       courseId: "orgochem-1",
       rubric: {
-        fullCredit: "Explains both angle and torsional strain, compares chair to planar, mentions bond angles and staggered/eclipsed",
+        fullCredit: "Correctly identifies chair minimizes both angle and torsional strain",
         partialCredit: [
           "Mentions one type of strain but not both",
-          "Correct concept but incomplete comparison",
-          "Missing specific angle values"
+          "Correct concept but incomplete",
+          "Wrong answer but understands strain concept"
         ],
         commonMistakes: [
           "Only mentioning one type of strain",
@@ -365,16 +392,22 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
     },
     {
       id: "hw-spec-2",
-      question: "Explain how you would distinguish between an aldehyde and a ketone using IR spectroscopy. What specific signals would you look for?",
-      type: "short-answer",
-      correctAnswer: "Aldehydes show C-H stretch at ~2700-2800 cm⁻¹ (two weak bands) in addition to C=O at ~1720-1740 cm⁻¹. Ketones only show C=O at ~1715 cm⁻¹, no aldehyde C-H stretch.",
+      question: "How can you distinguish between an aldehyde and a ketone using IR spectroscopy?",
+      type: "multiple-choice",
+      options: [
+        "Aldehydes show C-H stretch at ~2700-2800 cm⁻¹ in addition to C=O",
+        "Ketones show C-H stretch at ~2700-2800 cm⁻¹",
+        "Aldehydes have C=O at different wavenumber than ketones",
+        "They cannot be distinguished by IR"
+      ],
+      correctAnswer: "Aldehydes show C-H stretch at ~2700-2800 cm⁻¹ in addition to C=O",
       explanation: "Both aldehydes and ketones show C=O stretching around 1700-1750 cm⁻¹. However, aldehydes have a unique C-H stretch from the aldehyde hydrogen at ~2700-2800 cm⁻¹ (appears as two weak bands). Ketones do not have this signal. This is the key distinguishing feature.",
       points: 10,
       difficulty: "medium",
       topic: "spectroscopy",
       courseId: "orgochem-1",
       rubric: {
-        fullCredit: "Identifies aldehyde C-H stretch at ~2700-2800 cm⁻¹, explains both show C=O, notes ketones lack aldehyde C-H",
+        fullCredit: "Identifies aldehyde C-H stretch at ~2700-2800 cm⁻¹ as distinguishing feature",
         partialCredit: [
           "Mentions C-H stretch but wrong region",
           "Correct concept but incomplete",
@@ -418,19 +451,25 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
   "carbonyls-addition": [
     {
       id: "hw-carb-1",
-      question: "Explain why aldehydes are more reactive than ketones toward nucleophilic addition. Use both electronic and steric arguments.",
-      type: "short-answer",
-      correctAnswer: "Electronic: Aldehydes have less electron-donating groups, making carbonyl carbon more electrophilic. Steric: Aldehydes have less steric hindrance (one R vs two R groups), allowing easier nucleophile approach.",
+      question: "Why are aldehydes more reactive than ketones toward nucleophilic addition?",
+      type: "multiple-choice",
+      options: [
+        "Less steric hindrance and less electron-donating groups",
+        "More steric hindrance",
+        "Same reactivity",
+        "Ketones are more reactive"
+      ],
+      correctAnswer: "Less steric hindrance and less electron-donating groups",
       explanation: "Aldehydes are more reactive than ketones for two reasons: 1) Electronic: Aldehydes have one alkyl group (electron-donating) while ketones have two, making the carbonyl carbon in aldehydes more electrophilic. 2) Steric: Aldehydes have less steric hindrance around the carbonyl, allowing nucleophiles easier access. Ketones have two bulky R groups that hinder nucleophile approach.",
-      points: 12,
+      points: 10,
       difficulty: "medium",
       topic: "carbonyls-addition",
       courseId: "orgochem-2",
       rubric: {
-        fullCredit: "Explains both electronic (electron-donating groups) and steric (hindrance) factors correctly",
+        fullCredit: "Correctly identifies both electronic and steric factors",
         partialCredit: [
           "One factor correct but missing the other",
-          "Correct concept but incomplete explanation",
+          "Correct concept but incomplete",
           "Mentions reactivity but doesn't explain why"
         ],
         commonMistakes: [

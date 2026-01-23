@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { getHomeworkProblems, getCourseHomeworkProblems, type HomeworkProblem } from "../lib/homework-problems";
 import type { CourseId } from "../lib/curriculum";
+import ProfessorAssignmentCreator from "./ProfessorAssignmentCreator";
 
 type Assignment = {
   id: string;
@@ -44,6 +45,7 @@ export default function GradedHomework({ course, topic, assignmentId }: Props) {
   const [submitted, setSubmitted] = useState(false);
   const [showFeedback, setShowFeedback] = useState<Record<string, boolean>>({});
   const [gradingMode, setGradingMode] = useState(false);
+  const [showCreator, setShowCreator] = useState(false);
 
   // Load assignments and submissions from localStorage
   useEffect(() => {
@@ -231,8 +233,33 @@ export default function GradedHomework({ course, topic, assignmentId }: Props) {
           </div>
         </div>
 
+        {/* Professor Assignment Creator */}
+        <div style={{ marginBottom: 32 }}>
+          <ProfessorAssignmentCreator 
+            course={course} 
+            topic={topic || undefined}
+            onAssignmentCreated={(assignmentId) => {
+              // Reload assignments
+              const saved = localStorage.getItem(`orgopivy-assignments-${course}`);
+              if (saved) {
+                try {
+                  const loaded = JSON.parse(saved);
+                  setAssignments(loaded);
+                  const newAssignment = loaded.find((a: Assignment) => a.id === assignmentId);
+                  if (newAssignment) {
+                    setCurrentAssignment(newAssignment);
+                  }
+                } catch (e) {
+                  console.error("Failed to load assignments", e);
+                }
+              }
+            }}
+          />
+        </div>
+
         {assignments.length > 0 && (
-          <div style={{ marginBottom: 24 }}>
+          <>
+            <div className="divider" style={{ marginBottom: 24 }} />
             <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Your Assignments</div>
             <div style={{ display: "grid", gap: 12 }}>
               {assignments.map(assignment => {
@@ -282,18 +309,7 @@ export default function GradedHomework({ course, topic, assignmentId }: Props) {
                 );
               })}
             </div>
-          </div>
-        )}
-
-        {topic && (
-          <button
-            type="button"
-            className="btn btnPrimary"
-            onClick={createNewAssignment}
-            style={{ width: "100%" }}
-          >
-            Create New Assignment
-          </button>
+          </>
         )}
       </div>
     );
