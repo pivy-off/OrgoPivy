@@ -40,8 +40,50 @@ export default function AchieveHomework({ course, topic }: Props) {
     generateProblems();
   }, [course, topic]);
 
-  function generateProblems() {
+  async function generateProblems() {
     setLoading(true);
+    
+    if (topic && course) {
+      // Use API to generate problems for specific topic
+      try {
+        const response = await fetch(`/api/generate-problems?course=${course}&topic=${topic}&count=10`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.problems && data.problems.length > 0) {
+            // Convert API problems to HomeworkProblem format
+            const converted: HomeworkProblem[] = data.problems.map((p: any, idx: number) => ({
+              id: p.id,
+              topic: topic,
+              courseId: course,
+              question: p.question,
+              type: p.type,
+              difficulty: idx < 3 ? "easy" : idx < 7 ? "medium" : "hard",
+              points: p.points,
+              options: p.options,
+              correctAnswer: p.correctAnswer,
+              explanation: p.explanation,
+              hints: [
+                "Review the must-know items for this topic",
+                "Check the study steps for guidance",
+                "Refer to the external textbook reference",
+              ],
+            }));
+            setProblems(converted);
+            setTotalPoints(converted.reduce((sum, p) => sum + p.points, 0));
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Failed to generate problems:", error);
+      }
+    }
+    
+    // Fallback to manual generation
+    generateProblemsManual();
+  }
+
+  function generateProblemsManual() {
     // Generate problems based on course/topic
     const orgochem1Topics = getCourseTopics("orgochem-1");
     const orgochem2Topics = getCourseTopics("orgochem-2");

@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ExamProblemSolver from "./ExamProblemSolver";
+import { getCourseTopics, findTopic } from "../lib/curriculum";
+import type { CourseId } from "../lib/curriculum";
 
 type Problem = {
   id: string;
@@ -1773,34 +1775,105 @@ export default function ExamPracticeMode({ course, topic }: Props) {
   const [selectedExam, setSelectedExam] = useState<string>("");
   const [problems, setProblems] = useState<Problem[]>([]);
   const [examTitle, setExamTitle] = useState("Practice Exam");
+  const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState<Record<string, boolean>>({});
 
   // Load problems based on topic or use sample
   const availableExams = useMemo(() => {
-    const exams: Array<{ id: string; title: string; problems: Problem[] }> = [];
+    const exams: Array<{ id: string; title: string; problems: Problem[]; source: "built-in" | "ai" }> = [];
+    const courseTopics = getCourseTopics(course);
     
-    if (topic && SAMPLE_PROBLEMS[topic]) {
-      const topicProblems = SAMPLE_PROBLEMS[topic];
-      // Ensure we have exactly 15 problems (or all available if less)
-      const problemsToUse = topicProblems.slice(0, 15);
-      exams.push({
-        id: `sample-${topic}`,
-        title: `${topic.charAt(0).toUpperCase() + topic.slice(1).replace(/-/g, " ")} Practice Exam`,
-        problems: problemsToUse
+    if (topic) {
+      // Topic-specific exam
+      if (SAMPLE_PROBLEMS[topic]) {
+        const topicProblems = SAMPLE_PROBLEMS[topic];
+        const problemsToUse = topicProblems.slice(0, 15);
+        exams.push({
+          id: `sample-${topic}`,
+          title: `${findTopic(course, topic)?.title || topic.charAt(0).toUpperCase() + topic.slice(1).replace(/-/g, " ")} Practice Exam`,
+          problems: problemsToUse,
+          source: "built-in"
+        });
+      } else {
+        // No built-in problems, will generate via AI
+        exams.push({
+          id: `ai-${topic}`,
+          title: `${findTopic(course, topic)?.title || topic.charAt(0).toUpperCase() + topic.slice(1).replace(/-/g, " ")} Practice Exam (AI Generated)`,
+          problems: [],
+          source: "ai"
+        });
+      }
+    } else {
+      // Course-wide exams - create exam for each topic
+      courseTopics.forEach((t) => {
+        if (SAMPLE_PROBLEMS[t.slug]) {
+          const topicProblems = SAMPLE_PROBLEMS[t.slug];
+          const problemsToUse = topicProblems.slice(0, 10); // Use 10 for course-wide
+          exams.push({
+            id: `sample-${t.slug}`,
+            title: `${t.title} Practice Exam`,
+            problems: problemsToUse,
+            source: "built-in"
+          });
+        } else {
+          // AI-generated exam option
+          exams.push({
+            id: `ai-${t.slug}`,
+            title: `${t.title} Practice Exam (AI Generated)`,
+            problems: [],
+            source: "ai"
+          });
+        }
       });
     }
 
-    // Only show topic-specific exams when topic is provided
-    // General practice should be accessed from course page, not topic-specific exam mode
-
     return exams;
-  }, [topic]);
+  }, [topic, course]);
+
+  // Generate AI problems when an AI exam is selected
+  useEffect(() => {
+    if (selectedExam && selectedExam.startsWith("ai-")) {
+      const topicSlug = selectedExam.replace("ai-", "");
+      if (!generating[topicSlug] && problems.length === 0) {
+        generateAIProblems(course, topicSlug);
+      }
+    }
+  }, [selectedExam, course]);
+
+  async function generateAIProblems(course: CourseId, topicSlug: string) {
+    setGenerating((prev) => ({ ...prev, [topicSlug]: true }));
+    setLoading(true);
+    
+    try {
+      const response = await fetch(`/api/generate-problems?course=${course}&topic=${topicSlug}&count=15`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.problems && data.problems.length > 0) {
+          setProblems(data.problems);
+          const topic = findTopic(course, topicSlug);
+          setExamTitle(`${topic?.title || topicSlug} Practice Exam (AI Generated)`);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to generate AI problems:", error);
+    } finally {
+      setLoading(false);
+      setGenerating((prev) => ({ ...prev, [topicSlug]: false }));
+    }
+  }
 
   const handleSelectExam = (examId: string) => {
     const exam = availableExams.find(e => e.id === examId);
     if (exam) {
       setSelectedExam(examId);
-      setProblems(exam.problems);
-      setExamTitle(exam.title);
+      if (exam.source === "built-in" && exam.problems.length > 0) {
+        setProblems(exam.problems);
+        setExamTitle(exam.title);
+      } else if (exam.source === "ai") {
+        // Problems will be generated via useEffect
+        setProblems([]);
+        setExamTitle(exam.title);
+      }
     }
   };
 
@@ -1846,7 +1919,17 @@ export default function ExamPracticeMode({ course, topic }: Props) {
     return (
       <div style={{ padding: 24, textAlign: "center" }}>
         <div style={{ fontSize: 16, color: "rgba(0, 0, 0, 0.6)" }}>
-          No practice exams available for this topic yet. Check back soon!
+          No practice exams available. Try selecting a specific topic or course.
+        </div>
+      </div>
+    );
+  }
+
+  if (loading && problems.length === 0) {
+    return (
+      <div style={{ padding: 24, textAlign: "center" }}>
+        <div style={{ fontSize: 16, color: "rgba(0, 0, 0, 0.6)" }}>
+          Generating practice problems...
         </div>
       </div>
     );
@@ -1867,6 +1950,7 @@ export default function ExamPracticeMode({ course, topic }: Props) {
             {availableExams.map((exam) => (
               <button
                 key={exam.id}
+                disabled={loading && exam.source === "ai"}
                 type="button"
                 onClick={() => handleSelectExam(exam.id)}
                 style={{
@@ -1893,7 +1977,9 @@ export default function ExamPracticeMode({ course, topic }: Props) {
                   {exam.title}
                 </div>
                 <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.6)" }}>
-                  {exam.problems.length} problems · {exam.problems.reduce((sum, p) => sum + p.points, 0)} total points
+                  {exam.source === "built-in" 
+                    ? `${exam.problems.length} problems · ${exam.problems.reduce((sum, p) => sum + p.points, 0)} total points`
+                    : "AI Generated · Click to generate problems"}
                 </div>
               </button>
             ))}
