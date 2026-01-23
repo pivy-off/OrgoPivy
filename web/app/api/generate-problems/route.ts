@@ -5,7 +5,7 @@ import type { CourseId } from "../../lib/curriculum";
 type Problem = {
   id: string;
   question: string;
-  type: "multiple-choice" | "short-answer" | "mechanism" | "synthesis";
+  type: "multiple-choice" | "drawing";
   options?: string[];
   correctAnswer: string;
   explanation: string;
@@ -125,18 +125,86 @@ function generateProblemsFromCurriculum(
     });
   }
 
-  // Fill remaining slots with general questions
-  while (problems.length < count && problems.length < mustKnow.length + howToStudy.length + 2) {
-    const remaining = count - problems.length;
-    const concept = mustKnow[problems.length % mustKnow.length];
-    
+  // Generate multiple-choice questions from must-know items
+  mustKnow.forEach((concept, idx) => {
+    if (problems.length >= count) return;
+
+    const conceptWords = concept.split(" ");
+    const mainConcept = conceptWords.slice(0, 3).join(" ");
+
+    // Create multiple-choice question based on concept
+    let question = "";
+    let correctAnswer = "";
+    let options: string[] = [];
+    let explanation = "";
+
+    if (concept.includes("naming") || concept.includes("IUPAC")) {
+      question = `What is the correct IUPAC naming rule for ${mainConcept}?`;
+      correctAnswer = concept;
+      options = [
+        concept,
+        concept.split(" ").reverse().join(" "),
+        concept.replace("parent chain", "main chain"),
+        concept.replace("alphabetical", "numerical"),
+      ];
+      explanation = `Based on IUPAC naming conventions: ${concept}`;
+    } else if (concept.includes("mechanism") || concept.includes("reaction")) {
+      question = `What is the key mechanism for ${mainConcept}?`;
+      correctAnswer = concept;
+      options = [
+        concept,
+        concept.replace("mechanism", "reaction"),
+        concept.replace("reaction", "mechanism"),
+        "None of the above",
+      ];
+      explanation = `The key mechanism is: ${concept}`;
+    } else if (concept.includes("stability") || concept.includes("energy")) {
+      question = `Which factor affects ${mainConcept}?`;
+      correctAnswer = concept;
+      options = [
+        concept,
+        concept.replace("stability", "reactivity"),
+        concept.replace("energy", "entropy"),
+        "None of the above",
+      ];
+      explanation = `The factor affecting ${mainConcept} is: ${concept}`;
+    } else {
+      question = `What is important to know about ${mainConcept}?`;
+      correctAnswer = concept;
+      options = [
+        concept,
+        concept.split(" ").slice(0, 2).join(" "),
+        concept.split(" ").slice(-2).join(" "),
+        "All of the above",
+      ];
+      explanation = `Key point: ${concept}`;
+    }
+
     problems.push({
-      id: `gen-${topicSlug}-fill-${problems.length + 1}`,
-      question: `Explain the concept: ${concept}`,
-      type: "short-answer",
-      correctAnswer: `${concept} is important because it relates to ${title}`,
-      explanation: `Key concept: ${concept}. This is fundamental to understanding ${title}.`,
+      id: `gen-${topicSlug}-${idx + 1}`,
+      question,
+      type: "multiple-choice",
+      options: options.length === 4 ? options : [
+        concept,
+        concept.split(" ").reverse().join(" "),
+        concept.replace(/\w+/g, (w) => w.toUpperCase()),
+        "None of the above",
+      ],
+      correctAnswer,
+      explanation,
       points: 10,
+    });
+  });
+
+  // Generate drawing problems for topics with conformations/structures
+  if ((topicSlug.includes("alkanes") || topicSlug.includes("cycloalkanes") || topicSlug.includes("stereochemistry")) && problems.length < count) {
+    problems.push({
+      id: `gen-${topicSlug}-draw-1`,
+      question: `Draw the most stable conformation for ${title}.`,
+      type: "drawing",
+      correctAnswer: "Anti conformation or chair conformation (depending on topic)",
+      explanation: `For ${title}, the most stable conformation minimizes steric interactions.`,
+      points: 15,
     });
   }
 

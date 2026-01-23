@@ -5,13 +5,14 @@ import Link from "next/link";
 import type { CourseId } from "../lib/curriculum";
 import { getCourseTopics } from "../lib/curriculum";
 import { getProgress } from "../lib/progress";
+import ChemistryDrawingCanvas from "./ChemistryDrawingCanvas";
 
 type HomeworkProblem = {
   id: string;
   topic: string;
   courseId: CourseId;
   question: string;
-  type: "multiple-choice" | "short-answer" | "mechanism" | "synthesis";
+  type: "multiple-choice" | "drawing";
   difficulty: "easy" | "medium" | "hard";
   points: number;
   options?: string[];
@@ -29,6 +30,7 @@ export default function AchieveHomework({ course, topic }: Props) {
   const [problems, setProblems] = useState<HomeworkProblem[]>([]);
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
+  const [drawings, setDrawings] = useState<Record<string, string>>({}); // For drawing problems
   const [showHints, setShowHints] = useState<Record<string, boolean>>({});
   const [showExplanation, setShowExplanation] = useState<Record<string, boolean>>({});
   const [score, setScore] = useState(0);
@@ -50,24 +52,52 @@ export default function AchieveHomework({ course, topic }: Props) {
         if (response.ok) {
           const data = await response.json();
           if (data.problems && data.problems.length > 0) {
-            // Convert API problems to HomeworkProblem format
-            const converted: HomeworkProblem[] = data.problems.map((p: any, idx: number) => ({
-              id: p.id,
-              topic: topic,
-              courseId: course,
-              question: p.question,
-              type: p.type,
-              difficulty: idx < 3 ? "easy" : idx < 7 ? "medium" : "hard",
-              points: p.points,
-              options: p.options,
-              correctAnswer: p.correctAnswer,
-              explanation: p.explanation,
-              hints: [
-                "Review the must-know items for this topic",
-                "Check the study steps for guidance",
-                "Refer to the external textbook reference",
-              ],
-            }));
+            // Convert API problems to HomeworkProblem format - ensure multiple-choice
+            const converted: HomeworkProblem[] = data.problems.map((p: any, idx: number) => {
+              // Convert non-multiple-choice to multiple-choice if needed
+              if (p.type !== "multiple-choice" && p.type !== "drawing") {
+                // Convert to multiple-choice with options
+                return {
+                  id: p.id,
+                  topic: topic,
+                  courseId: course,
+                  question: p.question,
+                  type: "multiple-choice" as const,
+                  difficulty: idx < 3 ? "easy" : idx < 7 ? "medium" : "hard",
+                  points: p.points,
+                  options: p.options || [
+                    p.correctAnswer || "Option A",
+                    "Option B",
+                    "Option C",
+                    "Option D"
+                  ],
+                  correctAnswer: p.correctAnswer,
+                  explanation: p.explanation,
+                  hints: [
+                    "Review the must-know items for this topic",
+                    "Check the study steps for guidance",
+                    "Refer to the external textbook reference",
+                  ],
+                };
+              }
+              return {
+                id: p.id,
+                topic: topic,
+                courseId: course,
+                question: p.question,
+                type: p.type === "drawing" ? "drawing" : "multiple-choice",
+                difficulty: idx < 3 ? "easy" : idx < 7 ? "medium" : "hard",
+                points: p.points,
+                options: p.options,
+                correctAnswer: p.correctAnswer,
+                explanation: p.explanation,
+                hints: [
+                  "Review the must-know items for this topic",
+                  "Check the study steps for guidance",
+                  "Refer to the external textbook reference",
+                ],
+              };
+            });
             setProblems(converted);
             setTotalPoints(converted.reduce((sum, p) => sum + p.points, 0));
             setLoading(false);
@@ -102,7 +132,7 @@ export default function AchieveHomework({ course, topic }: Props) {
     filteredTopics.forEach((t, idx) => {
       const courseId = orgochem1Topics.includes(t) ? "orgochem-1" : "orgochem-2";
       
-      // Generate 2-3 problems per topic
+      // Generate 2-3 problems per topic - all multiple-choice or drawing
       for (let i = 0; i < 2; i++) {
         const problemId = `${courseId}-${t.slug}-${i}`;
         
@@ -111,16 +141,16 @@ export default function AchieveHomework({ course, topic }: Props) {
             id: problemId,
             topic: t.slug,
             courseId,
-            question: `Assign R or S configuration to the stereocenter in the following molecule: [Draw molecule with stereocenter]`,
-            type: "short-answer",
+            question: `Draw the Newman projection for the most stable conformation of butane.`,
+            type: "drawing",
             difficulty: i === 0 ? "easy" : "medium",
-            points: i === 0 ? 5 : 10,
-            correctAnswer: "R or S (depending on molecule)",
-            explanation: "Use CIP priority rules: assign priorities 1-4, put lowest priority in back, then determine if 1→2→3 is clockwise (R) or counterclockwise (S).",
+            points: i === 0 ? 10 : 15,
+            correctAnswer: "Anti conformation with methyl groups 180° apart",
+            explanation: "The anti conformation is most stable because the methyl groups are 180° apart, minimizing steric interactions.",
             hints: [
-              "Start by assigning CIP priorities based on atomic number",
-              "Put the lowest priority group (usually H) in the back",
-              "Trace from priority 1 to 2 to 3 to determine R or S",
+              "Draw Newman projection looking down C2-C3 bond",
+              "Anti conformation has methyl groups 180° apart",
+              "This minimizes steric interactions",
             ],
           });
         } else if (t.slug.includes("substitution") || t.slug.includes("elimination")) {
@@ -128,11 +158,17 @@ export default function AchieveHomework({ course, topic }: Props) {
             id: problemId,
             topic: t.slug,
             courseId,
-            question: `Predict the major product and mechanism for the following reaction: CH₃CH₂Br + NaOCH₃ in DMSO`,
-            type: "short-answer",
+            question: `What mechanism occurs when CH₃CH₂Br reacts with NaOCH₃ in DMSO?`,
+            type: "multiple-choice",
+            options: [
+              "SN2 mechanism",
+              "SN1 mechanism",
+              "E1 mechanism",
+              "E2 mechanism"
+            ],
+            correctAnswer: "SN2 mechanism",
             difficulty: i === 0 ? "medium" : "hard",
             points: i === 0 ? 10 : 15,
-            correctAnswer: "SN2 mechanism, CH₃CH₂OCH₃",
             explanation: "Primary alkyl halide + strong nucleophile in polar aprotic solvent → SN2. Product is substitution with inversion of configuration.",
             hints: [
               "Consider the substrate: primary, secondary, or tertiary?",
@@ -140,14 +176,45 @@ export default function AchieveHomework({ course, topic }: Props) {
               "Polar aprotic solvents favor SN2",
             ],
           });
-        } else {
-          // Generic problem
+        } else if (t.slug.includes("alkanes")) {
           generated.push({
             id: problemId,
             topic: t.slug,
             courseId,
-            question: `Explain the key concept: ${t.title}`,
-            type: "short-answer",
+            question: `What is the IUPAC name for (CH₃)₂CHCH₂CH(CH₃)₂?`,
+            type: "multiple-choice",
+            options: [
+              "2,4-dimethylpentane",
+              "1,1,3-trimethylbutane",
+              "2-methyl-4-methylpentane",
+              "isoheptane"
+            ],
+            correctAnswer: "2,4-dimethylpentane",
+            difficulty: "medium",
+            points: 10,
+            explanation: "The longest continuous chain has 5 carbons (pentane). There are two methyl groups, one on carbon 2 and one on carbon 4.",
+            hints: [
+              "Find the longest continuous chain",
+              "Number to give lowest substituent numbers",
+              "List substituents alphabetically",
+            ],
+          });
+        } else {
+          // Generic multiple-choice problem
+          const concept = t.mustKnow[0] || t.title;
+          generated.push({
+            id: problemId,
+            topic: t.slug,
+            courseId,
+            question: `Which of the following is a key concept for ${t.title}?`,
+            type: "multiple-choice",
+            options: [
+              concept,
+              t.mustKnow[1] || "Option B",
+              t.mustKnow[2] || "Option C",
+              "None of the above"
+            ],
+            correctAnswer: concept,
             difficulty: "medium",
             points: 10,
             explanation: t.summary,
@@ -173,16 +240,24 @@ export default function AchieveHomework({ course, topic }: Props) {
     const problem = problems.find((p) => p.id === problemId);
     if (!problem) return;
 
-    const userAnswer = userAnswers[problemId]?.trim().toLowerCase();
-    const correct = problem.correctAnswer 
-      ? userAnswer === problem.correctAnswer.toLowerCase() || 
-        problem.correctAnswer.toLowerCase().includes(userAnswer) ||
-        userAnswer.includes(problem.correctAnswer.toLowerCase())
-      : false;
+    if (problem.type === "drawing") {
+      // For drawing problems, just mark as completed if drawing exists
+      const drawing = drawings[problemId];
+      if (drawing && !completed.has(problemId)) {
+        setScore((prev) => prev + problem.points);
+        setCompleted((prev) => new Set([...prev, problemId]));
+      }
+    } else {
+      // Multiple-choice problems
+      const userAnswer = userAnswers[problemId]?.trim().toLowerCase();
+      const correct = problem.correctAnswer 
+        ? userAnswer === problem.correctAnswer.toLowerCase()
+        : false;
 
-    if (correct && !completed.has(problemId)) {
-      setScore((prev) => prev + problem.points);
-      setCompleted((prev) => new Set([...prev, problemId]));
+      if (correct && !completed.has(problemId)) {
+        setScore((prev) => prev + problem.points);
+        setCompleted((prev) => new Set([...prev, problemId]));
+      }
     }
 
     setShowExplanation((prev) => ({ ...prev, [problemId]: true }));
@@ -293,30 +368,92 @@ export default function AchieveHomework({ course, topic }: Props) {
             </div>
 
             {/* Answer Input */}
-            <div style={{ marginBottom: 12 }}>
-              <input
-                type="text"
-                value={userAnswers[currentProblem.id] || ""}
-                onChange={(e) => setUserAnswers((prev) => ({ ...prev, [currentProblem.id]: e.target.value }))}
-                placeholder="Enter your answer..."
-                disabled={completed.has(currentProblem.id)}
-                style={{
-                  width: "100%",
-                  padding: "12px 16px",
-                  borderRadius: "var(--radius-sm)",
-                  border: "1px solid var(--border)",
-                  background: "var(--panel)",
-                  color: "var(--text)",
-                  fontSize: 15,
-                  outline: "none",
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !completed.has(currentProblem.id)) {
-                    handleSubmit(currentProblem.id);
-                  }
-                }}
-              />
-            </div>
+            {currentProblem.type === "drawing" ? (
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, color: "var(--text)" }}>
+                  Draw your answer:
+                </div>
+                <ChemistryDrawingCanvas
+                  value={drawings[currentProblem.id]}
+                  onChange={(imageData) => {
+                    setDrawings((prev) => ({ ...prev, [currentProblem.id]: imageData }));
+                  }}
+                  disabled={completed.has(currentProblem.id)}
+                  width={600}
+                  height={400}
+                />
+              </div>
+            ) : currentProblem.type === "multiple-choice" && currentProblem.options ? (
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ display: "grid", gap: 8 }}>
+                  {currentProblem.options.map((option, idx) => {
+                    const isSelected = userAnswers[currentProblem.id] === option;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          if (!completed.has(currentProblem.id)) {
+                            setUserAnswers((prev) => ({ ...prev, [currentProblem.id]: option }));
+                          }
+                        }}
+                        disabled={completed.has(currentProblem.id)}
+                        style={{
+                          padding: 12,
+                          textAlign: "left",
+                          borderRadius: "var(--radius-sm)",
+                          border: `2px solid ${isSelected ? "var(--blue)" : "var(--border)"}`,
+                          background: isSelected ? "rgba(0, 122, 255, 0.1)" : "var(--panel)",
+                          cursor: completed.has(currentProblem.id) ? "default" : "pointer",
+                          fontSize: 15,
+                          fontWeight: isSelected ? 600 : 400,
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                          <div style={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: "50%",
+                            border: `2px solid ${isSelected ? "var(--blue)" : "var(--border)"}`,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}>
+                            {isSelected && <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--blue)" }} />}
+                          </div>
+                          <div>{option}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div style={{ marginBottom: 12 }}>
+                <input
+                  type="text"
+                  value={userAnswers[currentProblem.id] || ""}
+                  onChange={(e) => setUserAnswers((prev) => ({ ...prev, [currentProblem.id]: e.target.value }))}
+                  placeholder="Enter your answer..."
+                  disabled={completed.has(currentProblem.id)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--border)",
+                    background: "var(--panel)",
+                    color: "var(--text)",
+                    fontSize: 15,
+                    outline: "none",
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !completed.has(currentProblem.id)) {
+                      handleSubmit(currentProblem.id);
+                    }
+                  }}
+                />
+              </div>
+            )}
 
             {/* Hints */}
             {currentProblem.hints.length > 0 && (
@@ -347,7 +484,13 @@ export default function AchieveHomework({ course, topic }: Props) {
                 type="button"
                 className="btn btnPrimary"
                 onClick={() => handleSubmit(currentProblem.id)}
-                disabled={!userAnswers[currentProblem.id]?.trim()}
+                disabled={
+                  currentProblem.type === "multiple-choice" 
+                    ? !userAnswers[currentProblem.id]?.trim()
+                    : currentProblem.type === "drawing"
+                    ? !drawings[currentProblem.id]
+                    : true
+                }
                 style={{ width: "100%" }}
               >
                 Submit Answer
