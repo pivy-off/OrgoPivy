@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { getMemorizationItems } from "../lib/memorization";
 import type { MemorizationItem } from "../lib/memorization";
 
@@ -16,7 +16,9 @@ type FlashcardItem = {
 };
 
 export default function MemorizationFlashcards({ slug }: Props) {
-  const items = getMemorizationItems(slug);
+  // Memoize items to prevent infinite loops
+  const items = useMemo(() => getMemorizationItems(slug), [slug]);
+  
   const [flashcards, setFlashcards] = useState<FlashcardItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -35,10 +37,12 @@ export default function MemorizationFlashcards({ slug }: Props) {
         });
       });
     });
-    // Shuffle cards
-    const shuffled = [...allCards].sort(() => Math.random() - 0.5);
-    setFlashcards(shuffled);
-  }, [items]);
+    // Shuffle cards only if we have cards and flashcards is empty or different
+    if (allCards.length > 0) {
+      const shuffled = [...allCards].sort(() => Math.random() - 0.5);
+      setFlashcards(shuffled);
+    }
+  }, [slug]); // Use slug instead of items to prevent re-renders
 
   const currentCard = flashcards[currentIndex];
   const progress = flashcards.length > 0 ? ((studied.size / flashcards.length) * 100).toFixed(0) : 0;
