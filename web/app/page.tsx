@@ -24,31 +24,6 @@ export default function HomePage() {
           textAlign: "center",
           marginBottom: 60
         }}>
-          <h1 style={{
-            fontSize: 64,
-            fontWeight: 700,
-            letterSpacing: "-1.5px",
-            marginBottom: 16,
-            background: "linear-gradient(135deg, #007AFF 0%, #5856D6 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-            lineHeight: 1.1
-          }}>
-            OrgoPivy
-          </h1>
-          <p style={{
-            fontSize: 21,
-            color: "var(--muted)",
-            fontWeight: 400,
-            maxWidth: 640,
-            margin: "0 auto 32px",
-            lineHeight: 1.5
-          }}>
-            Your student-centered Organic Chemistry learning platform. 
-            Understand concepts clearly, practice effectively, and prepare for exams with confidence.
-          </p>
-          
           {/* Search */}
           <HomeSearch />
         </div>
