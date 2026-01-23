@@ -11,6 +11,7 @@ import MemorizationSection from "../../components/MemorizationSection";
 import MemorizationFlashcards from "../../components/MemorizationFlashcards";
 import ExportStudyGuide from "../../components/ExportStudyGuide";
 import AchieveHomework from "../../components/AchieveHomework";
+import GradedHomework from "../../components/GradedHomework";
 
 function createSVGIllustration(slug: string, title: string) {
   const common = {
@@ -421,7 +422,22 @@ export default async function OrgoChem2TopicPage({
             </Section>
 
             <Section title="Practice">
-              <AchieveHomework course="orgochem-2" topic={topic.slug} />
+              <div style={{ display: "grid", gap: 24 }}>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Graded Homework Assignments</div>
+                  <div className="subtle" style={{ fontSize: 13, marginBottom: 16 }}>
+                    Professional assignments with automatic grading and detailed feedback. Perfect for professors to assign.
+                  </div>
+                  <GradedHomework course="orgochem-2" topic={topic.slug} />
+                </div>
+                <div style={{ paddingTop: 24, borderTop: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Interactive Practice</div>
+                  <div className="subtle" style={{ fontSize: 13, marginBottom: 16 }}>
+                    Achieve-style practice with hints and immediate feedback.
+                  </div>
+                  <AchieveHomework course="orgochem-2" topic={topic.slug} />
+                </div>
+              </div>
             </Section>
 
             <Section title="Exam prep">
