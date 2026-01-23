@@ -286,6 +286,188 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
         ]
       }
     }
+  ],
+  "cycloalkanes": [
+    {
+      id: "hw-cyclo-1",
+      question: "Draw the chair conformation of trans-1,4-dimethylcyclohexane. Identify which conformation is more stable and explain why.",
+      type: "drawing",
+      correctAnswer: "Both methyl groups equatorial is most stable. Trans means one up, one down, so both can be equatorial.",
+      explanation: "In trans-1,4-dimethylcyclohexane, the methyl groups are on opposite sides. The most stable conformation has both methyl groups in equatorial positions, avoiding 1,3-diaxial interactions. The diequatorial conformation is significantly more stable than the diaxial conformation.",
+      points: 15,
+      difficulty: "hard",
+      topic: "cycloalkanes",
+      courseId: "orgochem-1",
+      rubric: {
+        fullCredit: "Draws correct chair with both methyls equatorial, identifies as most stable, explains 1,3-diaxial interactions",
+        partialCredit: [
+          "Correct drawing but incomplete explanation",
+          "Identifies stability but doesn't explain why",
+          "Minor drawing errors but correct concept"
+        ],
+        commonMistakes: [
+          "Confusing axial with equatorial",
+          "Not understanding trans relationship",
+          "Missing 1,3-diaxial interaction concept"
+        ]
+      }
+    },
+    {
+      id: "hw-cyclo-2",
+      question: "Explain why cyclohexane adopts a chair conformation rather than a planar hexagon. Include discussion of angle strain and torsional strain.",
+      type: "short-answer",
+      correctAnswer: "Chair conformation minimizes both angle strain (109.5° angles) and torsional strain (staggered bonds). Planar hexagon would have severe angle strain (120° vs 109.5°) and eclipsed bonds.",
+      explanation: "Cyclohexane adopts a chair conformation to minimize strain. In the chair, all C-C-C angles are close to the ideal 109.5° (no angle strain), and all bonds are staggered (minimal torsional strain). A planar hexagon would force 120° angles (angle strain) and eclipsed bonds (torsional strain), making it much higher in energy.",
+      points: 12,
+      difficulty: "medium",
+      topic: "cycloalkanes",
+      courseId: "orgochem-1",
+      rubric: {
+        fullCredit: "Explains both angle and torsional strain, compares chair to planar, mentions bond angles and staggered/eclipsed",
+        partialCredit: [
+          "Mentions one type of strain but not both",
+          "Correct concept but incomplete comparison",
+          "Missing specific angle values"
+        ],
+        commonMistakes: [
+          "Only mentioning one type of strain",
+          "Not comparing to planar structure",
+          "Confusing strain types"
+        ]
+      }
+    }
+  ],
+  "spectroscopy": [
+    {
+      id: "hw-spec-1",
+      question: "A compound with molecular formula C₄H₈O shows an IR absorption at 1715 cm⁻¹ and a ¹H NMR signal at 2.1 ppm (singlet, 3H). Propose a structure and explain your reasoning.",
+      type: "synthesis",
+      correctAnswer: "CH₃COCH₂CH₃ (butanone). IR indicates C=O, NMR singlet at 2.1 ppm indicates CH₃ adjacent to C=O.",
+      explanation: "The IR absorption at 1715 cm⁻¹ indicates a carbonyl group (C=O). The ¹H NMR singlet at 2.1 ppm with 3H integration suggests a methyl group adjacent to the carbonyl (typical chemical shift for CH₃-C=O). With formula C₄H₈O, this is consistent with a ketone. The structure is CH₃COCH₂CH₃ (butanone).",
+      points: 15,
+      difficulty: "hard",
+      topic: "spectroscopy",
+      courseId: "orgochem-1",
+      rubric: {
+        fullCredit: "Correct structure, identifies IR peak as C=O, explains NMR chemical shift, uses molecular formula correctly",
+        partialCredit: [
+          "Correct structure but incomplete explanation",
+          "Identifies functional group but wrong structure",
+          "Correct concept but missing NMR analysis"
+        ],
+        commonMistakes: [
+          "Not using molecular formula",
+          "Wrong IR interpretation",
+          "Incorrect NMR chemical shift assignment",
+          "Missing integration analysis"
+        ]
+      }
+    },
+    {
+      id: "hw-spec-2",
+      question: "Explain how you would distinguish between an aldehyde and a ketone using IR spectroscopy. What specific signals would you look for?",
+      type: "short-answer",
+      correctAnswer: "Aldehydes show C-H stretch at ~2700-2800 cm⁻¹ (two weak bands) in addition to C=O at ~1720-1740 cm⁻¹. Ketones only show C=O at ~1715 cm⁻¹, no aldehyde C-H stretch.",
+      explanation: "Both aldehydes and ketones show C=O stretching around 1700-1750 cm⁻¹. However, aldehydes have a unique C-H stretch from the aldehyde hydrogen at ~2700-2800 cm⁻¹ (appears as two weak bands). Ketones do not have this signal. This is the key distinguishing feature.",
+      points: 10,
+      difficulty: "medium",
+      topic: "spectroscopy",
+      courseId: "orgochem-1",
+      rubric: {
+        fullCredit: "Identifies aldehyde C-H stretch at ~2700-2800 cm⁻¹, explains both show C=O, notes ketones lack aldehyde C-H",
+        partialCredit: [
+          "Mentions C-H stretch but wrong region",
+          "Correct concept but incomplete",
+          "Only mentions C=O difference"
+        ],
+        commonMistakes: [
+          "Thinking only C=O position differs",
+          "Not knowing aldehyde C-H stretch",
+          "Wrong wavenumber ranges"
+        ]
+      }
+    }
+  ],
+  "alcohols": [
+    {
+      id: "hw-alc-1",
+      question: "Predict the product when 1-butanol is treated with PCC. Then predict the product if the same alcohol is treated with CrO₃/H₂SO₄. Explain the difference.",
+      type: "synthesis",
+      correctAnswer: "PCC gives butanal (aldehyde). CrO₃/H₂SO₄ gives butanoic acid. PCC stops at aldehyde, CrO₃ oxidizes all the way to acid.",
+      explanation: "1-butanol is a primary alcohol. PCC (pyridinium chlorochromate) oxidizes primary alcohols to aldehydes and stops there, giving butanal. CrO₃/H₂SO₄ (Jones reagent) is stronger and oxidizes primary alcohols all the way to carboxylic acids, giving butanoic acid. The difference is that PCC is milder and stops at the aldehyde stage.",
+      points: 15,
+      difficulty: "hard",
+      topic: "alcohols",
+      courseId: "orgochem-2",
+      rubric: {
+        fullCredit: "Correct products for both reagents, explains PCC stops at aldehyde, explains CrO₃ goes to acid, mentions reagent strength difference",
+        partialCredit: [
+          "One correct product but wrong explanation",
+          "Correct products but incomplete mechanism explanation",
+          "Mentions oxidation but wrong products"
+        ],
+        commonMistakes: [
+          "Confusing PCC with CrO₃",
+          "Thinking both give same product",
+          "Not understanding oxidation levels",
+          "Wrong product structures"
+        ]
+      }
+    }
+  ],
+  "carbonyls-addition": [
+    {
+      id: "hw-carb-1",
+      question: "Explain why aldehydes are more reactive than ketones toward nucleophilic addition. Use both electronic and steric arguments.",
+      type: "short-answer",
+      correctAnswer: "Electronic: Aldehydes have less electron-donating groups, making carbonyl carbon more electrophilic. Steric: Aldehydes have less steric hindrance (one R vs two R groups), allowing easier nucleophile approach.",
+      explanation: "Aldehydes are more reactive than ketones for two reasons: 1) Electronic: Aldehydes have one alkyl group (electron-donating) while ketones have two, making the carbonyl carbon in aldehydes more electrophilic. 2) Steric: Aldehydes have less steric hindrance around the carbonyl, allowing nucleophiles easier access. Ketones have two bulky R groups that hinder nucleophile approach.",
+      points: 12,
+      difficulty: "medium",
+      topic: "carbonyls-addition",
+      courseId: "orgochem-2",
+      rubric: {
+        fullCredit: "Explains both electronic (electron-donating groups) and steric (hindrance) factors correctly",
+        partialCredit: [
+          "One factor correct but missing the other",
+          "Correct concept but incomplete explanation",
+          "Mentions reactivity but doesn't explain why"
+        ],
+        commonMistakes: [
+          "Only mentioning one factor",
+          "Confusing electronic with steric",
+          "Not understanding electrophilicity",
+          "Wrong explanation of reactivity"
+        ]
+      }
+    }
+  ],
+  "aromatic-chemistry": [
+    {
+      id: "hw-arom-1",
+      question: "Predict the major product when toluene undergoes nitration. Then explain the directing effect of the methyl group and draw the resonance structures that show why it's an ortho/para director.",
+      type: "mechanism",
+      correctAnswer: "Ortho and para nitrotoluene. Methyl is activating ortho/para director. Resonance shows positive charge stabilized at ortho/para positions.",
+      explanation: "Toluene undergoes nitration to give ortho-nitrotoluene and para-nitrotoluene (with para being major due to sterics). The methyl group is an activating ortho/para director. Resonance structures show that when the electrophile attacks ortho or para, the positive charge on the ring can be delocalized onto the methyl group (benzylic position), stabilizing the intermediate. Meta attack doesn't allow this stabilization.",
+      points: 18,
+      difficulty: "hard",
+      topic: "aromatic-chemistry",
+      courseId: "orgochem-2",
+      rubric: {
+        fullCredit: "Correct products (ortho/para), identifies methyl as activating ortho/para director, draws correct resonance structures showing stabilization",
+        partialCredit: [
+          "Correct products but incomplete resonance explanation",
+          "Correct directing effect but wrong products",
+          "Resonance structures have minor errors"
+        ],
+        commonMistakes: [
+          "Thinking methyl is meta director",
+          "Wrong resonance structures",
+          "Not understanding activation vs deactivation",
+          "Incorrect product structures"
+        ]
+      }
+    }
   ]
 };
 
