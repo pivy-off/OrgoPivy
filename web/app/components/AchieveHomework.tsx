@@ -157,12 +157,12 @@ export default function AchieveHomework({ course, topic }: Props) {
             break;
           case "drawing-master":
             const drawingProblems = problems.filter(p => p.type === "drawing").length;
-            const progress = Math.min(drawingProblems, 3);
-            if (progress >= 3) {
+            const drawingProgress = Math.min(drawingProblems, 3);
+            if (drawingProgress >= 3) {
               newAchievement = { ...achievement, unlocked: true, progress: 3 };
               return newAchievement;
             } else {
-              return { ...achievement, progress };
+              return { ...achievement, progress: drawingProgress };
             }
         }
         return achievement;
