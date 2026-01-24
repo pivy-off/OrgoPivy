@@ -176,20 +176,40 @@ export default function MemorizationFlashcards({ slug }: Props) {
             alignItems: "center",
             textAlign: "center",
             transition: "all 0.3s ease",
-            transform: isFlipped ? "rotateY(180deg)" : "none",
+            position: "relative",
             marginBottom: 24,
+            perspective: "1000px",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = "var(--blue)";
-            e.currentTarget.style.transform = isFlipped ? "rotateY(180deg) scale(1.02)" : "scale(1.02)";
+            e.currentTarget.style.transform = "scale(1.02)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = "var(--border)";
-            e.currentTarget.style.transform = isFlipped ? "rotateY(180deg)" : "none";
+            e.currentTarget.style.transform = "scale(1)";
           }}
         >
-          {!showAnswer ? (
-            <>
+          <div style={{
+            width: "100%",
+            height: "100%",
+            transition: "transform 0.3s ease",
+            transform: showAnswer ? "rotateY(180deg)" : "rotateY(0deg)",
+            transformStyle: "preserve-3d",
+            position: "relative",
+          }}>
+            {/* Front side (Question) */}
+            <div style={{
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: showAnswer ? "rotateY(180deg)" : "rotateY(0deg)",
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}>
               <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>
                 {currentCard.category}
               </div>
@@ -199,9 +219,21 @@ export default function MemorizationFlashcards({ slug }: Props) {
               <div style={{ fontSize: 14, color: "var(--muted)" }}>
                 Click or press F to flip
               </div>
-            </>
-          ) : (
-            <>
+            </div>
+
+            {/* Back side (Answer) */}
+            <div style={{
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: showAnswer ? "rotateY(0deg)" : "rotateY(-180deg)",
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}>
               <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>
                 Answer
               </div>
@@ -216,8 +248,8 @@ export default function MemorizationFlashcards({ slug }: Props) {
               <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 16 }}>
                 Press Space or → for next
               </div>
-            </>
-          )}
+            </div>
+          </div>
         </div>
 
         {/* Controls */}
