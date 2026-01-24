@@ -864,7 +864,7 @@ export default function AchieveHomework({ course, topic }: Props) {
         <div style={{ display: "grid", gap: 8 }}>
           {problems.map((problem, idx) => (
             <button
-              key={problem.id}
+              key={`problem-${problem.id}-${idx}`}
               type="button"
               onClick={() => setCurrentProblemIndex(idx)}
               style={{
