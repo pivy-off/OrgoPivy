@@ -21,6 +21,16 @@ type HomeworkProblem = {
   hints: string[];
 };
 
+type Achievement = {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  progress?: number;
+  maxProgress?: number;
+};
+
 type Props = {
   course?: CourseId;
   topic?: string;
@@ -32,6 +42,9 @@ export default function AchieveHomework({ course, topic }: Props) {
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [drawings, setDrawings] = useState<Record<string, string>>({}); // For drawing problems
   const [showHints, setShowHints] = useState<Record<string, boolean>>({});
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [showAchievementModal, setShowAchievementModal] = useState(false);
+  const [latestAchievement, setLatestAchievement] = useState<Achievement | null>(null);
   const [showExplanation, setShowExplanation] = useState<Record<string, boolean>>({});
   const [score, setScore] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
@@ -40,7 +53,131 @@ export default function AchieveHomework({ course, topic }: Props) {
 
   useEffect(() => {
     generateProblems();
+    loadAchievements();
   }, [course, topic]);
+
+  function loadAchievements() {
+    const saved = localStorage.getItem(`orgopivy-achievements-${course}`);
+    const savedStats = localStorage.getItem(`orgopivy-practice-stats`);
+
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setAchievements(parsed);
+    } else {
+      // Initialize achievements
+      const initialAchievements: Achievement[] = [
+        {
+          id: "first-problem",
+          title: "First Step",
+          description: "Complete your first problem",
+          icon: "🎯",
+          unlocked: false,
+        },
+        {
+          id: "five-problems",
+          title: "Getting Started",
+          description: "Complete 5 problems",
+          icon: "📚",
+          unlocked: false,
+          progress: 0,
+          maxProgress: 5,
+        },
+        {
+          id: "perfect-score",
+          title: "Perfect!",
+          description: "Get a perfect score on a quiz",
+          icon: "⭐",
+          unlocked: false,
+        },
+        {
+          id: "drawing-master",
+          title: "Artist",
+          description: "Complete 3 drawing problems",
+          icon: "🎨",
+          unlocked: false,
+          progress: 0,
+          maxProgress: 3,
+        },
+        {
+          id: "streak-3",
+          title: "On Fire!",
+          description: "Complete 3 problems in a row correctly",
+          icon: "🔥",
+          unlocked: false,
+        },
+      ];
+
+      // Load progress from saved stats
+      if (savedStats) {
+        const stats = JSON.parse(savedStats);
+        if (stats.correctAnswers >= 1) {
+          initialAchievements[0].unlocked = true;
+        }
+        if (stats.correctAnswers >= 5) {
+          initialAchievements[1].unlocked = true;
+          initialAchievements[1].progress = 5;
+        } else {
+          initialAchievements[1].progress = Math.min(stats.correctAnswers, 5);
+        }
+      }
+
+      setAchievements(initialAchievements);
+      localStorage.setItem(`orgopivy-achievements-${course}`, JSON.stringify(initialAchievements));
+    }
+  }
+
+  function checkAchievements() {
+    const stats = JSON.parse(localStorage.getItem(`orgopivy-practice-stats`) || '{"correctAnswers": 0, "totalQuestions": 0}');
+    let newAchievement = null;
+
+    setAchievements(prev => {
+      const updated = prev.map(achievement => {
+        if (achievement.unlocked) return achievement;
+
+        switch (achievement.id) {
+          case "first-problem":
+            if (stats.correctAnswers >= 1) {
+              newAchievement = { ...achievement, unlocked: true };
+              return newAchievement;
+            }
+            break;
+          case "five-problems":
+            const progress = Math.min(stats.correctAnswers, 5);
+            if (progress >= 5) {
+              newAchievement = { ...achievement, unlocked: true, progress: 5 };
+              return newAchievement;
+            } else {
+              return { ...achievement, progress };
+            }
+          case "perfect-score":
+            if (score === totalPoints && score > 0) {
+              newAchievement = { ...achievement, unlocked: true };
+              return newAchievement;
+            }
+            break;
+          case "drawing-master":
+            const drawingProblems = problems.filter(p => p.type === "drawing").length;
+            const progress = Math.min(drawingProblems, 3);
+            if (progress >= 3) {
+              newAchievement = { ...achievement, unlocked: true, progress: 3 };
+              return newAchievement;
+            } else {
+              return { ...achievement, progress };
+            }
+        }
+        return achievement;
+      });
+
+      localStorage.setItem(`orgopivy-achievements-${course}`, JSON.stringify(updated));
+      return updated;
+    });
+
+    if (newAchievement) {
+      setLatestAchievement(newAchievement);
+      setShowAchievementModal(true);
+      setTimeout(() => setShowAchievementModal(false), 3000);
+    }
+  }
 
   async function generateProblems() {
     setLoading(true);
@@ -73,11 +210,7 @@ export default function AchieveHomework({ course, topic }: Props) {
                   ],
                   correctAnswer: p.correctAnswer,
                   explanation: p.explanation,
-                  hints: [
-                    "Review the must-know items for this topic",
-                    "Check the study steps for guidance",
-                    "Refer to the external textbook reference",
-                  ],
+                  hints: generateTailoredHints(p.question, p.type, p.options || []),
                 };
               }
               return {
@@ -148,9 +281,10 @@ export default function AchieveHomework({ course, topic }: Props) {
             correctAnswer: "Anti conformation with methyl groups 180° apart",
             explanation: "The anti conformation is most stable because the methyl groups are 180° apart, minimizing steric interactions.",
             hints: [
-              "Draw Newman projection looking down C2-C3 bond",
-              "Anti conformation has methyl groups 180° apart",
-              "This minimizes steric interactions",
+              "Draw Newman projection looking down the C2-C3 bond",
+              "In anti conformation, both methyl groups are 180° apart",
+              "Anti conformation minimizes steric (gauche) interactions between methyl groups",
+              "Remember: anti = 180°, gauche = 60°, eclipsed = 0°",
             ],
           });
         } else if (t.slug.includes("substitution") || t.slug.includes("elimination")) {
@@ -171,9 +305,10 @@ export default function AchieveHomework({ course, topic }: Props) {
             points: i === 0 ? 10 : 15,
             explanation: "Primary alkyl halide + strong nucleophile in polar aprotic solvent → SN2. Product is substitution with inversion of configuration.",
             hints: [
-              "Consider the substrate: primary, secondary, or tertiary?",
-              "Check the nucleophile/base strength",
-              "Polar aprotic solvents favor SN2",
+              "First, identify the substrate type: primary (CH₃CH₂Br has Br on primary carbon)",
+              "Check the nucleophile: NaOCH₃ provides OCH₃⁻, a strong nucleophile",
+              "Solvent: DMSO is polar aprotic, which favors SN2 over SN1",
+              "SN2 requires good nucleophile + primary substrate + polar aprotic solvent",
             ],
           });
         } else if (t.slug.includes("alkanes")) {
@@ -194,35 +329,66 @@ export default function AchieveHomework({ course, topic }: Props) {
             points: 10,
             explanation: "The longest continuous chain has 5 carbons (pentane). There are two methyl groups, one on carbon 2 and one on carbon 4.",
             hints: [
-              "Find the longest continuous chain",
-              "Number to give lowest substituent numbers",
-              "List substituents alphabetically",
+              "First, find the longest continuous carbon chain - count the carbons",
+              "The chain is: C-C-C-C-C with branches at positions 2 and 4",
+              "Number from the end that gives lowest substituent numbers",
+              "Both methyl groups get the same low numbers regardless of direction",
+              "Substituents are listed alphabetically: 'dimethyl'",
             ],
           });
         } else {
-          // Generic multiple-choice problem
+          // Generic multiple-choice problem with specific hints
           const concept = t.mustKnow[0] || t.title;
+          const questionText = t.slug.includes("cycloalkanes")
+            ? "Which conformation is most stable for cyclohexane?"
+            : t.slug.includes("alkenes")
+            ? "What type of addition occurs in catalytic hydrogenation?"
+            : `Which of the following is a key concept for ${t.title}?`;
+
+          const options = t.slug.includes("cycloalkanes")
+            ? ["Chair conformation", "Boat conformation", "Twist-boat", "Planar hexagon"]
+            : t.slug.includes("alkenes")
+            ? ["Syn addition", "Anti addition", "Both", "Neither"]
+            : [concept, t.mustKnow[1] || "Option B", t.mustKnow[2] || "Option C", "None of the above"];
+
+          const correctAnswer = t.slug.includes("cycloalkanes")
+            ? "Chair conformation"
+            : t.slug.includes("alkenes")
+            ? "Syn addition"
+            : concept;
+
+          const hints = t.slug.includes("cycloalkanes")
+            ? [
+              "Chair conformation has all bonds staggered",
+              "Chair has equatorial and axial positions",
+              "Angle strain is minimized in chair form",
+              "Chair conformation has no torsional strain",
+            ]
+            : t.slug.includes("alkenes")
+            ? [
+              "Catalytic hydrogenation uses H₂ and Pd catalyst",
+              "Both H atoms add to the same face of the double bond",
+              "Syn addition occurs in one step with concerted mechanism",
+              "No intermediate is formed in the addition",
+            ]
+            : [
+              `Review the must-know items for ${t.title}`,
+              `Check the study steps for ${t.title}`,
+              `Refer to the external textbook reference`,
+            ];
+
           generated.push({
             id: problemId,
             topic: t.slug,
             courseId,
-            question: `Which of the following is a key concept for ${t.title}?`,
+            question: questionText,
             type: "multiple-choice",
-            options: [
-              concept,
-              t.mustKnow[1] || "Option B",
-              t.mustKnow[2] || "Option C",
-              "None of the above"
-            ],
-            correctAnswer: concept,
+            options,
+            correctAnswer,
             difficulty: "medium",
             points: 10,
             explanation: t.summary,
-            hints: [
-              `Review the must-know items for ${t.title}`,
-              `Check the study steps for ${t.title}`,
-              `Refer to the external textbook reference`,
-            ],
+            hints,
           });
         }
       }
@@ -231,6 +397,59 @@ export default function AchieveHomework({ course, topic }: Props) {
     setProblems(generated.slice(0, 10)); // Limit to 10 problems
     setTotalPoints(generated.reduce((sum, p) => sum + p.points, 0));
     setLoading(false);
+  }
+
+  function generateTailoredHints(question: string, type: string, options: string[]): string[] {
+    if (question.includes("IUPAC") || question.includes("naming")) {
+      return [
+        "Find the longest continuous carbon chain",
+        "Number from the end that gives lowest substituent numbers",
+        "List substituents in alphabetical order",
+        "Use proper prefixes (di-, tri-, etc.) for multiples",
+      ];
+    } else if (question.includes("mechanism") || question.includes("reaction")) {
+      return [
+        "Identify the substrate type (primary/secondary/tertiary)",
+        "Check the nucleophile/base strength and type",
+        "Consider the solvent (polar protic vs aprotic)",
+        "Apply the mechanism rules for the specific conditions",
+      ];
+    } else if (question.includes("conformation") || question.includes("Newman")) {
+      return [
+        "Draw Newman projection looking down the bond of interest",
+        "Identify the substituents on each carbon",
+        "Calculate the dihedral angles between substituents",
+        "Compare steric interactions in different conformations",
+      ];
+    } else if (question.includes("cyclohexane") || question.includes("chair")) {
+      return [
+        "Chair conformation has alternating axial/equatorial positions",
+        "1,3-diaxial interactions cause steric strain",
+        "Equatorial substituents are more stable",
+        "Ring flip interconverts axial and equatorial positions",
+      ];
+    } else if (question.includes("alkene") || question.includes("addition")) {
+      return [
+        "Electrophilic addition starts with electrophile attack",
+        "More substituted carbocation is more stable",
+        "Markovnikov rule: H adds to less substituted carbon",
+        "Stereochemistry depends on mechanism (syn vs anti)",
+      ];
+    } else if (question.includes("spectroscopy") || question.includes("IR") || question.includes("NMR")) {
+      return [
+        "Identify the functional groups present",
+        "Look at characteristic wavenumbers/frequencies",
+        "Check for symmetry and equivalent protons",
+        "Use integration and splitting patterns",
+      ];
+    } else {
+      return [
+        "Review the must-know items for this topic",
+        "Check the study steps for guidance",
+        "Refer to the external textbook reference",
+        "Consider the specific conditions and reagents",
+      ];
+    }
   }
 
   const currentProblem = problems[currentProblemIndex];
@@ -294,19 +513,67 @@ export default function AchieveHomework({ course, topic }: Props) {
 
   return (
     <div className="card" style={{ padding: 24 }}>
+      {/* Achievement Modal */}
+      {showAchievementModal && latestAchievement && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+        }}>
+          <div style={{
+            background: "var(--panel)",
+            padding: 32,
+            borderRadius: "var(--radius-lg)",
+            textAlign: "center",
+            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
+            maxWidth: 400,
+          }}>
+            <div style={{ fontSize: 64, marginBottom: 16 }}>{latestAchievement.icon}</div>
+            <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: "var(--text)" }}>
+              Achievement Unlocked!
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: "var(--blue)" }}>
+              {latestAchievement.title}
+            </div>
+            <div style={{ fontSize: 14, color: "var(--muted)" }}>
+              {latestAchievement.description}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div>
             <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>Interactive Homework</div>
             <div className="subtle" style={{ fontSize: 13 }}>
-              Achieve-style practice with immediate feedback
+              Achieve-style practice with immediate feedback and achievements
             </div>
           </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 24, fontWeight: 700, color: "var(--blue)", marginBottom: 4 }}>
-              {score} / {totalPoints}
+          <div style={{ textAlign: "right", display: "flex", gap: 16, alignItems: "center" }}>
+            {/* Achievement Counter */}
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 20, fontWeight: 700, color: "var(--green)", marginBottom: 2 }}>
+                {achievements.filter(a => a.unlocked).length}
+              </div>
+              <div style={{ fontSize: 10, color: "var(--muted)", textTransform: "uppercase" }}>
+                Achievements
+              </div>
             </div>
-            <div style={{ fontSize: 12, color: "var(--muted)" }}>Points Earned</div>
+            {/* Score */}
+            <div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: "var(--blue)", marginBottom: 4 }}>
+                {score} / {totalPoints}
+              </div>
+              <div style={{ fontSize: 12, color: "var(--muted)" }}>Points Earned</div>
+            </div>
           </div>
         </div>
 
@@ -334,6 +601,44 @@ export default function AchieveHomework({ course, topic }: Props) {
               transition: "width 0.3s ease",
             }} />
           </div>
+        </div>
+      </div>
+
+      {/* Achievements Progress */}
+      <div style={{ marginBottom: 24, padding: 16, background: "var(--panel-2)", borderRadius: "var(--radius-md)" }}>
+        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: "var(--text)" }}>
+          🏆 Recent Achievements
+        </div>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          {achievements.filter(a => a.unlocked).slice(0, 4).map(achievement => (
+            <div
+              key={achievement.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: 8,
+                background: "var(--panel)",
+                borderRadius: "var(--radius-sm)",
+                border: "1px solid var(--green)",
+              }}
+            >
+              <div style={{ fontSize: 16 }}>{achievement.icon}</div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--green)" }}>
+                  {achievement.title}
+                </div>
+                <div style={{ fontSize: 10, color: "var(--muted)" }}>
+                  {achievement.description}
+                </div>
+              </div>
+            </div>
+          ))}
+          {achievements.filter(a => a.unlocked).length === 0 && (
+            <div style={{ fontSize: 13, color: "var(--muted)", fontStyle: "italic" }}>
+              Complete problems to unlock achievements!
+            </div>
+          )}
         </div>
       </div>
 
@@ -468,8 +773,11 @@ export default function AchieveHomework({ course, topic }: Props) {
                 </button>
                 {showHints[currentProblem.id] && (
                   <div style={{ marginTop: 8, padding: 12, background: "var(--panel)", borderRadius: "var(--radius-sm)" }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: "var(--text)" }}>
+                      💡 Helpful hints for this problem:
+                    </div>
                     {currentProblem.hints.map((hint, idx) => (
-                      <div key={idx} style={{ fontSize: 13, color: "var(--muted)", marginBottom: 4 }}>
+                      <div key={idx} style={{ fontSize: 13, color: "var(--muted)", marginBottom: 6, lineHeight: 1.4 }}>
                         {idx + 1}. {hint}
                       </div>
                     ))}
