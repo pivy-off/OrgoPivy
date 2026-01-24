@@ -191,11 +191,14 @@ export default function AchieveHomework({ course, topic }: Props) {
           if (data.problems && data.problems.length > 0) {
             // Convert API problems to HomeworkProblem format - ensure multiple-choice
             const converted: HomeworkProblem[] = data.problems.map((p: any, idx: number) => {
+              // Ensure unique ID by adding index and timestamp
+              const uniqueId = `${p.id || `gen-${topic}-${idx}`}-${Date.now()}-${idx}`;
+              
               // Convert non-multiple-choice to multiple-choice if needed
               if (p.type !== "multiple-choice" && p.type !== "drawing") {
                 // Convert to multiple-choice with options
                 return {
-                  id: p.id,
+                  id: uniqueId,
                   topic: topic,
                   courseId: course,
                   question: p.question,
@@ -214,7 +217,7 @@ export default function AchieveHomework({ course, topic }: Props) {
                 };
               }
               return {
-                id: p.id,
+                id: uniqueId,
                 topic: topic,
                 courseId: course,
                 question: p.question,
@@ -224,11 +227,7 @@ export default function AchieveHomework({ course, topic }: Props) {
                 options: p.options,
                 correctAnswer: p.correctAnswer,
                 explanation: p.explanation,
-                hints: [
-                  "Review the must-know items for this topic",
-                  "Check the study steps for guidance",
-                  "Refer to the external textbook reference",
-                ],
+                hints: p.hints || generateTailoredHints(p.question, p.type, p.options || []),
               };
             });
             setProblems(converted);
@@ -262,12 +261,13 @@ export default function AchieveHomework({ course, topic }: Props) {
 
     const generated: HomeworkProblem[] = [];
 
-    filteredTopics.forEach((t, idx) => {
+    filteredTopics.forEach((t, topicIdx) => {
       const courseId = orgochem1Topics.includes(t) ? "orgochem-1" : "orgochem-2";
       
       // Generate 2-3 problems per topic - all multiple-choice or drawing
       for (let i = 0; i < 2; i++) {
-        const problemId = `${courseId}-${t.slug}-${i}`;
+        // Ensure unique ID with timestamp and indices
+        const problemId = `${courseId}-${t.slug}-${topicIdx}-${i}-${Date.now()}`;
         
         if (t.slug.includes("stereochemistry")) {
           generated.push({
