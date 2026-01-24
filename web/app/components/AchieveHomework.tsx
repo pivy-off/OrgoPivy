@@ -460,9 +460,13 @@ export default function AchieveHomework({ course, topic }: Props) {
     if (!problem) return;
 
     if (problem.type === "drawing") {
-      // For drawing problems, just mark as completed if drawing exists
+      // For drawing problems, mark as completed if drawing exists
       const drawing = drawings[problemId];
-      if (drawing && !completed.has(problemId)) {
+      const hasExplanation = problem.question.toLowerCase().includes("explain") 
+        ? userAnswers[problemId]?.trim() 
+        : true; // If no explanation needed, always true
+      
+      if (drawing && hasExplanation && !completed.has(problemId)) {
         setScore((prev) => prev + problem.points);
         setCompleted((prev) => new Set([...prev, problemId]));
       }
@@ -687,6 +691,32 @@ export default function AchieveHomework({ course, topic }: Props) {
                   width={600}
                   height={400}
                 />
+                {/* Text explanation if question asks for explanation */}
+                {currentProblem.question.toLowerCase().includes("explain") && (
+                  <div style={{ marginTop: 16 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, color: "var(--text)" }}>
+                      Explanation:
+                    </div>
+                    <textarea
+                      value={userAnswers[currentProblem.id] || ""}
+                      onChange={(e) => setUserAnswers((prev) => ({ ...prev, [currentProblem.id]: e.target.value }))}
+                      disabled={completed.has(currentProblem.id)}
+                      placeholder="Explain why this conformation is most stable..."
+                      style={{
+                        width: "100%",
+                        minHeight: 100,
+                        padding: 12,
+                        borderRadius: "var(--radius-sm)",
+                        border: "1px solid var(--border)",
+                        background: "var(--panel)",
+                        color: "var(--text)",
+                        fontSize: 14,
+                        fontFamily: "inherit",
+                        resize: "vertical",
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             ) : currentProblem.type === "multiple-choice" && currentProblem.options ? (
               <div style={{ marginBottom: 12 }}>
@@ -796,7 +826,7 @@ export default function AchieveHomework({ course, topic }: Props) {
                   currentProblem.type === "multiple-choice" 
                     ? !userAnswers[currentProblem.id]?.trim()
                     : currentProblem.type === "drawing"
-                    ? !drawings[currentProblem.id]
+                    ? !drawings[currentProblem.id] || (currentProblem.question.toLowerCase().includes("explain") && !userAnswers[currentProblem.id]?.trim())
                     : true
                 }
                 style={{ width: "100%" }}
