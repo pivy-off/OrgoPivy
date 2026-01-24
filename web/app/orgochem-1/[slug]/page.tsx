@@ -12,6 +12,7 @@ import MemorizationFlashcards from "../../components/MemorizationFlashcards";
 import ExportStudyGuide from "../../components/ExportStudyGuide";
 import AchieveHomework from "../../components/AchieveHomework";
 import GradedHomework from "../../components/GradedHomework";
+import TabbedInterface from "../../components/TabbedInterface";
 function TopicIllustration({ slug, title, imageUrl, imageAlt }: { slug: string; title: string; imageUrl?: string; imageAlt?: string }) {
   // Use client component for images with SVG fallback
   if (imageUrl) {
@@ -410,142 +411,170 @@ export default async function OrgoChem1TopicPage({
 
             <div className="divider" />
 
-            <Section
-              title="Summary"
-              right={
-                <a className="btn topicExtBtn" href={topic.externalUrl} target="_blank" rel="noreferrer">
-                  Open full reference
-                </a>
-              }
+            <TabbedInterface
+              tabs={[
+                { id: "overview", label: "Overview", icon: "📋" },
+                { id: "study", label: "Study", icon: "📚" },
+                { id: "practice", label: "Practice", icon: "✏️" },
+                { id: "resources", label: "Resources", icon: "🔧" },
+              ]}
+              defaultTab="overview"
             >
-              <div className="topicSummaryText">
-                <div style={{ marginBottom: 16, fontSize: 16, lineHeight: 1.7, fontWeight: 500 }}>
-                  {topic.summary}
-                </div>
-                <div style={{ marginTop: 16, padding: 16, background: "rgba(0, 122, 255, 0.04)", borderRadius: 12, border: "1px solid rgba(0, 122, 255, 0.1)" }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: "#007AFF" }}>
-                    What you need to know:
-                  </div>
-                  <div style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.8)" }}>
-                    This topic covers {topic.title.toLowerCase()}. Focus on mastering the key concepts in the "Must know checklist" above. 
-                    Follow the study steps systematically, and use practice problems to reinforce your understanding. 
-                    The external reference provides comprehensive coverage of all concepts.
-                  </div>
-                </div>
-              </div>
-            </Section>
+              {(activeTab) => (
+                <>
+                  {activeTab === "overview" && (
+                    <div className="stack">
+                      <Section
+                        title="Summary"
+                        right={
+                          <a className="btn topicExtBtn" href={topic.externalUrl} target="_blank" rel="noreferrer">
+                            Open full reference
+                          </a>
+                        }
+                      >
+                        <div className="topicSummaryText">
+                          <div style={{ marginBottom: 16, fontSize: 16, lineHeight: 1.7, fontWeight: 500 }}>
+                            {topic.summary}
+                          </div>
+                          <div style={{ marginTop: 16, padding: 16, background: "rgba(0, 122, 255, 0.04)", borderRadius: 12, border: "1px solid rgba(0, 122, 255, 0.1)" }}>
+                            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: "#007AFF" }}>
+                              What you need to know:
+                            </div>
+                            <div style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.8)" }}>
+                              This topic covers {topic.title.toLowerCase()}. Focus on mastering the key concepts in the "Must know checklist" below. 
+                              Follow the study steps systematically, and use practice problems to reinforce your understanding. 
+                              The external reference provides comprehensive coverage of all concepts.
+                            </div>
+                          </div>
+                        </div>
+                      </Section>
 
-            <Section title="Study Timer">
-              <StudyTimer course="orgochem-1" topic={topic.slug} />
-            </Section>
+                      <div className="topicTwoCol">
+                        <Section title="Must know checklist">
+                          <MustKnowChecklist items={topic.mustKnow} course="orgochem-1" topic={topic.slug} />
+                        </Section>
 
-            <div className="topicTwoCol">
-              <Section title="Must know checklist">
-                <MustKnowChecklist items={topic.mustKnow} course="orgochem-1" topic={topic.slug} />
-              </Section>
+                        <Section title="Common mistakes">
+                          <Mistakes items={commonMistakes[topic.slug] || ["Write the one clue you ignored then redo the problem immediately"]} />
+                        </Section>
+                      </div>
+                    </div>
+                  )}
 
-              <Section title="Common mistakes">
-                <Mistakes items={commonMistakes[topic.slug] || ["Write the one clue you ignored then redo the problem immediately"]} />
-              </Section>
-            </div>
+                  {activeTab === "study" && (
+                    <div className="stack">
+                      <Section title="Study Timer">
+                        <StudyTimer course="orgochem-1" topic={topic.slug} />
+                      </Section>
 
-            <MemorizationSection slug={topic.slug} />
-            <MemorizationFlashcards slug={topic.slug} />
+                      <MemorizationSection slug={topic.slug} />
+                      <MemorizationFlashcards slug={topic.slug} />
 
-            <Section title="Study steps">
-              <StudyStepsChecklist items={topic.howToStudy} course="orgochem-1" topic={topic.slug} />
-            </Section>
+                      <Section title="Study steps">
+                        <StudyStepsChecklist items={topic.howToStudy} course="orgochem-1" topic={topic.slug} />
+                      </Section>
 
-            <Section title="Study Tools">
-              <div style={{ display: "grid", gap: 16 }}>
-                <StudyNotes course="orgochem-1" topic={topic.slug} />
-              </div>
-            </Section>
+                      <Section title="Study Tools">
+                        <div style={{ display: "grid", gap: 16 }}>
+                          <StudyNotes course="orgochem-1" topic={topic.slug} />
+                        </div>
+                      </Section>
+                    </div>
+                  )}
 
-            <Section title="Tools">
-              <div className="topicToolRow">
-                {topic.hasMechanism ? (
-                  <Link className="btn btnPrimary" href={`/mechanisms?topic=${encodeURIComponent(mechTag)}`}>
-                    Mechanism tool
-                  </Link>
-                ) : null}
-                {topic.slug === "spectroscopy" ? (
-                  <Link className="btn btnPrimary" href="/spectra">
-                    NMR Studio
-                  </Link>
-                ) : null}
-                {!topic.hasMechanism && topic.slug !== "spectroscopy" ? (
-                  <div className="subtle">No specialized tools needed for this topic</div>
-                ) : null}
-              </div>
+                  {activeTab === "practice" && (
+                    <div className="stack">
+                      <div style={{ display: "grid", gap: 24 }}>
+                        <div>
+                          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Graded Homework Assignments</div>
+                          <div className="subtle" style={{ fontSize: 13, marginBottom: 16 }}>
+                            Professional assignments with automatic grading and detailed feedback. Perfect for professors to assign.
+                          </div>
+                          <GradedHomework course="orgochem-1" topic={topic.slug} />
+                        </div>
+                        <div style={{ paddingTop: 24, borderTop: "1px solid var(--border)" }}>
+                          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Interactive Practice</div>
+                          <div className="subtle" style={{ fontSize: 13, marginBottom: 16 }}>
+                            Achieve-style practice with hints and immediate feedback.
+                          </div>
+                          <AchieveHomework course="orgochem-1" topic={topic.slug} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
-              <div className="topicToolRow">
-                <Link className="btn" href={`/ask?course=orgochem-1&topic=${encodeURIComponent(topic.slug)}`}>
-                  Ask questions
-                </Link>
-                <Link className="btn" href={`/uploads?course=orgochem-1&topic=${encodeURIComponent(topic.slug)}`}>
-                  Upload notes
-                </Link>
-              </div>
-            </Section>
+                  {activeTab === "resources" && (
+                    <div className="stack">
+                      <Section title="Tools">
+                        <div className="topicToolRow">
+                          {topic.hasMechanism ? (
+                            <Link className="btn btnPrimary" href={`/mechanisms?topic=${encodeURIComponent(mechTag)}`}>
+                              Mechanism tool
+                            </Link>
+                          ) : null}
+                          {topic.slug === "spectroscopy" ? (
+                            <Link className="btn btnPrimary" href="/spectra">
+                              NMR Studio
+                            </Link>
+                          ) : null}
+                          {!topic.hasMechanism && topic.slug !== "spectroscopy" ? (
+                            <div className="subtle">No specialized tools needed for this topic</div>
+                          ) : null}
+                        </div>
 
-            <Section title="Practice">
-              <div style={{ display: "grid", gap: 24 }}>
-                <div>
-                  <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Graded Homework Assignments</div>
-                  <div className="subtle" style={{ fontSize: 13, marginBottom: 16 }}>
-                    Professional assignments with automatic grading and detailed feedback. Perfect for professors to assign.
-                  </div>
-                  <GradedHomework course="orgochem-1" topic={topic.slug} />
-                </div>
-                <div style={{ paddingTop: 24, borderTop: "1px solid var(--border)" }}>
-                  <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Interactive Practice</div>
-                  <div className="subtle" style={{ fontSize: 13, marginBottom: 16 }}>
-                    Achieve-style practice with hints and immediate feedback.
-                  </div>
-                  <AchieveHomework course="orgochem-1" topic={topic.slug} />
-                </div>
-              </div>
-            </Section>
+                        <div className="topicToolRow">
+                          <Link className="btn" href={`/ask?course=orgochem-1&topic=${encodeURIComponent(topic.slug)}`}>
+                            Ask questions
+                          </Link>
+                          <Link className="btn" href={`/uploads?course=orgochem-1&topic=${encodeURIComponent(topic.slug)}`}>
+                            Upload notes
+                          </Link>
+                        </div>
+                      </Section>
 
-            <Section title="Exam prep">
-              <div className="topicSummaryText" style={{ marginBottom: 12 }}>
-                Download study guides and practice exam problems for this specific topic.
-              </div>
-              <ExportStudyGuide course="orgochem-1" topicSlug={topic.slug} />
-              <div className="topicToolRow" style={{ marginTop: 12 }}>
-                <a 
-                  className="btn btnPrimary" 
-                  href={`/api/exam-guide?course=orgochem-1&topic=${encodeURIComponent(topic.slug)}`}
-                  download
-                >
-                  Download Word Doc
-                </a>
-                <Link 
-                  className="btn" 
-                  href={`/orgochem-1/exams?topic=${encodeURIComponent(topic.slug)}`}
-                >
-                  Practice exam problems
-                </Link>
-              </div>
-              <div className="subtle" style={{ marginTop: 8, fontSize: 13 }}>
-                OrgoChem I uses uploaded study guides. Guides are organized by topic for focused exam preparation.
-              </div>
-            </Section>
+                      <Section title="Exam prep">
+                        <div className="topicSummaryText" style={{ marginBottom: 12 }}>
+                          Download study guides and practice exam problems for this specific topic.
+                        </div>
+                        <ExportStudyGuide course="orgochem-1" topicSlug={topic.slug} />
+                        <div className="topicToolRow" style={{ marginTop: 12 }}>
+                          <a 
+                            className="btn btnPrimary" 
+                            href={`/api/exam-guide?course=orgochem-1&topic=${encodeURIComponent(topic.slug)}`}
+                            download
+                          >
+                            Download Word Doc
+                          </a>
+                          <Link 
+                            className="btn" 
+                            href={`/orgochem-1/exams?topic=${encodeURIComponent(topic.slug)}`}
+                          >
+                            Practice exam problems
+                          </Link>
+                        </div>
+                        <div className="subtle" style={{ marginTop: 8, fontSize: 13 }}>
+                          OrgoChem I uses uploaded study guides. Guides are organized by topic for focused exam preparation.
+                        </div>
+                      </Section>
 
-            <Section title="Tips">
-              <div className="topicTips">
-                {[
-                  "Always name the intermediate before predicting the product",
-                  "When stuck, list what the reagent can do, then match to the substrate",
-                  "Speed comes after accuracy. First be right, then be fast",
-                ].map((t, i) => (
-                  <div key={i} className="topicTipItem">
-                    {t}
-                  </div>
-                ))}
-              </div>
-            </Section>
+                      <Section title="Tips">
+                        <div className="topicTips">
+                          {[
+                            "Always name the intermediate before predicting the product",
+                            "When stuck, list what the reagent can do, then match to the substrate",
+                            "Speed comes after accuracy. First be right, then be fast",
+                          ].map((t, i) => (
+                            <div key={i} className="topicTipItem">
+                              {t}
+                            </div>
+                          ))}
+                        </div>
+                      </Section>
+                    </div>
+                  )}
+                </>
+              )}
+            </TabbedInterface>
           </div>
         </div>
       </div>

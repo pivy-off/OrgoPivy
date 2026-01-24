@@ -12,6 +12,7 @@ import MemorizationFlashcards from "../../components/MemorizationFlashcards";
 import ExportStudyGuide from "../../components/ExportStudyGuide";
 import AchieveHomework from "../../components/AchieveHomework";
 import GradedHomework from "../../components/GradedHomework";
+import TabbedInterface from "../../components/TabbedInterface";
 
 function createSVGIllustration(slug: string, title: string) {
   const common = {
