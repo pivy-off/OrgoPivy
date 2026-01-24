@@ -8,14 +8,21 @@ type Tab = {
   icon?: string;
 };
 
+type TabContent = {
+  id: string;
+  content: React.ReactNode;
+};
+
 type Props = {
   tabs: Tab[];
   defaultTab?: string;
-  children: (activeTab: string) => React.ReactNode;
+  children: TabContent[];
 };
 
 export default function TabbedInterface({ tabs, defaultTab, children }: Props) {
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.id || "");
+
+  const activeContent = children.find((tab) => tab.id === activeTab)?.content || null;
 
   return (
     <div>
@@ -64,7 +71,7 @@ export default function TabbedInterface({ tabs, defaultTab, children }: Props) {
 
       {/* Tab Content */}
       <div>
-        {children(activeTab)}
+        {activeContent}
       </div>
     </div>
   );

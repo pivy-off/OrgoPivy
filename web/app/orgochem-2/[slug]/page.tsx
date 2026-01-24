@@ -354,10 +354,10 @@ export default async function OrgoChem2TopicPage({
                 { id: "resources", label: "Resources", icon: "🔧" },
               ]}
               defaultTab="overview"
-            >
-              {(activeTab) => (
-                <>
-                  {activeTab === "overview" && (
+              children={[
+                {
+                  id: "overview",
+                  content: (
                     <div className="stack">
                       <Section
                         title="Summary"
@@ -399,9 +399,11 @@ export default async function OrgoChem2TopicPage({
                         </Section>
                       </div>
                     </div>
-                  )}
-
-                  {activeTab === "study" && (
+                  ),
+                },
+                {
+                  id: "study",
+                  content: (
                     <div className="stack">
                       <Section title="Study Timer">
                         <StudyTimer course="orgochem-2" topic={topic.slug} />
@@ -420,9 +422,11 @@ export default async function OrgoChem2TopicPage({
                         </div>
                       </Section>
                     </div>
-                  )}
-
-                  {activeTab === "practice" && (
+                  ),
+                },
+                {
+                  id: "practice",
+                  content: (
                     <div className="stack">
                       <div style={{ display: "grid", gap: 24 }}>
                         <div>
@@ -441,9 +445,11 @@ export default async function OrgoChem2TopicPage({
                         </div>
                       </div>
                     </div>
-                  )}
-
-                  {activeTab === "resources" && (
+                  ),
+                },
+                {
+                  id: "resources",
+                  content: (
                     <div className="stack">
                       <Section title="Tools">
                         <div className="topicToolRow">
@@ -506,10 +512,10 @@ export default async function OrgoChem2TopicPage({
                         </div>
                       </Section>
                     </div>
-                  )}
-                </>
-              )}
-            </TabbedInterface>
+                  ),
+                },
+              ]}
+            />
           </div>
         </div>
       </div>
