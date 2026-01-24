@@ -435,6 +435,10 @@ export default async function OrgoChem1TopicPage({
               </div>
             </Section>
 
+            <Section title="Study Timer">
+              <StudyTimer course="orgochem-1" topic={topic.slug} />
+            </Section>
+
             <div className="topicTwoCol">
               <Section title="Must know checklist">
                 <MustKnowChecklist items={topic.mustKnow} course="orgochem-1" topic={topic.slug} />
@@ -454,7 +458,6 @@ export default async function OrgoChem1TopicPage({
 
             <Section title="Study Tools">
               <div style={{ display: "grid", gap: 16 }}>
-                <StudyTimer course="orgochem-1" topic={topic.slug} />
                 <StudyNotes course="orgochem-1" topic={topic.slug} />
               </div>
             </Section>
