@@ -2,20 +2,22 @@
 
 import { useState, useRef, useEffect } from "react";
 
-type DrawingTool = "bond" | "atom" | "erase" | "clear";
+type DrawingTool = "bond" | "atom" | "circle" | "line" | "text" | "erase" | "clear";
 type BondType = "single" | "double" | "triple";
 
 type DrawingElement = {
   id: string;
-  type: "bond" | "atom";
+  type: "bond" | "atom" | "circle" | "line" | "text";
   x1?: number;
   y1?: number;
   x2?: number;
   y2?: number;
   x?: number;
   y?: number;
+  radius?: number;
   label?: string;
   bondType?: BondType;
+  fontSize?: number;
 };
 
 type Props = {
@@ -38,8 +40,11 @@ export default function ChemistryDrawingCanvas({
   const [tool, setTool] = useState<DrawingTool>("bond");
   const [bondType, setBondType] = useState<BondType>("single");
   const [currentAtom, setCurrentAtom] = useState<string>("C");
+  const [currentText, setCurrentText] = useState<string>("CH3");
+  const [circleRadius, setCircleRadius] = useState<number>(80);
   const [elements, setElements] = useState<DrawingElement[]>([]);
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
+  const [currentPos, setCurrentPos] = useState<{ x: number; y: number } | null>(null);
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
 
   useEffect(() => {
@@ -147,6 +152,22 @@ export default function ChemistryDrawingCanvas({
           ctx.lineTo(el.x2 - perpX, el.y2 - perpY);
           ctx.stroke();
         }
+      } else if (el.type === "line" && el.x1 !== undefined && el.y1 !== undefined && el.x2 !== undefined && el.y2 !== undefined) {
+        // Simple line (for Newman projection substituents)
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(el.x1, el.y1);
+        ctx.lineTo(el.x2, el.y2);
+        ctx.stroke();
+      } else if (el.type === "circle" && el.x !== undefined && el.y !== undefined && el.radius !== undefined) {
+        // Circle (for Newman projection)
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(el.x, el.y, el.radius, 0, Math.PI * 2);
+        ctx.stroke();
       } else if (el.type === "atom" && el.x !== undefined && el.y !== undefined) {
         ctx.fillStyle = "#ffffff";
         ctx.strokeStyle = "#000000";
@@ -163,27 +184,44 @@ export default function ChemistryDrawingCanvas({
           ctx.textBaseline = "middle";
           ctx.fillText(el.label, el.x, el.y);
         }
+      } else if (el.type === "text" && el.x !== undefined && el.y !== undefined && el.label) {
+        // Text label (for substituent labels in Newman projections)
+        ctx.fillStyle = "#000000";
+        ctx.font = `${el.fontSize || 14}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(el.label, el.x, el.y);
       }
     });
 
     // Draw preview if drawing
-    if (isDrawing && startPos && tool === "bond") {
+    if (isDrawing && startPos && currentPos) {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
       const currentX = startPos.x;
       const currentY = startPos.y;
-      const mouseX = startPos.x; // Will be updated on mouse move
-      const mouseY = startPos.y;
+      const mouseX = currentPos.x;
+      const mouseY = currentPos.y;
 
-      ctx.strokeStyle = "#007AFF";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-      ctx.beginPath();
-      ctx.moveTo(currentX, currentY);
-      ctx.lineTo(mouseX, mouseY);
-      ctx.stroke();
-      ctx.setLineDash([]);
+      if (tool === "bond" || tool === "line") {
+        ctx.strokeStyle = "#007AFF";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(currentX, currentY);
+        ctx.lineTo(mouseX, mouseY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      } else if (tool === "circle") {
+        const dist = Math.sqrt((mouseX - currentX) ** 2 + (mouseY - currentY) ** 2);
+        ctx.strokeStyle = "#007AFF";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, dist, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
     }
   }
 
@@ -203,12 +241,29 @@ export default function ChemistryDrawingCanvas({
       };
       setElements((prev) => [...prev, newElement]);
       saveCanvas();
+    } else if (tool === "text") {
+      const newElement: DrawingElement = {
+        id: `text-${Date.now()}`,
+        type: "text",
+        x: pos.x,
+        y: pos.y,
+        label: currentText,
+        fontSize: 14,
+      };
+      setElements((prev) => [...prev, newElement]);
+      saveCanvas();
     } else if (tool === "erase") {
       // Find and remove element at click position
       const clickedElement = elements.find((el) => {
         if (el.type === "atom" && el.x !== undefined && el.y !== undefined) {
           const dist = Math.sqrt((el.x - pos.x) ** 2 + (el.y - pos.y) ** 2);
           return dist < 20;
+        } else if (el.type === "circle" && el.x !== undefined && el.y !== undefined && el.radius !== undefined) {
+          const dist = Math.sqrt((el.x - pos.x) ** 2 + (el.y - pos.y) ** 2);
+          return dist < el.radius + 10;
+        } else if (el.type === "text" && el.x !== undefined && el.y !== undefined) {
+          const dist = Math.sqrt((el.x - pos.x) ** 2 + (el.y - pos.y) ** 2);
+          return dist < 30;
         }
         return false;
       });
@@ -220,32 +275,69 @@ export default function ChemistryDrawingCanvas({
   }
 
   function handleMouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
-    if (!isDrawing || !startPos || tool !== "bond") return;
+    if (!isDrawing || !startPos) return;
+    const pos = getCanvasCoordinates(e);
+    setCurrentPos(pos);
+    
+    // Redraw canvas with preview
     drawCanvas();
   }
 
   function handleMouseUp(e: React.MouseEvent<HTMLCanvasElement>) {
-    if (!isDrawing || !startPos || tool !== "bond") return;
+    if (!isDrawing || !startPos) return;
     
     const pos = getCanvasCoordinates(e);
-    const dist = Math.sqrt((pos.x - startPos.x) ** 2 + (pos.y - startPos.y) ** 2);
     
-    if (dist > 10) {
-      const newElement: DrawingElement = {
-        id: `bond-${Date.now()}`,
-        type: "bond",
-        x1: startPos.x,
-        y1: startPos.y,
-        x2: pos.x,
-        y2: pos.y,
-        bondType: bondType,
-      };
-      setElements((prev) => [...prev, newElement]);
-      saveCanvas();
+    if (tool === "bond") {
+      const dist = Math.sqrt((pos.x - startPos.x) ** 2 + (pos.y - startPos.y) ** 2);
+      
+      if (dist > 10) {
+        const newElement: DrawingElement = {
+          id: `bond-${Date.now()}`,
+          type: "bond",
+          x1: startPos.x,
+          y1: startPos.y,
+          x2: pos.x,
+          y2: pos.y,
+          bondType: bondType,
+        };
+        setElements((prev) => [...prev, newElement]);
+        saveCanvas();
+      }
+    } else if (tool === "line") {
+      const dist = Math.sqrt((pos.x - startPos.x) ** 2 + (pos.y - startPos.y) ** 2);
+      
+      if (dist > 5) {
+        const newElement: DrawingElement = {
+          id: `line-${Date.now()}`,
+          type: "line",
+          x1: startPos.x,
+          y1: startPos.y,
+          x2: pos.x,
+          y2: pos.y,
+        };
+        setElements((prev) => [...prev, newElement]);
+        saveCanvas();
+      }
+    } else if (tool === "circle") {
+      const dist = Math.sqrt((pos.x - startPos.x) ** 2 + (pos.y - startPos.y) ** 2);
+      
+      if (dist > 10) {
+        const newElement: DrawingElement = {
+          id: `circle-${Date.now()}`,
+          type: "circle",
+          x: startPos.x,
+          y: startPos.y,
+          radius: dist,
+        };
+        setElements((prev) => [...prev, newElement]);
+        saveCanvas();
+      }
     }
     
     setIsDrawing(false);
     setStartPos(null);
+    setCurrentPos(null);
   }
 
   function saveCanvas() {
@@ -274,7 +366,61 @@ export default function ChemistryDrawingCanvas({
 
   useEffect(() => {
     drawCanvas();
-  }, [elements, isDrawing, startPos, tool, bondType]);
+  }, [elements, isDrawing, startPos, currentPos, tool, bondType]);
+
+  // Helper function to create Newman projection template
+  function createNewmanTemplate() {
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = 80;
+    
+    // Clear and add template
+    const templateElements: DrawingElement[] = [
+      {
+        id: `circle-template-${Date.now()}`,
+        type: "circle",
+        x: centerX,
+        y: centerY,
+        radius: radius,
+      },
+      // Add guide lines for common positions (12, 3, 6, 9 o'clock)
+      {
+        id: `line-guide-1-${Date.now()}`,
+        type: "line",
+        x1: centerX,
+        y1: centerY - radius - 20,
+        x2: centerX,
+        y2: centerY - radius - 5,
+      },
+      {
+        id: `line-guide-2-${Date.now()}`,
+        type: "line",
+        x1: centerX + radius + 5,
+        y1: centerY,
+        x2: centerX + radius + 20,
+        y2: centerY,
+      },
+      {
+        id: `line-guide-3-${Date.now()}`,
+        type: "line",
+        x1: centerX,
+        y1: centerY + radius + 5,
+        x2: centerX,
+        y2: centerY + radius + 20,
+      },
+      {
+        id: `line-guide-4-${Date.now()}`,
+        type: "line",
+        x1: centerX - radius - 20,
+        y1: centerY,
+        x2: centerX - radius - 5,
+        y2: centerY,
+      },
+    ];
+    
+    setElements(templateElements);
+    saveCanvas();
+  }
 
   return (
     <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
@@ -316,6 +462,48 @@ export default function ChemistryDrawingCanvas({
           }}
         >
           Atom
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setTool("circle")}
+          className="btn"
+          style={{
+            fontSize: 12,
+            padding: "6px 12px",
+            background: tool === "circle" ? "var(--blue)" : "var(--panel)",
+            color: tool === "circle" ? "white" : "var(--text)",
+          }}
+        >
+          Circle
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setTool("line")}
+          className="btn"
+          style={{
+            fontSize: 12,
+            padding: "6px 12px",
+            background: tool === "line" ? "var(--blue)" : "var(--panel)",
+            color: tool === "line" ? "white" : "var(--text)",
+          }}
+        >
+          Line
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setTool("text")}
+          className="btn"
+          style={{
+            fontSize: 12,
+            padding: "6px 12px",
+            background: tool === "text" ? "var(--blue)" : "var(--panel)",
+            color: tool === "text" ? "white" : "var(--text)",
+          }}
+        >
+          Text
         </button>
 
         {tool === "bond" && (
@@ -361,6 +549,44 @@ export default function ChemistryDrawingCanvas({
           </select>
         )}
 
+        {tool === "text" && (
+          <input
+            type="text"
+            value={currentText}
+            onChange={(e) => setCurrentText(e.target.value)}
+            placeholder="Label (e.g., CH3)"
+            style={{
+              fontSize: 12,
+              padding: "6px 12px",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid var(--border)",
+              background: "var(--panel)",
+              width: 120,
+            }}
+          />
+        )}
+
+        {tool === "circle" && (
+          <div style={{ fontSize: 12, color: "var(--muted)" }}>
+            Click & drag to draw circle
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={createNewmanTemplate}
+          className="btn"
+          style={{
+            fontSize: 12,
+            padding: "6px 12px",
+            background: "var(--green)",
+            color: "white",
+          }}
+          title="Create Newman projection template"
+        >
+          Newman Template
+        </button>
+
         <button
           type="button"
           onClick={() => setTool("erase")}
@@ -399,7 +625,7 @@ export default function ChemistryDrawingCanvas({
         onMouseUp={handleMouseUp}
         style={{
           display: "block",
-          cursor: disabled ? "not-allowed" : tool === "bond" ? "crosshair" : tool === "atom" ? "pointer" : "default",
+          cursor: disabled ? "not-allowed" : tool === "bond" || tool === "line" ? "crosshair" : tool === "atom" || tool === "text" ? "pointer" : tool === "circle" ? "crosshair" : "default",
           background: "#ffffff",
           width: "100%",
           height: "auto",
