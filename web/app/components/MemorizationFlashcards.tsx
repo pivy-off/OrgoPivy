@@ -21,8 +21,7 @@ export default function MemorizationFlashcards({ slug }: Props) {
   
   const [flashcards, setFlashcards] = useState<FlashcardItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [cardState, setCardState] = useState<"question" | "hint" | "answer">("question");
   const [studied, setStudied] = useState<Set<number>>(new Set());
   const [isActive, setIsActive] = useState(false);
 
@@ -50,8 +49,7 @@ export default function MemorizationFlashcards({ slug }: Props) {
   const handleNext = useCallback(() => {
     if (currentIndex < flashcards.length - 1) {
       setCurrentIndex(currentIndex + 1);
-      setIsFlipped(false);
-      setShowAnswer(false);
+      setCardState("question");
     } else {
       // Completed all cards
       setIsActive(false);
@@ -61,30 +59,39 @@ export default function MemorizationFlashcards({ slug }: Props) {
   const handlePrevious = useCallback(() => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
-      setIsFlipped(false);
-      setShowAnswer(false);
+      setCardState("question");
     }
   }, [currentIndex]);
 
   const handleFlip = useCallback(() => {
-    setIsFlipped(!isFlipped);
-    setShowAnswer(!showAnswer);
-    setStudied((prev) => new Set([...prev, currentIndex]));
-  }, [isFlipped, currentIndex]);
+    // Cycle through: question -> hint -> answer -> question
+    if (cardState === "question") {
+      setCardState("hint");
+    } else if (cardState === "hint") {
+      setCardState("answer");
+      setStudied((prev) => new Set([...prev, currentIndex]));
+    } else {
+      setCardState("question");
+    }
+  }, [cardState, currentIndex]);
 
   useEffect(() => {
     function handleKeyPress(e: KeyboardEvent) {
       if (!isActive) return;
       if (e.key === "ArrowRight" || e.key === " ") {
         e.preventDefault();
-        if (showAnswer) {
+        if (cardState === "answer") {
           handleNext();
         } else {
           handleFlip();
         }
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
-        handlePrevious();
+        if (cardState === "question") {
+          handlePrevious();
+        } else {
+          setCardState("question");
+        }
       } else if (e.key === "f" || e.key === "F") {
         e.preventDefault();
         handleFlip();
@@ -93,7 +100,7 @@ export default function MemorizationFlashcards({ slug }: Props) {
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [isActive, showAnswer, handleNext, handlePrevious, handleFlip]);
+  }, [isActive, cardState, handleNext, handlePrevious, handleFlip]);
 
   if (flashcards.length === 0) {
     return null;
@@ -178,7 +185,6 @@ export default function MemorizationFlashcards({ slug }: Props) {
             transition: "all 0.3s ease",
             position: "relative",
             marginBottom: 24,
-            perspective: "1000px",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = "var(--blue)";
@@ -189,56 +195,50 @@ export default function MemorizationFlashcards({ slug }: Props) {
             e.currentTarget.style.transform = "scale(1)";
           }}
         >
-          <div style={{
-            width: "100%",
-            height: "100%",
-            transition: "transform 0.3s ease",
-            transform: showAnswer ? "rotateY(180deg)" : "rotateY(0deg)",
-            transformStyle: "preserve-3d",
-            position: "relative",
-          }}>
-            {/* Front side (Question) */}
-            <div style={{
-              backfaceVisibility: "hidden",
-              WebkitBackfaceVisibility: "hidden",
-              transform: showAnswer ? "rotateY(180deg)" : "rotateY(0deg)",
-              position: "absolute",
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
+          {cardState === "question" && (
+            <>
               <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>
                 {currentCard.category}
               </div>
               <div style={{ fontSize: 32, fontWeight: 700, color: "var(--text)", marginBottom: 16 }}>
+                {currentCard.value}
+              </div>
+              <div style={{ fontSize: 14, color: "var(--muted)" }}>
+                Click or press F to see hint
+              </div>
+            </>
+          )}
+          
+          {cardState === "hint" && (
+            <>
+              <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>
+                Hint
+              </div>
+              <div style={{ fontSize: 28, fontWeight: 600, color: "var(--orange)", marginBottom: 16 }}>
                 {currentCard.term}
               </div>
               <div style={{ fontSize: 14, color: "var(--muted)" }}>
-                Click or press F to flip
+                Click or press F to see answer
               </div>
-            </div>
-
-            {/* Back side (Answer) */}
-            <div style={{
-              backfaceVisibility: "hidden",
-              WebkitBackfaceVisibility: "hidden",
-              transform: showAnswer ? "rotateY(0deg)" : "rotateY(-180deg)",
-              position: "absolute",
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
+            </>
+          )}
+          
+          {cardState === "answer" && (
+            <>
               <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>
                 Answer
               </div>
               <div style={{ fontSize: 36, fontWeight: 700, color: "var(--blue)", marginBottom: 12 }}>
-                {currentCard.value}
+                {(() => {
+                  // Generate answer based on card type
+                  // For naming prefixes (like "Hept-" -> "7 carbons"), show the full name
+                  if (currentCard.value.includes("carbon") && currentCard.term.endsWith("-")) {
+                    const prefix = currentCard.term.replace("-", "").toLowerCase();
+                    return prefix + "ane";
+                  }
+                  // For other cases, show the term as the answer
+                  return currentCard.term;
+                })()}
               </div>
               {currentCard.note && (
                 <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 12, maxWidth: 500 }}>
@@ -246,10 +246,10 @@ export default function MemorizationFlashcards({ slug }: Props) {
                 </div>
               )}
               <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 16 }}>
-                Press Space or → for next
+                Press Space or → for next card
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
 
         {/* Controls */}
@@ -268,7 +268,7 @@ export default function MemorizationFlashcards({ slug }: Props) {
             className="btn btnPrimary"
             onClick={handleFlip}
           >
-            {showAnswer ? "Show Question" : "Show Answer"}
+            {cardState === "question" ? "Show Hint" : cardState === "hint" ? "Show Answer" : "Show Question"}
           </button>
           <button
             type="button"
@@ -282,7 +282,7 @@ export default function MemorizationFlashcards({ slug }: Props) {
         </div>
 
         <div style={{ marginTop: 16, textAlign: "center", fontSize: 12, color: "var(--muted)" }}>
-          Keyboard: Space/→ = Next, ← = Previous, F = Flip
+          Keyboard: Space/→ = Flip/Next, ← = Previous/Back, F = Flip
         </div>
       </div>
     </div>
