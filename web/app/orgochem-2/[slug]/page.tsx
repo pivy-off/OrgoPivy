@@ -4,6 +4,7 @@ import { findTopic } from "../../lib/curriculum";
 import MustKnowChecklist from "../../components/MustKnowChecklist";
 import StudyStepsChecklist from "../../components/StudyStepsChecklist";
 import StudyTimer from "../../components/StudyTimer";
+import VideoCard from "../../components/VideoCard";
 import BookmarkButton from "../../components/BookmarkButton";
 import StudyNotes from "../../components/StudyNotes";
 import TopicIllustrationClient from "../../components/TopicIllustrationClient";
@@ -375,7 +376,7 @@ export default async function OrgoChem2TopicPage({
                             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: "#007AFF" }}>
                               What you need to know:
                             </div>
-                            <div style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.8)" }}>
+                            <div style={{ fontSize: 14, lineHeight: 1.6, color: "var(--text)" }}>
                               This topic covers {topic.title.toLowerCase()}. Focus on mastering the key concepts in the "Must know checklist" below. 
                               Follow the study steps systematically, and use practice problems to reinforce your understanding. 
                               The external reference provides comprehensive coverage of all concepts.
@@ -384,9 +385,15 @@ export default async function OrgoChem2TopicPage({
                         </div>
                       </Section>
 
+                      {topic.video && (
+                        <Section title="Video Tutorial">
+                          <VideoCard video={topic.video} />
+                        </Section>
+                      )}
+
                       <div className="topicTwoCol">
                         <Section title="Must know checklist">
-                          <MustKnowChecklist items={topic.mustKnow} course="orgochem-2" topic={topic.slug} />
+                          <MustKnowChecklist items={topic.mustKnow} videos={topic.mustKnowVideos} course="orgochem-2" topic={topic.slug} />
                         </Section>
 
                         <Section title="Common mistakes">

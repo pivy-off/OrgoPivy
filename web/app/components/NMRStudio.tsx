@@ -114,10 +114,10 @@ export default function NMRStudio() {
         borderRadius: 20,
         border: "1px solid rgba(0, 122, 255, 0.2)"
       }}>
-        <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 8, letterSpacing: "-0.5px" }}>
+        <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 8, letterSpacing: "-0.5px", color: "var(--text)" }}>
           NMR Studio
         </h1>
-        <p style={{ fontSize: 16, color: "rgba(0, 0, 0, 0.7)", lineHeight: 1.6 }}>
+        <p style={{ fontSize: 16, color: "var(--muted)", lineHeight: 1.6 }}>
           Upload your NMR spectrum and get instant analysis. Identify signals, interpret chemical shifts, 
           determine multiplicity, and solve structure determination problems.
         </p>
@@ -126,12 +126,12 @@ export default function NMRStudio() {
       {/* NMR Type Selection */}
       <div style={{
         padding: 20,
-        background: "white",
+        background: "var(--panel)",
         borderRadius: 16,
-        border: "1px solid rgba(0, 0, 0, 0.08)",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)"
+        border: "1px solid var(--border)",
+        boxShadow: "var(--shadow)"
       }}>
-        <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>
+        <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text)" }}>
           Select NMR Type
         </div>
         <div style={{ display: "flex", gap: 12 }}>
@@ -145,16 +145,17 @@ export default function NMRStudio() {
               flex: 1,
               padding: 20,
               borderRadius: 12,
-              border: `2px solid ${nmrType === "1H" ? "#007AFF" : "rgba(0, 0, 0, 0.1)"}`,
-              background: nmrType === "1H" ? "rgba(0, 122, 255, 0.08)" : "white",
+              border: `2px solid ${nmrType === "1H" ? "var(--blue)" : "var(--border)"}`,
+              background: nmrType === "1H" ? "rgba(0, 122, 255, 0.08)" : "var(--panel)",
               cursor: "pointer",
               fontSize: 16,
               fontWeight: 600,
-              transition: "all 0.2s ease"
+              transition: "all 0.2s ease",
+              color: "var(--text)"
             }}
           >
-            <div style={{ fontSize: 24, marginBottom: 8 }}>¹H NMR</div>
-            <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.6)" }}>
+            <div style={{ fontSize: 24, marginBottom: 8, color: "var(--text)" }}>¹H NMR</div>
+            <div style={{ fontSize: 14, color: "var(--muted)" }}>
               Proton Nuclear Magnetic Resonance
             </div>
           </button>
@@ -168,16 +169,17 @@ export default function NMRStudio() {
               flex: 1,
               padding: 20,
               borderRadius: 12,
-              border: `2px solid ${nmrType === "13C" ? "#007AFF" : "rgba(0, 0, 0, 0.1)"}`,
-              background: nmrType === "13C" ? "rgba(0, 122, 255, 0.08)" : "white",
+              border: `2px solid ${nmrType === "13C" ? "var(--blue)" : "var(--border)"}`,
+              background: nmrType === "13C" ? "rgba(0, 122, 255, 0.08)" : "var(--panel)",
               cursor: "pointer",
               fontSize: 16,
               fontWeight: 600,
-              transition: "all 0.2s ease"
+              transition: "all 0.2s ease",
+              color: "var(--text)"
             }}
           >
-            <div style={{ fontSize: 24, marginBottom: 8 }}>¹³C NMR</div>
-            <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.6)" }}>
+            <div style={{ fontSize: 24, marginBottom: 8, color: "var(--text)" }}>¹³C NMR</div>
+            <div style={{ fontSize: 14, color: "var(--muted)" }}>
               Carbon-13 Nuclear Magnetic Resonance
             </div>
           </button>
@@ -188,12 +190,12 @@ export default function NMRStudio() {
       {nmrType && (
         <div style={{
           padding: 20,
-          background: "white",
+          background: "var(--panel)",
           borderRadius: 16,
-          border: "1px solid rgba(0, 0, 0, 0.08)",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)"
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow)"
         }}>
-          <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>
+          <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text)" }}>
             Upload {nmrType === "1H" ? "Proton" : "Carbon-13"} NMR Spectrum
           </div>
           
@@ -236,17 +238,17 @@ export default function NMRStudio() {
                     marginBottom: 12
                   }}
                 />
-                <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.6)" }}>
+                <div style={{ fontSize: 14, color: "var(--muted)" }}>
                   {spectrumFile?.name}
                 </div>
               </div>
             ) : (
               <div>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>📄</div>
-                <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
+                <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8, color: "var(--text)" }}>
                   Click to upload spectrum
                 </div>
-                <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.6)" }}>
+                <div style={{ fontSize: 14, color: "var(--muted)" }}>
                   Supports images (PNG, JPG) or JCAMP files (.jdx, .jcamp)
                 </div>
               </div>
@@ -257,7 +259,7 @@ export default function NMRStudio() {
             <>
               {/* Question Type Selection */}
               <div style={{ marginTop: 24 }}>
-                <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>
+                <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, color: "var(--text)" }}>
                   What would you like to analyze?
                 </div>
                 <select
@@ -267,9 +269,10 @@ export default function NMRStudio() {
                     width: "100%",
                     padding: 12,
                     borderRadius: 12,
-                    border: "1px solid rgba(0, 0, 0, 0.1)",
+                    border: "1px solid var(--border)",
                     fontSize: 15,
-                    background: "white"
+                    background: "var(--panel)",
+                    color: "var(--text)"
                   }}
                 >
                   <option value="">Select analysis type...</option>
@@ -309,9 +312,9 @@ export default function NMRStudio() {
                   borderRadius: 12,
                   border: "none",
                   background: analyzing || !questionType
-                    ? "rgba(0, 0, 0, 0.1)"
+                    ? "var(--border-2)"
                     : "linear-gradient(135deg, #007AFF, #5856D6)",
-                  color: analyzing || !questionType ? "rgba(0, 0, 0, 0.4)" : "white",
+                  color: analyzing || !questionType ? "var(--muted)" : "white",
                   fontSize: 16,
                   fontWeight: 600,
                   cursor: analyzing || !questionType ? "not-allowed" : "pointer",
@@ -329,10 +332,10 @@ export default function NMRStudio() {
       {analysisResult && (
         <div style={{
           padding: 24,
-          background: "white",
+          background: "var(--panel)",
           borderRadius: 16,
           border: "1px solid rgba(52, 199, 89, 0.3)",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
+          boxShadow: "var(--shadow)"
         }}>
           <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: "#34C759" }}>
             ✓ Analysis Complete
@@ -340,10 +343,10 @@ export default function NMRStudio() {
 
           {analysisResult.moleculeType && (
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(0, 0, 0, 0.6)", marginBottom: 8 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--muted)", marginBottom: 8 }}>
                 Molecule Type
               </div>
-              <div style={{ fontSize: 16, fontWeight: 600 }}>
+              <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)" }}>
                 {analysisResult.moleculeType}
               </div>
             </div>
@@ -351,7 +354,7 @@ export default function NMRStudio() {
 
           {analysisResult.functionalGroups && (
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(0, 0, 0, 0.6)", marginBottom: 8 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--muted)", marginBottom: 8 }}>
                 Functional Groups Identified
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -376,7 +379,7 @@ export default function NMRStudio() {
 
           {analysisResult.signals && (
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(0, 0, 0, 0.6)", marginBottom: 12 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--muted)", marginBottom: 12 }}>
                 Signals Identified
               </div>
               <div style={{ display: "grid", gap: 12 }}>
@@ -385,9 +388,9 @@ export default function NMRStudio() {
                     key={idx}
                     style={{
                       padding: 16,
-                      background: "rgba(0, 0, 0, 0.02)",
+                      background: "var(--panel-2)",
                       borderRadius: 12,
-                      border: "1px solid rgba(0, 0, 0, 0.08)"
+                      border: "1px solid var(--border)"
                     }}
                   >
                     <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
@@ -395,18 +398,18 @@ export default function NMRStudio() {
                         {signal.ppm} ppm
                       </div>
                       {signal.integration && (
-                        <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.7)" }}>
+                        <div style={{ fontSize: 14, color: "var(--text)" }}>
                           Integration: {signal.integration}H
                         </div>
                       )}
                       {signal.multiplicity && (
-                        <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.7)" }}>
+                        <div style={{ fontSize: 14, color: "var(--text)" }}>
                           Multiplicity: {signal.multiplicity}
                         </div>
                       )}
                     </div>
                     {signal.assignment && (
-                      <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.8)", marginTop: 8 }}>
+                      <div style={{ fontSize: 14, color: "var(--text)", marginTop: 8 }}>
                         <strong>Assignment:</strong> {signal.assignment}
                       </div>
                     )}
@@ -426,7 +429,7 @@ export default function NMRStudio() {
               <div style={{ fontSize: 14, fontWeight: 600, color: "#007AFF", marginBottom: 8 }}>
                 Analysis Answer
               </div>
-              <div style={{ fontSize: 15, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.9)" }}>
+              <div style={{ fontSize: 15, lineHeight: 1.6, color: "var(--text)" }}>
                 {analysisResult.answer}
               </div>
             </div>

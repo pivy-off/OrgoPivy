@@ -56,20 +56,20 @@ export default function StudyStepsChecklist({ items, course, topic }: Props) {
         justifyContent: "space-between",
         marginBottom: 16
       }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(0, 0, 0, 0.6)" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)" }}>
           Progress: {checked.size} / {items.length}
         </div>
         <div style={{
           width: 120,
           height: 6,
-          background: "rgba(0, 0, 0, 0.08)",
+          background: "var(--border-2)",
           borderRadius: 3,
           overflow: "hidden"
         }}>
           <div style={{
             width: `${progress}%`,
             height: "100%",
-            background: "linear-gradient(90deg, #007AFF, #5856D6)",
+            background: "linear-gradient(90deg, var(--blue), var(--purple))",
             transition: "width 0.3s ease"
           }} />
         </div>
@@ -91,7 +91,7 @@ export default function StudyStepsChecklist({ items, course, topic }: Props) {
                 alignItems: "flex-start",
                 padding: 14,
                 borderRadius: 12,
-                border: `1px solid ${isChecked ? "rgba(0, 122, 255, 0.3)" : "rgba(0, 0, 0, 0.08)"}`,
+                border: `1px solid ${isChecked ? "rgba(0, 122, 255, 0.3)" : "var(--border)"}`,
                 background: isChecked ? "rgba(0, 122, 255, 0.04)" : "transparent",
                 cursor: "pointer",
                 transition: "all 0.2s ease"
@@ -104,7 +104,7 @@ export default function StudyStepsChecklist({ items, course, topic }: Props) {
               }}
               onMouseLeave={(e) => {
                 if (!isChecked) {
-                  e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.08)";
+                  e.currentTarget.style.borderColor = "var(--border)";
                   e.currentTarget.style.background = "transparent";
                 }
               }}
@@ -125,7 +125,7 @@ export default function StudyStepsChecklist({ items, course, topic }: Props) {
                 <div style={{
                   fontSize: 14,
                   fontWeight: isChecked ? 500 : 600,
-                  color: isChecked ? "rgba(0, 0, 0, 0.5)" : "rgba(0, 0, 0, 0.9)",
+                  color: isChecked ? "var(--muted)" : "var(--text)",
                   textDecoration: isChecked ? "line-through" : "none",
                   marginBottom: tail ? 4 : 0
                 }}>
@@ -134,7 +134,7 @@ export default function StudyStepsChecklist({ items, course, topic }: Props) {
                 {tail ? (
                   <div style={{
                     fontSize: 12,
-                    color: "rgba(0, 0, 0, 0.6)",
+                    color: "var(--muted)",
                     lineHeight: 1.5
                   }}>
                     {tail}

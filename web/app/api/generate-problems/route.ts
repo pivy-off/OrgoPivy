@@ -261,47 +261,95 @@ function generateProblemsFromCurriculum(
     });
   });
 
-  // Generate drawing problems for topics with conformations/structures
+  // Generate drawing problems for topics with conformations/structures - CONVERT TO MULTIPLE-CHOICE
   if ((topicSlug.includes("alkanes") || topicSlug.includes("cycloalkanes") || topicSlug.includes("stereochemistry")) && problems.length < count) {
-    const question = topicSlug.includes("cycloalkanes")
-      ? "Draw the chair conformation of cyclohexane showing axial and equatorial positions."
-      : topicSlug.includes("stereochemistry")
-      ? "Draw the Newman projection for the most stable conformation of butane."
-      : `Draw the most stable conformation for ${title}.`;
-
-    const hints = topicSlug.includes("cycloalkanes")
-      ? [
-        "Chair conformation has alternating axial/equatorial positions",
-        "1,3-diaxial interactions cause steric strain",
-        "Draw both axial and equatorial hydrogens",
-        "Ring flip interconverts axial and equatorial positions",
-      ]
-      : topicSlug.includes("stereochemistry")
-      ? [
-        "Draw Newman projection looking down C2-C3 bond",
-        "Anti conformation has methyl groups 180° apart",
-        "Anti conformation minimizes steric interactions",
-        "Remember: anti = 180°, gauche = 60°, eclipsed = 0°",
-      ]
-      : [
-        "Consider steric interactions between substituents",
-        "Look for staggered vs eclipsed arrangements",
-        "Identify the most stable dihedral angles",
-        "Minimize 1,3-diaxial or gauche interactions",
-      ];
-
-    problems.push({
-      id: `gen-${topicSlug}-draw-1`,
-      question,
-      type: "drawing",
-      correctAnswer: "Anti conformation or chair conformation (depending on topic)",
-      explanation: `For ${title}, the most stable conformation minimizes steric interactions.`,
-      points: 15,
-      hints,
-    });
+    if (topicSlug.includes("stereochemistry")) {
+      // Convert R/S assignment questions to multiple-choice
+      problems.push({
+        id: `gen-${topicSlug}-stereo-1`,
+        question: "What is the R or S configuration of a stereocenter with priorities assigned as: 1 (highest), 2, 3, 4 (lowest), where the sequence 1→2→3 is clockwise when viewed with priority 4 pointing away?",
+        type: "multiple-choice",
+        options: ["R configuration", "S configuration", "Cannot be determined", "Racemic"],
+        correctAnswer: "R configuration",
+        explanation: "When the lowest priority (4) is pointing away and the sequence 1→2→3 is clockwise, the configuration is R (rectus).",
+        points: 15,
+        hints: [
+          "Assign priorities using CIP rules",
+          "Put the lowest priority away from you",
+          "Clockwise = R, Counterclockwise = S",
+          "Remember: R = rectus (right), S = sinister (left)",
+        ],
+      });
+    } else if (topicSlug.includes("cycloalkanes")) {
+      // Convert chair drawing to multiple-choice
+      problems.push({
+        id: `gen-${topicSlug}-chair-1`,
+        question: "In cyclohexane, which position is more stable for a substituent?",
+        type: "multiple-choice",
+        options: ["Axial position", "Equatorial position", "Both are equally stable", "Depends on the substituent"],
+        correctAnswer: "Equatorial position",
+        explanation: "Equatorial positions are more stable because they avoid 1,3-diaxial interactions with other substituents.",
+        points: 15,
+        hints: [
+          "Equatorial substituents avoid steric strain",
+          "Axial substituents have 1,3-diaxial interactions",
+          "Bulky groups prefer equatorial positions",
+          "Chair flip converts axial to equatorial",
+        ],
+      });
+    } else {
+      // Convert Newman projection to multiple-choice
+      problems.push({
+        id: `gen-${topicSlug}-conform-1`,
+        question: "Which conformation of butane is most stable?",
+        type: "multiple-choice",
+        options: ["Anti conformation", "Gauche conformation", "Eclipsed conformation", "Fully eclipsed conformation"],
+        correctAnswer: "Anti conformation",
+        explanation: "The anti conformation has methyl groups 180° apart, minimizing steric interactions and torsional strain.",
+        points: 15,
+        hints: [
+          "Anti conformation has groups 180° apart",
+          "Gauche has groups 60° apart",
+          "Eclipsed has groups 0° apart",
+          "Anti minimizes both steric and torsional strain",
+        ],
+      });
+    }
   }
 
-  return problems.slice(0, count);
+  // Convert any short-answer questions that require drawing/assignment to multiple-choice
+  const convertedProblems = problems.map((p) => {
+    // Check if question asks to assign, draw, or similar actions
+    const questionLower = p.question.toLowerCase();
+    const requiresDrawing = 
+      questionLower.includes("assign r or s") ||
+      questionLower.includes("assign r/s") ||
+      questionLower.includes("draw the") ||
+      questionLower.includes("draw a") ||
+      questionLower.includes("sketch") ||
+      questionLower.includes("construct") ||
+      (questionLower.includes("assign") && (questionLower.includes("configuration") || questionLower.includes("stereocenter")));
+
+    if (p.type === "short-answer" && requiresDrawing) {
+      // Convert to multiple-choice
+      const baseOptions = [
+        p.correctAnswer,
+        p.correctAnswer.split(" ").reverse().join(" "),
+        "Cannot be determined from the information given",
+        "None of the above",
+      ];
+      
+      return {
+        ...p,
+        type: "multiple-choice" as const,
+        options: baseOptions.slice(0, 4),
+      };
+    }
+    
+    return p;
+  });
+
+  return convertedProblems.slice(0, count);
 }
 
 export async function GET(request: NextRequest) {

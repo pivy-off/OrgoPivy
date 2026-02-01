@@ -96,7 +96,7 @@ function AskPageContent() {
                   Context: {courseParam ? courseParam.replace("orgochem-", "OrgoChem ").replace("-", " ").toUpperCase() : ""} 
                   {topicParam ? ` • ${topicParam.charAt(0).toUpperCase() + topicParam.slice(1).replace(/-/g, " ")}` : ""}
                 </div>
-                <div style={{ color: "rgba(0, 0, 0, 0.6)", fontSize: 13 }}>
+                <div style={{ color: "var(--muted)", fontSize: 13 }}>
                   Your questions will be focused on this {courseParam ? "course" : ""} {topicParam ? "and topic" : ""}.
                 </div>
               </div>
@@ -104,11 +104,11 @@ function AskPageContent() {
 
             <div style={{
               padding: 20,
-              background: "rgba(0, 0, 0, 0.02)",
+              background: "var(--panel-2)",
               borderRadius: 16,
-              border: "1px solid rgba(0, 0, 0, 0.08)"
+              border: "1px solid var(--border)"
             }}>
-              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: "rgba(0, 0, 0, 0.8)" }}>
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: "var(--text)" }}>
                 How to use:
               </div>
               <ul style={{ 
@@ -116,7 +116,7 @@ function AskPageContent() {
                 paddingLeft: 20, 
                 fontSize: 14, 
                 lineHeight: 1.8, 
-                color: "rgba(0, 0, 0, 0.7)",
+                color: "var(--muted)",
                 listStyle: "disc"
               }}>
                 <li>Upload your notes first using the Upload page</li>
@@ -152,7 +152,7 @@ function AskPageContent() {
 
               <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
                 <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.6)" }}>Top K:</div>
+                  <div style={{ fontSize: 14, color: "var(--muted)" }}>Top K:</div>
                   <input
                     type="number"
                     min={1}
@@ -168,7 +168,7 @@ function AskPageContent() {
                     }}
                     disabled={loading}
                   />
-                  <div style={{ fontSize: 12, color: "rgba(0, 0, 0, 0.5)" }}>
+                  <div style={{ fontSize: 12, color: "var(--muted-2)" }}>
                     (number of source chunks to search)
                   </div>
                 </label>
@@ -192,7 +192,7 @@ function AskPageContent() {
               }}>
                 <div className="cardInner" style={{ padding: 16 }}>
                   <div style={{ fontWeight: 600, color: "#FF3B30", marginBottom: 4 }}>Error</div>
-                  <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.7)" }}>{error}</div>
+                  <div style={{ fontSize: 14, color: "var(--muted)" }}>{error}</div>
                 </div>
               </div>
             ) : null}
@@ -207,11 +207,11 @@ function AskPageContent() {
                         Based on your uploaded notes
                       </div>
                     </div>
-                    <div style={{ 
-                      whiteSpace: "pre-wrap", 
-                      padding: 20, 
-                      borderRadius: 12, 
-                      background: "rgba(0, 0, 0, 0.02)",
+                    <div style={{
+                      whiteSpace: "pre-wrap",
+                      padding: 20,
+                      borderRadius: 12,
+                      background: "var(--panel-2)",
                       border: "1px solid var(--border)",
                       fontSize: 15,
                       lineHeight: 1.7,
@@ -257,7 +257,7 @@ function AskPageContent() {
                             whiteSpace: "pre-wrap", 
                             fontSize: 14, 
                             lineHeight: 1.6,
-                            color: "rgba(0, 0, 0, 0.8)"
+                            color: "var(--text)"
                           }}>
                             {c.snippet || c.text || ""}
                           </div>
@@ -273,7 +273,7 @@ function AskPageContent() {
               <div style={{
                 padding: 20,
                 textAlign: "center",
-                color: "rgba(0, 0, 0, 0.5)",
+                color: "var(--muted)",
                 fontSize: 14
               }}>
                 Enter a question above to get started

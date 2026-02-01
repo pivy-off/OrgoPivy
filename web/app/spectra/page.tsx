@@ -1179,24 +1179,24 @@ export function SpectraPageOld() {
   };
 
   const cardStyle: React.CSSProperties = {
-    border: "1px solid #e5e5e5",
+    border: "1px solid var(--border)",
     borderRadius: 14,
-    background: "white",
+    background: "var(--panel)",
     padding: 14,
   };
 
   const buttonStyle = (active?: boolean): React.CSSProperties => ({
     padding: "10px 12px",
     borderRadius: 12,
-    border: active ? "1px solid #111" : "1px solid #e5e5e5",
-    background: active ? "#111" : "white",
-    color: active ? "white" : "#111",
+    border: active ? "1px solid var(--blue)" : "1px solid var(--border)",
+    background: active ? "var(--blue)" : "var(--panel)",
+    color: active ? "white" : "var(--text)",
     cursor: "pointer",
     fontWeight: 800,
   });
 
   return (
-    <main style={{ padding: 18, background: "#fafafa", minHeight: "100vh" }}>
+    <main style={{ padding: 18, background: "var(--bg)", minHeight: "100vh" }}>
       <div style={topBarStyle}>
         <div style={{ display: "grid", gap: 4 }}>
           <div style={{ fontSize: 18, fontWeight: 900 }}>NMR Studio</div>
@@ -1268,7 +1268,7 @@ export function SpectraPageOld() {
             </div>
           </div>
 
-          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 12, display: "grid", gap: 10 }}>
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12, display: "grid", gap: 10 }}>
             <div style={{ fontSize: 14, fontWeight: 900 }}>Calibration</div>
 
             <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr 1fr" }}>
@@ -1277,7 +1277,7 @@ export function SpectraPageOld() {
                 <input
                   value={cal.ppm1}
                   onChange={(e) => setCal((c) => ({ ...c, ppm1: e.target.value }))}
-                  style={{ padding: 10, borderRadius: 10, border: "1px solid #e5e5e5" }}
+                  style={{ padding: 10, borderRadius: 10, border: "1px solid var(--border)" }}
                 />
               </label>
 
@@ -1286,7 +1286,7 @@ export function SpectraPageOld() {
                 <input
                   value={cal.ppm2}
                   onChange={(e) => setCal((c) => ({ ...c, ppm2: e.target.value }))}
-                  style={{ padding: 10, borderRadius: 10, border: "1px solid #e5e5e5" }}
+                  style={{ padding: 10, borderRadius: 10, border: "1px solid var(--border)" }}
                 />
               </label>
             </div>
@@ -1294,7 +1294,7 @@ export function SpectraPageOld() {
             <button
               type="button"
               onClick={applyCalibration}
-              style={{ padding: "10px 12px", borderRadius: 12, border: "1px solid #e5e5e5", background: "white", cursor: "pointer", fontWeight: 900 }}
+              style={{ padding: "10px 12px", borderRadius: 12, border: "1px solid var(--border)", background: "var(--panel)", cursor: "pointer", fontWeight: 900, color: "var(--text)" }}
               disabled={plotMode === "jcamp"}
               title={plotMode === "jcamp" ? "Calibration for image mode in this version" : ""}
             >
@@ -1306,7 +1306,7 @@ export function SpectraPageOld() {
             </div>
           </div>
 
-          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 12, display: "grid", gap: 10 }}>
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12, display: "grid", gap: 10 }}>
             <div style={{ fontSize: 14, fontWeight: 900 }}>JCAMP</div>
             <button
               type="button"
@@ -1315,8 +1315,8 @@ export function SpectraPageOld() {
               style={{
                 padding: "10px 12px",
                 borderRadius: 12,
-                border: "1px solid #111",
-                background: "#111",
+                border: "1px solid var(--blue)",
+                background: "var(--blue)",
                 color: "white",
                 cursor: plot.has ? "pointer" : "not-allowed",
                 opacity: plot.has ? 1 : 0.5,
@@ -1333,28 +1333,30 @@ export function SpectraPageOld() {
               style={{
                 padding: "10px 12px",
                 borderRadius: 12,
-                border: "1px solid #e5e5e5",
-                background: "white",
+                border: "1px solid var(--border)",
+                background: "var(--panel)",
                 cursor: plot.has && plotMode === "jcamp" ? "pointer" : "not-allowed",
                 opacity: plot.has && plotMode === "jcamp" ? 1 : 0.5,
                 fontWeight: 900,
+                color: "var(--text)"
               }}
             >
               Reset view R
             </button>
           </div>
 
-          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 12, display: "grid", gap: 10 }}>
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12, display: "grid", gap: 10 }}>
             <div style={{ fontSize: 14, fontWeight: 900 }}>Intelligence</div>
             <div style={{ display: "grid", gap: 8 }}>
               {checks.map((c, i) => (
                 <div
                   key={i}
                   style={{
-                    border: "1px solid #e5e5e5",
+                    border: "1px solid var(--border)",
                     borderRadius: 12,
                     padding: 10,
-                    background: c.level === "warn" ? "#fff7f7" : "white",
+                    background: c.level === "warn" ? "rgba(255, 149, 0, 0.1)" : "var(--panel)",
+                    color: "var(--text)"
                   }}
                 >
                   <div style={{ fontSize: 12, fontWeight: 900 }}>{c.level === "warn" ? "Check" : "Hint"}</div>
@@ -1364,11 +1366,11 @@ export function SpectraPageOld() {
             </div>
           </div>
 
-          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 12, display: "grid", gap: 10 }}>
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12, display: "grid", gap: 10 }}>
             <button
               type="button"
               onClick={exportWorkspace}
-              style={{ padding: "10px 12px", borderRadius: 12, border: "1px solid #e5e5e5", background: "white", cursor: "pointer", fontWeight: 900 }}
+              style={{ padding: "10px 12px", borderRadius: 12, border: "1px solid var(--border)", background: "var(--panel)", cursor: "pointer", fontWeight: 900, color: "var(--text)" }}
             >
               Export workspace JSON
             </button>
@@ -1376,14 +1378,14 @@ export function SpectraPageOld() {
             <button
               type="button"
               onClick={exportAnnotatedPngs}
-              style={{ padding: "10px 12px", borderRadius: 12, border: "1px solid #111", background: "#111", color: "white", cursor: "pointer", fontWeight: 950 }}
+              style={{ padding: "10px 12px", borderRadius: 12, border: "1px solid var(--blue)", background: "var(--blue)", color: "white", cursor: "pointer", fontWeight: 950 }}
             >
               Export annotated PNG
             </button>
           </div>
         </div>
 
-        <div style={{ border: "1px solid #e5e5e5", borderRadius: 14, background: "white", overflow: "hidden", position: "relative", minHeight: 680 }}>
+        <div style={{ border: "1px solid var(--border)", borderRadius: 14, background: "var(--panel)", overflow: "hidden", position: "relative", minHeight: 680 }}>
           {spectrumUrl ? (
             <img
               ref={spectrumImgRef}
@@ -1418,7 +1420,7 @@ export function SpectraPageOld() {
           />
         </div>
 
-        <div style={{ border: "1px solid #e5e5e5", borderRadius: 14, background: "white", overflow: "hidden", position: "relative", minHeight: 680, display: "grid", gridTemplateRows: "1fr auto" }}>
+        <div style={{ border: "1px solid var(--border)", borderRadius: 14, background: "var(--panel)", overflow: "hidden", position: "relative", minHeight: 680, display: "grid", gridTemplateRows: "1fr auto" }}>
           {structureUrl ? (
             <img
               ref={structureImgRef}
@@ -1449,11 +1451,11 @@ export function SpectraPageOld() {
             }}
           />
 
-          <div style={{ borderTop: "1px solid #f0f0f0", padding: 12, display: "grid", gap: 10 }}>
+          <div style={{ borderTop: "1px solid var(--border)", padding: 12, display: "grid", gap: 10 }}>
             <div style={{ fontSize: 14, fontWeight: 950 }}>Linking</div>
 
             <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr 1fr" }}>
-              <div style={{ border: "1px solid #e5e5e5", borderRadius: 12, padding: 10 }}>
+              <div style={{ border: "1px solid var(--border)", borderRadius: 12, padding: 10 }}>
                 <div style={{ fontSize: 12, fontWeight: 950 }}>Selected peak</div>
                 <div style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>
                   {selectedPeak
@@ -1472,7 +1474,7 @@ export function SpectraPageOld() {
                       <input
                         value={selectedPeak.ppmManual}
                         onChange={(e) => updateSelectedPeak({ ppmManual: e.target.value })}
-                        style={{ padding: 9, borderRadius: 10, border: "1px solid #e5e5e5" }}
+                        style={{ padding: 9, borderRadius: 10, border: "1px solid var(--border)" }}
                       />
                     </label>
                     <label style={{ display: "grid", gap: 6 }}>
@@ -1480,7 +1482,7 @@ export function SpectraPageOld() {
                       <input
                         value={selectedPeak.multiplicity}
                         onChange={(e) => updateSelectedPeak({ multiplicity: e.target.value })}
-                        style={{ padding: 9, borderRadius: 10, border: "1px solid #e5e5e5" }}
+                        style={{ padding: 9, borderRadius: 10, border: "1px solid var(--border)" }}
                       />
                     </label>
                     <label style={{ display: "grid", gap: 6 }}>
@@ -1488,14 +1490,14 @@ export function SpectraPageOld() {
                       <input
                         value={selectedPeak.integration}
                         onChange={(e) => updateSelectedPeak({ integration: e.target.value })}
-                        style={{ padding: 9, borderRadius: 10, border: "1px solid #e5e5e5" }}
+                        style={{ padding: 9, borderRadius: 10, border: "1px solid var(--border)" }}
                       />
                     </label>
                   </div>
                 ) : null}
               </div>
 
-              <div style={{ border: "1px solid #e5e5e5", borderRadius: 12, padding: 10 }}>
+              <div style={{ border: "1px solid var(--border)", borderRadius: 12, padding: 10 }}>
                 <div style={{ fontSize: 12, fontWeight: 950 }}>Selected atom</div>
                 <div style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>
                   {selectedAtom ? selectedAtom.label || "atom" : "none"}
@@ -1508,7 +1510,7 @@ export function SpectraPageOld() {
                       <input
                         value={selectedAtom.label}
                         onChange={(e) => updateSelectedAtom({ label: e.target.value })}
-                        style={{ padding: 9, borderRadius: 10, border: "1px solid #e5e5e5" }}
+                        style={{ padding: 9, borderRadius: 10, border: "1px solid var(--border)" }}
                       />
                     </label>
                     <label style={{ display: "grid", gap: 6 }}>
@@ -1516,7 +1518,7 @@ export function SpectraPageOld() {
                       <input
                         value={selectedAtom.note}
                         onChange={(e) => updateSelectedAtom({ note: e.target.value })}
-                        style={{ padding: 9, borderRadius: 10, border: "1px solid #e5e5e5" }}
+                        style={{ padding: 9, borderRadius: 10, border: "1px solid var(--border)" }}
                       />
                     </label>
                   </div>
@@ -1531,8 +1533,8 @@ export function SpectraPageOld() {
               style={{
                 padding: "10px 12px",
                 borderRadius: 12,
-                border: "1px solid #111",
-                background: "#111",
+                border: "1px solid var(--blue)",
+                background: "var(--blue)",
                 color: "white",
                 cursor: selectedPeakId && selectedAtomId ? "pointer" : "not-allowed",
                 opacity: selectedPeakId && selectedAtomId ? 1 : 0.5,

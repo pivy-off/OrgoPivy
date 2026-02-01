@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import type { Video } from "../lib/curriculum";
 
 type Props = {
   items: string[];
+  videos?: Video[];
   course: string;
   topic: string;
 };
 
-export default function MustKnowChecklist({ items, course, topic }: Props) {
+export default function MustKnowChecklist({ items, videos, course, topic }: Props) {
   const storageKey = `orgopivy-checklist-${course}-${topic}`;
   
   const [checked, setChecked] = useState<Set<number>>(new Set());
@@ -56,20 +58,20 @@ export default function MustKnowChecklist({ items, course, topic }: Props) {
         justifyContent: "space-between",
         marginBottom: 16
       }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(0, 0, 0, 0.6)" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)" }}>
           Progress: {checked.size} / {items.length}
         </div>
         <div style={{
           width: 120,
           height: 6,
-          background: "rgba(0, 0, 0, 0.08)",
+          background: "var(--border-2)",
           borderRadius: 3,
           overflow: "hidden"
         }}>
           <div style={{
             width: `${progress}%`,
             height: "100%",
-            background: "linear-gradient(90deg, #007AFF, #5856D6)",
+            background: "linear-gradient(90deg, var(--blue), var(--purple))",
             transition: "width 0.3s ease"
           }} />
         </div>
@@ -91,7 +93,7 @@ export default function MustKnowChecklist({ items, course, topic }: Props) {
                 alignItems: "flex-start",
                 padding: 14,
                 borderRadius: 12,
-                border: `1px solid ${isChecked ? "rgba(0, 122, 255, 0.3)" : "rgba(0, 0, 0, 0.08)"}`,
+                border: `1px solid ${isChecked ? "rgba(0, 122, 255, 0.3)" : "var(--border)"}`,
                 background: isChecked ? "rgba(0, 122, 255, 0.04)" : "transparent",
                 cursor: "pointer",
                 transition: "all 0.2s ease"
@@ -104,7 +106,7 @@ export default function MustKnowChecklist({ items, course, topic }: Props) {
               }}
               onMouseLeave={(e) => {
                 if (!isChecked) {
-                  e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.08)";
+                  e.currentTarget.style.borderColor = "var(--border)";
                   e.currentTarget.style.background = "transparent";
                 }
               }}
@@ -125,7 +127,7 @@ export default function MustKnowChecklist({ items, course, topic }: Props) {
                 <div style={{
                   fontSize: 14,
                   fontWeight: isChecked ? 500 : 600,
-                  color: isChecked ? "rgba(0, 0, 0, 0.5)" : "rgba(0, 0, 0, 0.9)",
+                  color: isChecked ? "var(--muted)" : "var(--text)",
                   textDecoration: isChecked ? "line-through" : "none",
                   marginBottom: tail ? 4 : 0
                 }}>
@@ -134,12 +136,70 @@ export default function MustKnowChecklist({ items, course, topic }: Props) {
                 {tail ? (
                   <div style={{
                     fontSize: 12,
-                    color: "rgba(0, 0, 0, 0.6)",
+                    color: "var(--muted)",
                     lineHeight: 1.5
                   }}>
                     {tail}
                   </div>
                 ) : null}
+                {videos && videos[i] && (
+                  <a
+                    href={videos[i].url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginTop: 8,
+                      padding: 8,
+                      borderRadius: 8,
+                      background: "var(--panel-2)",
+                      border: "1px solid var(--border)",
+                      textDecoration: "none",
+                      transition: "all 0.2s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "var(--blue)";
+                      e.currentTarget.style.background = "rgba(0, 122, 255, 0.05)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "var(--border)";
+                      e.currentTarget.style.background = "var(--panel-2)";
+                    }}
+                  >
+                    <img
+                      src={videos[i].thumbnail}
+                      alt={videos[i].title}
+                      style={{
+                        width: 80,
+                        height: 45,
+                        borderRadius: 4,
+                        objectFit: "cover"
+                      }}
+                    />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: "var(--text)",
+                        marginBottom: 2,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap"
+                      }}>
+                        {videos[i].title}
+                      </div>
+                      <div style={{
+                        fontSize: 10,
+                        color: "var(--muted)"
+                      }}>
+                        Watch on YouTube →
+                      </div>
+                    </div>
+                  </a>
+                )}
               </div>
             </label>
           );

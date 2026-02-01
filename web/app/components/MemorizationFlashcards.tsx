@@ -13,6 +13,8 @@ type FlashcardItem = {
   value: string;
   note?: string;
   category: string;
+  imageUrl?: string;
+  imageAlt?: string;
 };
 
 export default function MemorizationFlashcards({ slug }: Props) {
@@ -30,9 +32,14 @@ export default function MemorizationFlashcards({ slug }: Props) {
     const allCards: FlashcardItem[] = [];
     items.forEach((category) => {
       category.items.forEach((item) => {
+        const entry = item as { term: string; value: string; note?: string; imageUrl?: string; imageAlt?: string };
         allCards.push({
-          ...item,
+          term: entry.term,
+          value: entry.value,
+          note: entry.note,
           category: category.category,
+          imageUrl: entry.imageUrl,
+          imageAlt: entry.imageAlt,
         });
       });
     });
@@ -200,11 +207,16 @@ export default function MemorizationFlashcards({ slug }: Props) {
               <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>
                 {currentCard.category}
               </div>
-              <div style={{ fontSize: 32, fontWeight: 700, color: "var(--text)", marginBottom: 16 }}>
+              <div style={{ fontSize: 24, fontWeight: 700, color: "var(--text)", marginBottom: 16, lineHeight: 1.4 }}>
                 {currentCard.value}
               </div>
-              <div style={{ fontSize: 14, color: "var(--muted)" }}>
-                Click or press F to see hint
+              {currentCard.note && (
+                <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 8, fontStyle: "italic" }}>
+                  💡 {currentCard.note}
+                </div>
+              )}
+              <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 20 }}>
+                Click or press F to see answer
               </div>
             </>
           )}
@@ -214,11 +226,11 @@ export default function MemorizationFlashcards({ slug }: Props) {
               <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>
                 Hint
               </div>
-              <div style={{ fontSize: 28, fontWeight: 600, color: "var(--orange)", marginBottom: 16 }}>
+              <div style={{ fontSize: 20, fontWeight: 600, color: "var(--orange)", marginBottom: 16, lineHeight: 1.4 }}>
                 {currentCard.term}
               </div>
-              <div style={{ fontSize: 14, color: "var(--muted)" }}>
-                Click or press F to see answer
+              <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 20 }}>
+                Click or press F to see full answer
               </div>
             </>
           )}
@@ -228,21 +240,25 @@ export default function MemorizationFlashcards({ slug }: Props) {
               <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>
                 Answer
               </div>
-              <div style={{ fontSize: 36, fontWeight: 700, color: "var(--blue)", marginBottom: 12 }}>
-                {(() => {
-                  // Generate answer based on card type
-                  // For naming prefixes (like "Hept-" -> "7 carbons"), show the full name
-                  if (currentCard.value.includes("carbon") && currentCard.term.endsWith("-")) {
-                    const prefix = currentCard.term.replace("-", "").toLowerCase();
-                    return prefix + "ane";
-                  }
-                  // For other cases, show the term as the answer
-                  return currentCard.term;
-                })()}
+              {currentCard.imageUrl && (
+                <img
+                  src={currentCard.imageUrl}
+                  alt={currentCard.imageAlt ?? currentCard.term}
+                  width={120}
+                  height={120}
+                  referrerPolicy="no-referrer"
+                  style={{ objectFit: "contain", marginBottom: 16, borderRadius: "var(--radius-sm)", background: "var(--panel)" }}
+                />
+              )}
+              <div style={{ fontSize: 20, fontWeight: 600, color: "var(--blue)", marginBottom: 12, lineHeight: 1.5 }}>
+                {currentCard.term}
+              </div>
+              <div style={{ fontSize: 16, color: "var(--text)", marginBottom: 12, lineHeight: 1.6 }}>
+                {currentCard.value}
               </div>
               {currentCard.note && (
-                <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 12, maxWidth: 500 }}>
-                  {currentCard.note}
+                <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 12, padding: 12, background: "var(--panel)", borderRadius: 8, border: "1px solid var(--border)" }}>
+                  📚 {currentCard.note}
                 </div>
               )}
               <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 16 }}>

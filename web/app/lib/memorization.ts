@@ -1,19 +1,197 @@
 // Memorization items for organic chemistry topics
+// Enhanced with valuable "must know" information from curriculum
+
+import { findTopic, getCourseTopics } from "./curriculum";
+import type { CourseId } from "./curriculum";
+
+export type MemorizationItemEntry = {
+  term: string;
+  value: string;
+  note?: string;
+  /** Best image from the web for this item (e.g. Wikipedia Commons structure) */
+  imageUrl?: string;
+  imageAlt?: string;
+  /** Shown when user hasn't reached spectroscopy yet (no IR/NMR) */
+  valueNoSpectroscopy?: string;
+};
 
 export type MemorizationItem = {
   category: string;
-  items: Array<{
-    term: string;
-    value: string;
-    note?: string;
-  }>;
+  /** Optional image for the whole category (e.g. reference diagram) */
+  categoryImageUrl?: string;
+  categoryImageAlt?: string;
+  items: MemorizationItemEntry[];
 };
 
+// Topics before spectroscopy in Orgo 1 — don't show IR/NMR on functional groups yet
+const SLUGS_BEFORE_SPECTROSCOPY = ["alkanes", "cycloalkanes", "stereochemistry", "substitution-elimination", "alkenes"];
+
+function getTopicFromSlug(slug: string): { topic: any; course: CourseId } | null {
+  const orgochem1Topics = getCourseTopics("orgochem-1");
+  const orgochem2Topics = getCourseTopics("orgochem-2");
+  
+  let topic = orgochem1Topics.find(t => t.slug === slug);
+  if (topic) return { topic, course: "orgochem-1" };
+  
+  topic = orgochem2Topics.find(t => t.slug === slug);
+  if (topic) return { topic, course: "orgochem-2" };
+  
+  return null;
+}
+
 export function getMemorizationItems(slug: string): MemorizationItem[] {
-  const items: Record<string, MemorizationItem[]> = {
+  const topicData = getTopicFromSlug(slug);
+  const items: MemorizationItem[] = [];
+
+  // Add "Must Know" items as flashcards - these are the most valuable
+  if (topicData?.topic.mustKnow && topicData.topic.mustKnow.length > 0) {
+    // Group must-know items into logical categories for better organization
+    const categorizedItems: Record<string, Array<{term: string; value: string; note?: string}>> = {};
+    
+    topicData.topic.mustKnow.forEach((concept: string, idx: number) => {
+      // Determine category based on content
+      let category = "Must Know Concepts";
+      
+      if (concept.toLowerCase().includes("newman") || concept.toLowerCase().includes("conformation") || concept.toLowerCase().includes("staggered") || concept.toLowerCase().includes("eclipsed") || concept.toLowerCase().includes("anti") || concept.toLowerCase().includes("gauche")) {
+        category = "Conformations & Newman Projections";
+      } else if (concept.toLowerCase().includes("naming") || concept.toLowerCase().includes("iupac") || concept.toLowerCase().includes("substituent") || concept.toLowerCase().includes("alphabetical")) {
+        category = "Naming Rules";
+      } else if (concept.toLowerCase().includes("primary") || concept.toLowerCase().includes("secondary") || concept.toLowerCase().includes("tertiary") || concept.toLowerCase().includes("1°") || concept.toLowerCase().includes("2°") || concept.toLowerCase().includes("3°")) {
+        category = "Carbon Classification";
+      } else if (concept.toLowerCase().includes("strain") || concept.toLowerCase().includes("torsional") || concept.toLowerCase().includes("steric") || concept.toLowerCase().includes("angle")) {
+        category = "Strain & Stability";
+      } else if (concept.toLowerCase().includes("chair") || concept.toLowerCase().includes("axial") || concept.toLowerCase().includes("equatorial") || concept.toLowerCase().includes("flip")) {
+        category = "Cycloalkane Conformations";
+      } else if (concept.toLowerCase().includes("r/s") || concept.toLowerCase().includes("e/z") || concept.toLowerCase().includes("enantiomer") || concept.toLowerCase().includes("diastereomer") || concept.toLowerCase().includes("chiral") || concept.toLowerCase().includes("stereocenter") || concept.toLowerCase().includes("cip")) {
+        category = "Stereochemistry";
+      } else if (concept.toLowerCase().includes("sn1") || concept.toLowerCase().includes("sn2") || concept.toLowerCase().includes("e1") || concept.toLowerCase().includes("e2") || concept.toLowerCase().includes("substrate") || concept.toLowerCase().includes("nucleophile") || concept.toLowerCase().includes("solvent")) {
+        category = "Substitution & Elimination";
+      } else if (concept.toLowerCase().includes("markovnikov") || concept.toLowerCase().includes("addition") || concept.toLowerCase().includes("syn") || concept.toLowerCase().includes("anti") || concept.toLowerCase().includes("rearrangement")) {
+        category = "Alkene Reactions";
+      } else if (concept.toLowerCase().includes("ir") || concept.toLowerCase().includes("nmr") || concept.toLowerCase().includes("spectroscopy") || concept.toLowerCase().includes("chemical shift") || concept.toLowerCase().includes("splitting")) {
+        category = "Spectroscopy";
+      } else if (concept.toLowerCase().includes("oxidation") || concept.toLowerCase().includes("pcc") || concept.toLowerCase().includes("jones") || concept.toLowerCase().includes("alcohol")) {
+        category = "Alcohol Reactions";
+      } else if (concept.toLowerCase().includes("williamson") || concept.toLowerCase().includes("epoxide") || concept.toLowerCase().includes("ether")) {
+        category = "Ethers & Epoxides";
+      } else if (concept.toLowerCase().includes("carbonyl") || concept.toLowerCase().includes("grignard") || concept.toLowerCase().includes("aldehyde") || concept.toLowerCase().includes("ketone") || concept.toLowerCase().includes("acetal")) {
+        category = "Carbonyl Chemistry";
+      } else if (concept.toLowerCase().includes("acyl") || concept.toLowerCase().includes("carboxylic") || concept.toLowerCase().includes("ester") || concept.toLowerCase().includes("amide") || concept.toLowerCase().includes("reactivity ladder")) {
+        category = "Carboxylic Acid Derivatives";
+      } else if (concept.toLowerCase().includes("enolate") || concept.toLowerCase().includes("aldol") || concept.toLowerCase().includes("claisen") || concept.toLowerCase().includes("alpha")) {
+        category = "Enolate Chemistry";
+      } else if (concept.toLowerCase().includes("aromatic") || concept.toLowerCase().includes("eas") || concept.toLowerCase().includes("directing") || concept.toLowerCase().includes("ortho") || concept.toLowerCase().includes("meta") || concept.toLowerCase().includes("para")) {
+        category = "Aromatic Chemistry";
+      } else if (concept.toLowerCase().includes("amine") || concept.toLowerCase().includes("basicity") || concept.toLowerCase().includes("reductive amination")) {
+        category = "Amines";
+      }
+      
+      if (!categorizedItems[category]) {
+        categorizedItems[category] = [];
+      }
+      
+      // Create better flashcard format from must-know concepts
+      // Pattern 1: "Term: definition" format
+      const colonIndex = concept.indexOf(":");
+      if (colonIndex > 0 && colonIndex < concept.length - 5) {
+        const term = concept.substring(0, colonIndex).trim();
+        const definition = concept.substring(colonIndex + 1).trim();
+        categorizedItems[category].push({
+          term: term,
+          value: definition,
+          note: topicData.topic.mustKnowVideos?.[idx]?.title
+        });
+        return;
+      }
+      
+      // Pattern 2: Split by "vs" or "and" for comparisons
+      if (concept.includes(" vs ") || concept.includes(" vs. ")) {
+        const parts = concept.split(/ vs\.? /);
+        if (parts.length === 2) {
+          categorizedItems[category].push({
+            term: parts[0].trim(),
+            value: parts[1].trim(),
+            note: topicData.topic.mustKnowVideos?.[idx]?.title
+          });
+          return;
+        }
+      }
+      
+      // Pattern 3: First sentence as question, rest as answer
+      const periodIndex = concept.indexOf(".");
+      if (periodIndex > 10 && periodIndex < concept.length / 2) {
+        categorizedItems[category].push({
+          term: concept.substring(0, periodIndex).trim(),
+          value: concept.substring(periodIndex + 1).trim() || concept,
+          note: topicData.topic.mustKnowVideos?.[idx]?.title
+        });
+        return;
+      }
+      
+      // Pattern 4: Extract key concept and explanation
+      const words = concept.split(" ");
+      if (words.length > 8) {
+        const midPoint = Math.floor(words.length * 0.4);
+        categorizedItems[category].push({
+          term: words.slice(0, midPoint).join(" "),
+          value: words.slice(midPoint).join(" "),
+          note: topicData.topic.mustKnowVideos?.[idx]?.title
+        });
+        return;
+      }
+      
+      // Default: Use first part as question, full text as answer
+      const questionLength = Math.min(60, Math.floor(concept.length * 0.4));
+      categorizedItems[category].push({
+        term: concept.substring(0, questionLength).trim() + (concept.length > questionLength ? "..." : ""),
+        value: concept,
+        note: topicData.topic.mustKnowVideos?.[idx]?.title
+      });
+    });
+    
+    // Convert categorized items to MemorizationItem format
+    // Don't show Conformations & Newman Projections under Alkanes — conformation is its own topic
+    const categoriesToSkipForAlkanes = new Set(["Conformations & Newman Projections"]);
+    Object.keys(categorizedItems).forEach(category => {
+      if (slug === "alkanes" && categoriesToSkipForAlkanes.has(category)) return;
+      if (categorizedItems[category].length > 0) {
+        items.push({
+          category: category,
+          items: categorizedItems[category]
+        });
+      }
+    });
+  }
+
+  // Functional groups for Orgo Chem 1: memorize name, structure; IR/NMR only after spectroscopy topic
+  const functionalGroupsOrgo1: MemorizationItem = {
+    category: "Functional Groups (Memorize & Identify)",
+    items: [
+      { term: "Alkane", value: "C–C and C–H only (no π bonds). IR: C–H stretch ~2850–2960 cm⁻¹. Very unreactive.", valueNoSpectroscopy: "C–C and C–H only (no π bonds). Very unreactive.", note: "R–H", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b9/Butane-2D-flat.png", imageAlt: "Butane structure" },
+      { term: "Alkene", value: "Carbon–carbon double bond (C=C). IR: C=C ~1620–1680 cm⁻¹; vinylic C–H ~3020–3100 cm⁻¹. ¹H NMR: vinyl ~4.5–6.5 ppm.", valueNoSpectroscopy: "Carbon–carbon double bond (C=C).", note: "R₂C=CR₂", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/8/8d/Ethene-2D-flat.png", imageAlt: "Ethene structure" },
+      { term: "Alkyne", value: "Carbon–carbon triple bond (C≡C). IR: C≡C ~2100–2260 cm⁻¹; terminal ≡C–H ~3300 cm⁻¹. Terminal alkynes are acidic.", valueNoSpectroscopy: "Carbon–carbon triple bond (C≡C). Terminal alkynes (R–C≡C–H) are acidic.", note: "R–C≡C–H or R–C≡C–R", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2b/Ethyne-2D-flat.png", imageAlt: "Ethyne structure" },
+      { term: "Alcohol", value: "R–OH. IR: O–H broad ~3200–3600 cm⁻¹; C–O ~1000–1200 cm⁻¹. ¹H NMR: O–H ~2–5 ppm (variable).", valueNoSpectroscopy: "R–OH. Primary, secondary, or tertiary depending on C attached to OH.", note: "Primary, secondary, tertiary", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/60/Ethanol-2D-flat.png", imageAlt: "Ethanol structure" },
+      { term: "Ether", value: "R–O–R′ (C–O–C). IR: C–O ~1050–1150 cm⁻¹ (no O–H). Relatively unreactive.", valueNoSpectroscopy: "R–O–R′ (C–O–C). No O–H. Relatively unreactive.", note: "No O–H", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3e/Diethyl-ether-2D-flat.png", imageAlt: "Diethyl ether structure" },
+      { term: "Alkyl halide", value: "R–X (X = F, Cl, Br, I). IR: C–X stretch varies (C–Cl ~700–800). ¹H NMR: R–CH₂–X ~3–4 ppm. Good leaving groups.", valueNoSpectroscopy: "R–X (X = F, Cl, Br, I). Good leaving groups in substitution/elimination.", note: "Halide = leaving group", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Chloroethane-2D-flat.png", imageAlt: "Chloroethane structure" },
+      { term: "Aldehyde", value: "R–CHO (C=O with H on carbonyl). IR: C=O ~1725–1740 cm⁻¹; aldehyde C–H ~2700–2800 (doublet). ¹H NMR: CHO ~9–10 ppm.", valueNoSpectroscopy: "R–CHO (C=O with H on carbonyl). Oxidizes to carboxylic acid.", note: "Oxidizes to carboxylic acid", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3e/Acetaldehyde-2D-flat.png", imageAlt: "Acetaldehyde structure" },
+      { term: "Ketone", value: "R–(C=O)–R′. IR: C=O ~1705–1720 cm⁻¹. ¹H NMR: no CHO; α protons ~2–2.5 ppm. Resists oxidation.", valueNoSpectroscopy: "R–(C=O)–R′. No H on carbonyl. Resists oxidation.", note: "No H on carbonyl", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/00/Acetone-2D-flat.png", imageAlt: "Acetone structure" },
+      { term: "Carboxylic acid", value: "R–COOH. IR: O–H broad ~2500–3300; C=O ~1710 cm⁻¹. ¹H NMR: COOH ~10–12 ppm. Acidic (pKa ~4–5).", valueNoSpectroscopy: "R–COOH. Acidic (pKa ~4–5).", note: "Dimer H-bonding", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Acetic-acid-2D-flat.png", imageAlt: "Acetic acid structure" },
+      { term: "Ester", value: "R–COO–R′. IR: C=O ~1735–1750 cm⁻¹; C–O ~1150–1250. No O–H. ¹H NMR: COO–CH₂– ~3.7–4.2 ppm.", valueNoSpectroscopy: "R–COO–R′. Formed from acid + alcohol. No O–H.", note: "From acid + alcohol", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Ethyl-acetate-2D-flat.png", imageAlt: "Ethyl acetate structure" },
+      { term: "Amide", value: "R–(C=O)–NR₂. IR: C=O ~1640–1680; N–H ~3200–3500 (1 or 2 peaks). Least reactive carbonyl derivative.", valueNoSpectroscopy: "R–(C=O)–NR₂. Least reactive carbonyl derivative.", note: "N–H in structure", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/8/8e/Acetamide-2D-flat.png", imageAlt: "Acetamide structure" },
+      { term: "Amine", value: "R–NH₂, R₂NH, or R₃N. IR: N–H ~3300–3500 (sharp, 1 or 2 peaks). Basic; ¹H NMR: N–H ~1–3 ppm (broad, exchangeable).", valueNoSpectroscopy: "R–NH₂, R₂NH, or R₃N. Basic. Primary: 2 N–H; secondary: 1 N–H.", note: "Primary: 2 N–H; secondary: 1 N–H", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Methylamine-2D-flat.png", imageAlt: "Methylamine structure" },
+      { term: "Nitrile", value: "R–C≡N. IR: C≡N ~2210–2260 cm⁻¹ (sharp). ¹H NMR: α protons ~2–3 ppm.", valueNoSpectroscopy: "R–C≡N. Not the same as alkyne C≡C.", note: "Not the same as alkyne C≡C", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Acetonitrile-2D-flat.png", imageAlt: "Acetonitrile structure" },
+      { term: "Aromatic", value: "Benzene ring (conjugated π). IR: C–H ~3000–3100; C=C ~1450–1600. ¹H NMR: aromatic H ~6.5–8.5 ppm.", valueNoSpectroscopy: "Benzene ring (conjugated π). Planar, 4n+2 π electrons.", note: "Planar, 4n+2 π electrons", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/90/Benzene-2D-flat.png", imageAlt: "Benzene structure" },
+    ],
+  };
+
+  // Add topic-specific valuable memorization items (supplementary to must-know)
+  const topicSpecificItems: Record<string, MemorizationItem[]> = {
     "alkanes": [
+      functionalGroupsOrgo1,
       {
         category: "Naming Prefixes",
+        categoryImageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b9/Butane-2D-flat.png",
+        categoryImageAlt: "Alkane carbon chain (butane)",
         items: [
           { term: "Meth-", value: "1 carbon" },
           { term: "Eth-", value: "2 carbons" },
@@ -27,6 +205,7 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
       },
     ],
     "cycloalkanes": [
+      functionalGroupsOrgo1,
       {
         category: "Ring Strain",
         items: [
@@ -38,6 +217,7 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
       },
     ],
     "stereochemistry": [
+      functionalGroupsOrgo1,
       {
         category: "CIP Priority Rules",
         items: [
@@ -49,6 +229,7 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
       },
     ],
     "substitution-elimination": [
+      functionalGroupsOrgo1,
       {
         category: "pKa Values (Important)",
         items: [
@@ -83,6 +264,7 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
       },
     ],
     "alkenes": [
+      functionalGroupsOrgo1,
       {
         category: "Markovnikov's Rule",
         items: [
@@ -103,6 +285,7 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
       },
     ],
     "spectroscopy": [
+      functionalGroupsOrgo1,
       {
         category: "IR Key Regions (cm⁻¹)",
         items: [
@@ -141,6 +324,7 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
       },
     ],
     "alcohols": [
+      functionalGroupsOrgo1,
       {
         category: "Oxidation Reagents",
         items: [
@@ -152,6 +336,7 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
       },
     ],
     "carbonyls-addition": [
+      functionalGroupsOrgo1,
       {
         category: "Reactivity Order",
         items: [
@@ -171,6 +356,7 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
       },
     ],
     "carboxylic-acids-derivatives": [
+      functionalGroupsOrgo1,
       {
         category: "Reactivity Ladder",
         items: [
@@ -183,6 +369,7 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
       },
     ],
     "enolates-aldol-claisen": [
+      functionalGroupsOrgo1,
       {
         category: "pKa Values (Alpha H)",
         items: [
@@ -194,6 +381,7 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
       },
     ],
     "aromatic-chemistry": [
+      functionalGroupsOrgo1,
       {
         category: "Directing Effects",
         items: [
@@ -206,6 +394,7 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
       },
     ],
     "amines": [
+      functionalGroupsOrgo1,
       {
         category: "Basicity Trends",
         items: [
@@ -220,5 +409,19 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
     ],
   };
 
-  return items[slug] || [];
+  // Add topic-specific items if they exist
+  if (topicSpecificItems[slug]) {
+    items.push(...topicSpecificItems[slug]);
+  }
+
+  // Before spectroscopy topic: show functional groups without IR/NMR so students aren’t overwhelmed
+  const useSimpleValues = SLUGS_BEFORE_SPECTROSCOPY.includes(slug);
+  return items.map((cat) => ({
+    ...cat,
+    items: cat.items.map((entry) => {
+      const e = entry as MemorizationItemEntry;
+      const value = useSimpleValues && e.valueNoSpectroscopy ? e.valueNoSpectroscopy : e.value;
+      return { ...e, value };
+    }),
+  }));
 }

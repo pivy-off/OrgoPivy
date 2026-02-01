@@ -3,8 +3,8 @@
   --panel: #ffffff;
   --panel-2: #fafafa;
 
-  --text: #1d1d1f;
-  --muted: rgba(29, 29, 31, 0.6);
+  --text: #1d1d1f; /* Black text for white/light backgrounds */
+  --muted: rgba(29, 29, 31, 0.6); /* Dark muted text for light backgrounds */
   --muted-2: rgba(29, 29, 31, 0.4);
 
   --border: rgba(29, 29, 31, 0.1);
@@ -43,9 +43,9 @@
   --panel: #1c1c1e;
   --panel-2: #2c2c2e;
 
-  --text: #f5f5f7;
-  --muted: rgba(245, 245, 247, 0.6);
-  --muted-2: rgba(245, 245, 247, 0.4);
+  --text: #ffffff; /* White text for black/dark backgrounds */
+  --muted: rgba(255, 255, 255, 0.7); /* Light muted text for dark backgrounds */
+  --muted-2: rgba(255, 255, 255, 0.5);
 
   --border: rgba(245, 245, 247, 0.15);
   --border-2: rgba(245, 245, 247, 0.08);
@@ -62,6 +62,65 @@
   --focus: rgba(10, 132, 255, 0.25);
   --warn-bg: rgba(255, 159, 10, 0.15);
   --warn-border: rgba(255, 159, 10, 0.3);
+}
+
+/* Ensure proper text colors for light and dark themes */
+/* Light theme: black text on white backgrounds */
+/* Dark theme: white text on dark backgrounds */
+
+* {
+  color: inherit;
+}
+
+/* Dark mode: ensure all text is white */
+[data-theme="dark"] * {
+  color: var(--text) !important;
+}
+
+/* Light mode: ensure all text is black */
+:root * {
+  color: var(--text);
+}
+
+/* Specific overrides for dark mode to ensure white text */
+[data-theme="dark"] .btn,
+[data-theme="dark"] button {
+  color: var(--text) !important;
+}
+
+[data-theme="dark"] .pill {
+  color: var(--text) !important;
+}
+
+[data-theme="dark"] .navLink {
+  color: var(--text) !important;
+}
+
+[data-theme="dark"] a {
+  color: var(--text) !important;
+}
+
+[data-theme="dark"] .cardTitle,
+[data-theme="dark"] .h1,
+[data-theme="dark"] .topicSectionTitle,
+[data-theme="dark"] .courseCardTitle,
+[data-theme="dark"] .progressRowTitle {
+  color: var(--text) !important;
+}
+
+/* Ensure inputs and selects use proper colors */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  color: var(--text) !important;
+  background: var(--panel) !important;
+}
+
+:root input,
+:root select,
+:root textarea {
+  color: var(--text);
+  background: var(--panel);
 }
 
 * {

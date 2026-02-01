@@ -132,7 +132,7 @@ export default function PracticeAchievements({ score, totalQuestions, correctAns
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <div>
           <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Achievements</div>
-          <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.6)" }}>
+          <div style={{ fontSize: 14, color: "var(--muted)" }}>
             {unlockedCount} of {totalCount} unlocked
           </div>
         </div>
@@ -155,10 +155,11 @@ export default function PracticeAchievements({ score, totalQuestions, correctAns
             style={{
               padding: 16,
               borderRadius: 12,
-              border: `2px solid ${achievement.unlocked ? "#34C759" : "rgba(0, 0, 0, 0.1)"}`,
-              background: achievement.unlocked ? "rgba(52, 199, 89, 0.1)" : "white",
+              border: `2px solid ${achievement.unlocked ? "#34C759" : "var(--border)"}`,
+              background: achievement.unlocked ? "rgba(52, 199, 89, 0.1)" : "var(--panel)",
               opacity: achievement.unlocked ? 1 : 0.6,
-              transition: "all 0.2s ease"
+              transition: "all 0.2s ease",
+              color: "var(--text)"
             }}
           >
             <div style={{ fontSize: 32, marginBottom: 8, filter: achievement.unlocked ? "none" : "grayscale(100%)" }}>
@@ -167,14 +168,14 @@ export default function PracticeAchievements({ score, totalQuestions, correctAns
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
               {achievement.name}
             </div>
-            <div style={{ fontSize: 12, color: "rgba(0, 0, 0, 0.6)", marginBottom: 8 }}>
+            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 8 }}>
               {achievement.description}
             </div>
             {achievement.maxProgress > 1 && (
               <div style={{
                 width: "100%",
                 height: 4,
-                background: "rgba(0, 0, 0, 0.1)",
+                background: "var(--border-2)",
                 borderRadius: 2,
                 overflow: "hidden",
                 marginTop: 8

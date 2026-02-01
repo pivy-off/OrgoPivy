@@ -62,7 +62,7 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
   if (problems.length === 0) {
     return (
       <div style={{ padding: 24, textAlign: "center" }}>
-        <div style={{ fontSize: 16, color: "rgba(0, 0, 0, 0.6)" }}>
+        <div style={{ fontSize: 16, color: "var(--muted)" }}>
           No problems available. Upload an exam file to get started.
         </div>
       </div>
@@ -80,22 +80,22 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(0, 0, 0, 0.6)", marginBottom: 4 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "var(--muted)", marginBottom: 4 }}>
               {examTitle}
             </div>
-            <div style={{ fontSize: 20, fontWeight: 700 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text)" }}>
               Problem {currentIndex + 1} of {problems.length}
             </div>
           </div>
           {submitted && (
             <div style={{
               padding: "12px 20px",
-              background: "white",
+              background: "var(--panel)",
               borderRadius: 12,
               border: "1px solid rgba(0, 122, 255, 0.2)",
               textAlign: "center"
             }}>
-              <div style={{ fontSize: 12, color: "rgba(0, 0, 0, 0.6)", marginBottom: 4 }}>Score</div>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>Score</div>
               <div style={{ fontSize: 24, fontWeight: 700, color: "#007AFF" }}>
                 {earnedPoints} / {totalPoints}
               </div>
@@ -110,7 +110,7 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
         <div style={{
           width: "100%",
           height: 8,
-          background: "rgba(0, 0, 0, 0.08)",
+          background: "var(--border-2)",
           borderRadius: 4,
           overflow: "hidden"
         }}>
@@ -127,10 +127,10 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
       {currentProblem && (
         <div style={{
           padding: 24,
-          background: "white",
+          background: "var(--panel)",
           borderRadius: 16,
-          border: "1px solid rgba(0, 0, 0, 0.08)",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)"
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow)"
         }}>
           <div style={{ marginBottom: 20 }}>
             <div style={{
@@ -145,7 +145,7 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
             }}>
               {currentProblem.type.replace("-", " ").toUpperCase()} · {currentProblem.points} points
             </div>
-            <div style={{ fontSize: 18, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.9)", marginBottom: 20 }}>
+            <div style={{ fontSize: 18, lineHeight: 1.6, color: "var(--text)", marginBottom: 20 }}>
               {currentProblem.question}
             </div>
           </div>
@@ -177,7 +177,7 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
                           ? "#34C759"
                           : isSelected
                           ? "#007AFF"
-                          : "rgba(0, 0, 0, 0.1)"
+                          : "var(--border)"
                       }`,
                       background:
                         show && isSelected && correct
@@ -188,12 +188,12 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
                           ? "rgba(52, 199, 89, 0.1)"
                           : isSelected
                           ? "rgba(0, 122, 255, 0.08)"
-                          : "white",
+                          : "var(--panel)",
                       cursor: submitted ? "default" : "pointer",
                       transition: "all 0.2s ease",
                       fontSize: 15,
                       fontWeight: isSelected ? 600 : 400,
-                      color: "rgba(0, 0, 0, 0.9)"
+                      color: "var(--text)"
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -210,7 +210,7 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
                             ? "#34C759"
                             : isSelected
                             ? "#007AFF"
-                            : "rgba(0, 0, 0, 0.3)"
+                            : "var(--border)"
                         }`,
                         display: "flex",
                         alignItems: "center",
@@ -254,10 +254,12 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
                 minHeight: 120,
                 padding: 16,
                 borderRadius: 12,
-                border: "2px solid rgba(0, 0, 0, 0.1)",
+                border: "2px solid var(--border)",
                 fontSize: 15,
                 fontFamily: "inherit",
-                resize: "vertical"
+                resize: "vertical",
+                background: "var(--panel)",
+                color: "var(--text)"
               }}
             />
           )}
@@ -281,11 +283,11 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
               }}>
                 {isCorrect(currentProblem.id) ? "✓ Correct!" : "✗ Incorrect"}
               </div>
-              <div style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.8)" }}>
+              <div style={{ fontSize: 14, lineHeight: 1.6, color: "var(--text)" }}>
                 <strong>Correct answer:</strong> {currentProblem.correctAnswer}
               </div>
               {currentProblem.explanation && (
-                <div style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.7)", marginTop: 8 }}>
+                <div style={{ fontSize: 14, lineHeight: 1.6, color: "var(--muted)", marginTop: 8 }}>
                   <strong>Explanation:</strong> {currentProblem.explanation}
                 </div>
               )}
@@ -303,18 +305,19 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
           style={{
             padding: "12px 24px",
             borderRadius: 12,
-            border: "1px solid rgba(0, 0, 0, 0.1)",
-            background: "white",
+            border: "1px solid var(--border)",
+            background: "var(--panel)",
             cursor: currentIndex === 0 ? "not-allowed" : "pointer",
             opacity: currentIndex === 0 ? 0.5 : 1,
             fontSize: 15,
-            fontWeight: 600
+            fontWeight: 600,
+            color: "var(--text)"
           }}
         >
           ← Previous
         </button>
 
-        <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.6)" }}>
+        <div style={{ fontSize: 14, color: "var(--muted)" }}>
           {Object.keys(answers).length} of {problems.length} answered
         </div>
 
@@ -345,9 +348,9 @@ export default function ExamProblemSolver({ problems, examTitle }: Props) {
               borderRadius: 12,
               border: "none",
               background: submitted || Object.keys(answers).length < problems.length
-                ? "rgba(0, 0, 0, 0.1)"
+                ? "var(--border-2)"
                 : "linear-gradient(135deg, #34C759, #30D158)",
-              color: submitted || Object.keys(answers).length < problems.length ? "rgba(0, 0, 0, 0.4)" : "white",
+              color: submitted || Object.keys(answers).length < problems.length ? "var(--muted)" : "white",
               cursor: submitted || Object.keys(answers).length < problems.length ? "not-allowed" : "pointer",
               fontSize: 15,
               fontWeight: 600

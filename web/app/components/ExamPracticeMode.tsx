@@ -1917,21 +1917,21 @@ export default function ExamPracticeMode({ course, topic }: Props) {
 
   if (availableExams.length === 0) {
     return (
-      <div style={{ padding: 24, textAlign: "center" }}>
-        <div style={{ fontSize: 16, color: "rgba(0, 0, 0, 0.6)" }}>
-          No practice exams available. Try selecting a specific topic or course.
+        <div style={{ padding: 24, textAlign: "center" }}>
+          <div style={{ fontSize: 16, color: "var(--muted)" }}>
+            No practice exams available. Try selecting a specific topic or course.
+          </div>
         </div>
-      </div>
     );
   }
 
   if (loading && problems.length === 0) {
     return (
-      <div style={{ padding: 24, textAlign: "center" }}>
-        <div style={{ fontSize: 16, color: "rgba(0, 0, 0, 0.6)" }}>
-          Generating practice problems...
+        <div style={{ padding: 24, textAlign: "center" }}>
+          <div style={{ fontSize: 16, color: "var(--muted)" }}>
+            Generating practice problems...
+          </div>
         </div>
-      </div>
     );
   }
 
@@ -1940,8 +1940,8 @@ export default function ExamPracticeMode({ course, topic }: Props) {
       {!selectedExam ? (
         <div>
           <div style={{ marginBottom: 20 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Practice Mode</h2>
-            <p style={{ fontSize: 15, color: "rgba(0, 0, 0, 0.6)", lineHeight: 1.6 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: "var(--text)" }}>Practice Mode</h2>
+            <p style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.6 }}>
               Select an exam to practice. You'll receive immediate feedback on each problem and see your score at the end.
             </p>
           </div>
@@ -1957,26 +1957,27 @@ export default function ExamPracticeMode({ course, topic }: Props) {
                   padding: 20,
                   textAlign: "left",
                   borderRadius: 16,
-                  border: "1px solid rgba(0, 0, 0, 0.1)",
-                  background: "white",
+                  border: "1px solid var(--border)",
+                  background: "var(--panel)",
                   cursor: "pointer",
-                  transition: "all 0.2s ease"
+                  transition: "all 0.2s ease",
+                  color: "var(--text)"
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "#007AFF";
+                  e.currentTarget.style.borderColor = "var(--blue)";
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 122, 255, 0.15)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.1)";
+                  e.currentTarget.style.borderColor = "var(--border)";
                   e.currentTarget.style.transform = "translateY(0)";
                   e.currentTarget.style.boxShadow = "none";
                 }}
               >
-                <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
+                <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: "var(--text)" }}>
                   {exam.title}
                 </div>
-                <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.6)" }}>
+                <div style={{ fontSize: 14, color: "var(--muted)" }}>
                   {exam.source === "built-in" 
                     ? `${exam.problems.length} problems · ${exam.problems.reduce((sum, p) => sum + p.points, 0)} total points`
                     : "AI Generated · Click to generate problems"}
@@ -1997,11 +1998,12 @@ export default function ExamPracticeMode({ course, topic }: Props) {
               style={{
                 padding: "10px 16px",
                 borderRadius: 12,
-                border: "1px solid rgba(0, 0, 0, 0.1)",
-                background: "white",
+                border: "1px solid var(--border)",
+                background: "var(--panel)",
                 cursor: "pointer",
                 fontSize: 14,
-                fontWeight: 600
+                fontWeight: 600,
+                color: "var(--text)"
               }}
             >
               ← Back to Exams

@@ -189,14 +189,32 @@ export default function AchieveHomework({ course, topic }: Props) {
         if (response.ok) {
           const data = await response.json();
           if (data.problems && data.problems.length > 0) {
-            // Convert API problems to HomeworkProblem format - ensure multiple-choice
+            // Convert API problems to HomeworkProblem format - ensure multiple-choice, convert drawing/assignment questions
             const converted: HomeworkProblem[] = data.problems.map((p: any, idx: number) => {
               // Ensure unique ID by adding index and timestamp
               const uniqueId = `${p.id || `gen-${topic}-${idx}`}-${Date.now()}-${idx}`;
               
-              // Convert non-multiple-choice to multiple-choice if needed
-              if (p.type !== "multiple-choice" && p.type !== "drawing") {
+              // Check if question asks to assign, draw, or similar actions that require drawing tools
+              const questionLower = (p.question || "").toLowerCase();
+              const requiresDrawing = 
+                questionLower.includes("assign r or s") ||
+                questionLower.includes("assign r/s") ||
+                questionLower.includes("draw the") ||
+                questionLower.includes("draw a") ||
+                questionLower.includes("sketch") ||
+                questionLower.includes("construct") ||
+                (questionLower.includes("assign") && (questionLower.includes("configuration") || questionLower.includes("stereocenter")));
+              
+              // Convert non-multiple-choice to multiple-choice if needed, or if it requires drawing
+              if ((p.type !== "multiple-choice" && p.type !== "drawing") || (p.type === "short-answer" && requiresDrawing)) {
                 // Convert to multiple-choice with options
+                const baseOptions = p.options || [
+                  p.correctAnswer || "Option A",
+                  "Option B",
+                  "Option C",
+                  "Option D"
+                ];
+                
                 return {
                   id: uniqueId,
                   topic: topic,
@@ -204,16 +222,14 @@ export default function AchieveHomework({ course, topic }: Props) {
                   question: p.question,
                   type: "multiple-choice" as const,
                   difficulty: idx < 3 ? "easy" : idx < 7 ? "medium" : "hard",
-                  points: p.points,
-                  options: p.options || [
-                    p.correctAnswer || "Option A",
-                    "Option B",
-                    "Option C",
-                    "Option D"
-                  ],
+                  points: p.points || 10,
+                  options: baseOptions.length >= 4 ? baseOptions.slice(0, 4) : [
+                    ...baseOptions,
+                    ...Array(4 - baseOptions.length).fill(null).map((_, i) => `Option ${String.fromCharCode(68 + i)}`)
+                  ].slice(0, 4),
                   correctAnswer: p.correctAnswer,
                   explanation: p.explanation,
-                  hints: generateTailoredHints(p.question, p.type, p.options || []),
+                  hints: generateTailoredHints(p.question, "multiple-choice", p.options || []),
                 };
               }
               return {
@@ -223,7 +239,7 @@ export default function AchieveHomework({ course, topic }: Props) {
                 question: p.question,
                 type: p.type === "drawing" ? "drawing" : "multiple-choice",
                 difficulty: idx < 3 ? "easy" : idx < 7 ? "medium" : "hard",
-                points: p.points,
+                points: p.points || 10,
                 options: p.options,
                 correctAnswer: p.correctAnswer,
                 explanation: p.explanation,
@@ -274,18 +290,32 @@ export default function AchieveHomework({ course, topic }: Props) {
             id: problemId,
             topic: t.slug,
             courseId,
-            question: `Draw the Newman projection for the most stable conformation of butane.`,
-            type: "drawing",
+            question: i === 0 
+              ? "What is the R or S configuration of a stereocenter where priorities 1→2→3 form a clockwise sequence when viewed with priority 4 pointing away?"
+              : "Which of the following correctly describes enantiomers?",
+            type: "multiple-choice",
+            options: i === 0
+              ? ["R configuration", "S configuration", "Cannot be determined", "Racemic mixture"]
+              : ["Mirror images that are not superimposable", "Identical molecules", "Diastereomers", "Constitutional isomers"],
+            correctAnswer: i === 0 ? "R configuration" : "Mirror images that are not superimposable",
             difficulty: i === 0 ? "easy" : "medium",
             points: i === 0 ? 10 : 15,
-            correctAnswer: "Anti conformation with methyl groups 180° apart",
-            explanation: "The anti conformation is most stable because the methyl groups are 180° apart, minimizing steric interactions.",
-            hints: [
-              "Draw Newman projection looking down the C2-C3 bond",
-              "In anti conformation, both methyl groups are 180° apart",
-              "Anti conformation minimizes steric (gauche) interactions between methyl groups",
-              "Remember: anti = 180°, gauche = 60°, eclipsed = 0°",
-            ],
+            explanation: i === 0
+              ? "When the lowest priority (4) is pointing away and the sequence 1→2→3 is clockwise, the configuration is R (rectus)."
+              : "Enantiomers are non-superimposable mirror images with opposite configurations at all stereocenters.",
+            hints: i === 0
+              ? [
+                  "Assign priorities using CIP rules (atomic number)",
+                  "Put the lowest priority away from you",
+                  "Clockwise = R, Counterclockwise = S",
+                  "Remember: R = rectus (right), S = sinister (left)",
+                ]
+              : [
+                  "Enantiomers are mirror images",
+                  "They have opposite configurations",
+                  "They are not superimposable",
+                  "They have identical physical properties except optical activity",
+                ],
           });
         } else if (t.slug.includes("substitution") || t.slug.includes("elimination")) {
           generated.push({
@@ -742,6 +772,7 @@ export default function AchieveHomework({ course, topic }: Props) {
                           cursor: completed.has(currentProblem.id) ? "default" : "pointer",
                           fontSize: 15,
                           fontWeight: isSelected ? 600 : 400,
+                          color: "var(--text)",
                         }}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -756,7 +787,7 @@ export default function AchieveHomework({ course, topic }: Props) {
                           }}>
                             {isSelected && <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--blue)" }} />}
                           </div>
-                          <div>{option}</div>
+                          <div style={{ color: "var(--text)" }}>{option}</div>
                         </div>
                       </button>
                     );

@@ -44,7 +44,7 @@ function SvgStage({ children }: { children: React.ReactNode }) {
         height: "100%",
         borderRadius: 16,
         border: "1px solid var(--border)",
-        background: "white",
+        background: "var(--panel)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -125,7 +125,7 @@ export default function MechanismPage() {
   return (
     <main style={{ padding: 0, height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden", background: "var(--background)" }}>
       {/* Header */}
-      <div style={{ padding: "20px 30px", borderBottom: "1px solid var(--border)", background: "white" }}>
+      <div style={{ padding: "20px 30px", borderBottom: "1px solid var(--border)", background: "var(--panel)", color: "var(--text)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", maxWidth: 1600, margin: "0 auto" }}>
           <div>
             <Link

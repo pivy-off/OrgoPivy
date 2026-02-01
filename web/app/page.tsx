@@ -6,6 +6,7 @@ import HomeSearch from "./components/HomeSearch";
 import StudyStreak from "./components/StudyStreak";
 import QuickReview from "./components/QuickReview";
 import ProgressChart from "./components/ProgressChart";
+import ProfessorAssignmentCreator from "./components/ProfessorAssignmentCreator";
 
 export default function HomePage() {
   return (
@@ -157,6 +158,22 @@ export default function HomePage() {
         {/* Recent Activity & Achievements */}
         <RecentActivity />
         <AchievementsDisplay />
+
+        {/* Professor Mode */}
+        <div style={{ marginTop: 60, maxWidth: 1000, margin: "60px auto 0" }}>
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: "var(--text)" }}>
+              Professor Tools
+            </div>
+            <div className="subtle" style={{ fontSize: 14, marginBottom: 24 }}>
+              Create assignments and generate practice problems for your students
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 24 }}>
+            <ProfessorAssignmentCreator course="orgochem-1" />
+            <ProfessorAssignmentCreator course="orgochem-2" />
+          </div>
+        </div>
       </div>
     </main>
   );

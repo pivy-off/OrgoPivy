@@ -273,7 +273,7 @@ export default function UploadsPage() {
                 borderRadius: 12,
                 border: "1px solid rgba(0, 122, 255, 0.2)"
               }}>
-                <div style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.8)" }}>
+                <div style={{ fontSize: 14, lineHeight: 1.6, color: "var(--text)" }}>
                   <strong>How it works:</strong> Upload your class notes, textbook summaries, or study materials as text files. 
                   Once uploaded, you can ask questions about your notes using the <strong>Ask</strong> tool, and the system will 
                   generate personalized practice homework based on your uploaded content. Organize your notes by course and topic 

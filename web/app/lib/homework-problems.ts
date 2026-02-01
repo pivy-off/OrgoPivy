@@ -53,8 +53,14 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
     },
     {
       id: "hw-alk-2",
-      question: "Draw the Newman projection for the most stable conformation of butane. Explain why this conformation is most stable.",
-      type: "drawing",
+      question: "Which conformation of butane is most stable?",
+      type: "multiple-choice",
+      options: [
+        "Anti conformation with methyl groups 180° apart",
+        "Gauche conformation with methyl groups 60° apart",
+        "Eclipsed conformation with methyl groups 0° apart",
+        "All conformations are equally stable"
+      ],
       correctAnswer: "Anti conformation with methyl groups 180° apart",
       explanation: "The anti conformation is most stable because the methyl groups are 180° apart, minimizing steric interactions. In this conformation, there are no gauche interactions between the methyl groups, resulting in the lowest energy state.",
       points: 15,
@@ -62,11 +68,11 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
       topic: "alkanes",
       courseId: "orgochem-1",
       rubric: {
-        fullCredit: "Draws correct anti Newman projection with methyl groups 180° apart and explains steric minimization",
+        fullCredit: "Correctly identifies anti conformation and understands steric minimization",
         partialCredit: [
-          "Draws anti conformation but explanation is incomplete",
-          "Correct drawing but doesn't explain steric interactions",
-          "Identifies anti but drawing has minor errors"
+          "Identifies anti but explanation is incomplete",
+          "Correct answer but doesn't explain steric interactions",
+          "Confuses anti with gauche"
         ],
         commonMistakes: [
           "Confusing anti with gauche",
@@ -165,28 +171,33 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
     },
     {
       id: "hw-sub-3",
-      question: "Draw the complete mechanism for the SN2 reaction between CH₃Br and OH⁻. Include all curved arrows, intermediates (if any), and show stereochemistry.",
-      type: "mechanism",
-      correctAnswer: "Backside attack mechanism with inversion of configuration, no intermediate, one-step concerted process",
+      question: "What is the key characteristic of the SN2 mechanism between CH₃Br and OH⁻?",
+      type: "multiple-choice",
+      options: [
+        "One-step concerted mechanism with backside attack and inversion of configuration",
+        "Two-step mechanism with carbocation intermediate",
+        "One-step mechanism with retention of configuration",
+        "Two-step mechanism with no stereochemistry change"
+      ],
+      correctAnswer: "One-step concerted mechanism with backside attack and inversion of configuration",
       explanation: "SN2 is a one-step concerted mechanism. The OH⁻ nucleophile attacks from the backside (opposite the leaving group), forming a transition state where the C-Br bond is partially broken and the C-O bond is partially formed. The reaction proceeds with inversion of configuration (Walden inversion). No intermediate is formed.",
       points: 15,
       difficulty: "hard",
       topic: "substitution-elimination",
       courseId: "orgochem-1",
       rubric: {
-        fullCredit: "Shows correct backside attack, curved arrows, transition state, inversion of configuration, and notes concerted mechanism",
+        fullCredit: "Correctly identifies one-step concerted mechanism, backside attack, and inversion of configuration",
         partialCredit: [
-          "Correct arrows but missing transition state",
-          "Shows mechanism but misses stereochemistry",
-          "Correct concept but arrow direction errors",
-          "Missing some key features"
+          "Correct mechanism type but missing stereochemistry",
+          "Mentions backside attack but wrong mechanism type",
+          "Correct concept but incomplete"
         ],
         commonMistakes: [
           "Drawing an intermediate (SN2 has no intermediate)",
-          "Wrong arrow direction",
-          "Not showing backside attack",
+          "Confusing with SN1 mechanism",
+          "Not understanding backside attack",
           "Missing stereochemistry",
-          "Incorrect transition state structure"
+          "Incorrect mechanism type"
         ]
       }
     }
@@ -194,21 +205,26 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
   "stereochemistry": [
     {
       id: "hw-stereo-1",
-      question: "Assign R or S configuration to the stereocenter in the following molecule: [Molecule with stereocenter]. Show your work using CIP priority rules.",
-      type: "short-answer",
-      correctAnswer: "R or S (depending on specific molecule provided)",
-      explanation: "To assign R/S: 1) Assign CIP priorities based on atomic number (higher = higher priority), 2) If tied, compare next atoms, 3) Put lowest priority group in back, 4) Trace from priority 1→2→3: clockwise = R, counterclockwise = S.",
+      question: "A stereocenter has priorities assigned as: 1 (highest), 2, 3, 4 (lowest). When viewed with priority 4 pointing away, the sequence 1→2→3 is clockwise. What is the configuration?",
+      type: "multiple-choice",
+      options: [
+        "R configuration",
+        "S configuration",
+        "Cannot be determined",
+        "Racemic mixture"
+      ],
+      correctAnswer: "R configuration",
+      explanation: "To assign R/S: 1) Assign CIP priorities based on atomic number (higher = higher priority), 2) If tied, compare next atoms, 3) Put lowest priority group in back, 4) Trace from priority 1→2→3: clockwise = R, counterclockwise = S. In this case, clockwise = R.",
       points: 15,
       difficulty: "hard",
       topic: "stereochemistry",
       courseId: "orgochem-1",
       rubric: {
-        fullCredit: "Correctly assigns priorities, puts lowest priority in back, traces correctly, and gives correct R/S assignment",
+        fullCredit: "Correctly identifies R configuration and understands CIP priority rules",
         partialCredit: [
           "Correct priorities but wrong R/S assignment",
           "Correct concept but calculation error",
-          "Missing one step in the process",
-          "Correct answer but no work shown"
+          "Missing one step in the process"
         ],
         commonMistakes: [
           "Incorrect priority assignment",
@@ -311,20 +327,26 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
   "cycloalkanes": [
     {
       id: "hw-cyclo-1",
-      question: "Draw the chair conformation of trans-1,4-dimethylcyclohexane. Identify which conformation is more stable and explain why.",
-      type: "drawing",
-      correctAnswer: "Both methyl groups equatorial is most stable. Trans means one up, one down, so both can be equatorial.",
+      question: "In trans-1,4-dimethylcyclohexane, which conformation is most stable?",
+      type: "multiple-choice",
+      options: [
+        "Both methyl groups in equatorial positions",
+        "Both methyl groups in axial positions",
+        "One methyl axial, one methyl equatorial",
+        "All conformations are equally stable"
+      ],
+      correctAnswer: "Both methyl groups in equatorial positions",
       explanation: "In trans-1,4-dimethylcyclohexane, the methyl groups are on opposite sides. The most stable conformation has both methyl groups in equatorial positions, avoiding 1,3-diaxial interactions. The diequatorial conformation is significantly more stable than the diaxial conformation.",
       points: 15,
       difficulty: "hard",
       topic: "cycloalkanes",
       courseId: "orgochem-1",
       rubric: {
-        fullCredit: "Draws correct chair with both methyls equatorial, identifies as most stable, explains 1,3-diaxial interactions",
+        fullCredit: "Correctly identifies diequatorial as most stable and explains 1,3-diaxial interactions",
         partialCredit: [
-          "Correct drawing but incomplete explanation",
+          "Correct answer but incomplete explanation",
           "Identifies stability but doesn't explain why",
-          "Minor drawing errors but correct concept"
+          "Minor conceptual errors"
         ],
         commonMistakes: [
           "Confusing axial with equatorial",
@@ -484,24 +506,30 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
   "aromatic-chemistry": [
     {
       id: "hw-arom-1",
-      question: "Predict the major product when toluene undergoes nitration. Then explain the directing effect of the methyl group and draw the resonance structures that show why it's an ortho/para director.",
-      type: "mechanism",
-      correctAnswer: "Ortho and para nitrotoluene. Methyl is activating ortho/para director. Resonance shows positive charge stabilized at ortho/para positions.",
+      question: "What are the major products when toluene undergoes nitration, and why is the methyl group an ortho/para director?",
+      type: "multiple-choice",
+      options: [
+        "Ortho and para nitrotoluene; methyl stabilizes positive charge at ortho/para positions through resonance",
+        "Meta nitrotoluene only; methyl is a meta director",
+        "Ortho and para nitrotoluene; methyl destabilizes the intermediate",
+        "All positions equally; methyl has no directing effect"
+      ],
+      correctAnswer: "Ortho and para nitrotoluene; methyl stabilizes positive charge at ortho/para positions through resonance",
       explanation: "Toluene undergoes nitration to give ortho-nitrotoluene and para-nitrotoluene (with para being major due to sterics). The methyl group is an activating ortho/para director. Resonance structures show that when the electrophile attacks ortho or para, the positive charge on the ring can be delocalized onto the methyl group (benzylic position), stabilizing the intermediate. Meta attack doesn't allow this stabilization.",
       points: 18,
       difficulty: "hard",
       topic: "aromatic-chemistry",
       courseId: "orgochem-2",
       rubric: {
-        fullCredit: "Correct products (ortho/para), identifies methyl as activating ortho/para director, draws correct resonance structures showing stabilization",
+        fullCredit: "Correct products (ortho/para), identifies methyl as activating ortho/para director, understands resonance stabilization",
         partialCredit: [
           "Correct products but incomplete resonance explanation",
           "Correct directing effect but wrong products",
-          "Resonance structures have minor errors"
+          "Mentions resonance but doesn't explain stabilization"
         ],
         commonMistakes: [
           "Thinking methyl is meta director",
-          "Wrong resonance structures",
+          "Not understanding resonance stabilization",
           "Not understanding activation vs deactivation",
           "Incorrect product structures"
         ]
@@ -513,7 +541,39 @@ export const HOMEWORK_PROBLEMS: Record<string, HomeworkProblem[]> = {
 // Get problems for a specific topic
 export function getHomeworkProblems(topic: string, count?: number): HomeworkProblem[] {
   const problems = HOMEWORK_PROBLEMS[topic] || [];
-  return count ? problems.slice(0, count) : problems;
+  const converted = problems.map(convertDrawingQuestions);
+  return count ? converted.slice(0, count) : converted;
+}
+
+// Convert any questions that require drawing/assignment to multiple-choice
+function convertDrawingQuestions(problem: HomeworkProblem): HomeworkProblem {
+  const questionLower = problem.question.toLowerCase();
+  const requiresDrawing = 
+    questionLower.includes("assign r or s") ||
+    questionLower.includes("assign r/s") ||
+    questionLower.includes("draw the") ||
+    questionLower.includes("draw a") ||
+    questionLower.includes("sketch") ||
+    questionLower.includes("construct") ||
+    (questionLower.includes("assign") && (questionLower.includes("configuration") || questionLower.includes("stereocenter")));
+
+  if ((problem.type === "short-answer" || problem.type === "drawing" || problem.type === "mechanism") && requiresDrawing) {
+    // Convert to multiple-choice
+    const baseOptions = problem.options || [
+      problem.correctAnswer,
+      problem.correctAnswer.split(" ").reverse().join(" "),
+      "Cannot be determined from the information given",
+      "None of the above",
+    ];
+    
+    return {
+      ...problem,
+      type: "multiple-choice",
+      options: baseOptions.slice(0, 4),
+    };
+  }
+  
+  return problem;
 }
 
 // Get all problems for a course
@@ -522,7 +582,7 @@ export function getCourseHomeworkProblems(courseId: "orgochem-1" | "orgochem-2")
   Object.values(HOMEWORK_PROBLEMS).forEach(topicProblems => {
     topicProblems.forEach(problem => {
       if (problem.courseId === courseId) {
-        allProblems.push(problem);
+        allProblems.push(convertDrawingQuestions(problem));
       }
     });
   });

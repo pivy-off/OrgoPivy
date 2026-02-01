@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { getMemorizationItems } from "../lib/memorization";
+import type { MemorizationItemEntry } from "../lib/memorization";
 
 type Props = {
   slug: string;
@@ -86,43 +87,68 @@ export default function MemorizationSection({ slug }: Props) {
                       borderTop: "1px solid var(--border)",
                     }}
                   >
+                    {category.categoryImageUrl && (
+                      <div style={{ marginBottom: 16, textAlign: "center" }}>
+                        <img
+                          src={category.categoryImageUrl}
+                          alt={category.categoryImageAlt ?? category.category}
+                          width={240}
+                          height={120}
+                          referrerPolicy="no-referrer"
+                          style={{ objectFit: "contain", borderRadius: "var(--radius-sm)", background: "var(--panel)" }}
+                        />
+                      </div>
+                    )}
                     <div style={{ display: "grid", gap: 12 }}>
-                      {category.items.map((item, itemIdx) => (
-                        <div
-                          key={itemIdx}
-                          style={{
-                            display: "grid",
-                            gridTemplateColumns: "1fr auto",
-                            gap: 12,
-                            alignItems: "start",
-                            padding: "12px 14px",
-                            background: "var(--panel)",
-                            borderRadius: "var(--radius-sm)",
-                            border: "1px solid var(--border-2)",
-                          }}
-                        >
-                          <div>
-                            <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
-                              {item.term}
-                            </div>
-                            {item.note && (
-                              <div style={{ fontSize: 12, color: "var(--muted-2)", marginTop: 2 }}>
-                                {item.note}
-                              </div>
-                            )}
-                          </div>
+                      {category.items.map((item, itemIdx) => {
+                        const entry = item as MemorizationItemEntry;
+                        return (
                           <div
+                            key={itemIdx}
                             style={{
-                              fontSize: 15,
-                              fontWeight: 700,
-                              color: "var(--blue)",
-                              whiteSpace: "nowrap",
+                              display: "grid",
+                              gridTemplateColumns: entry.imageUrl ? "auto 1fr auto" : "1fr auto",
+                              gap: 14,
+                              alignItems: "center",
+                              padding: "12px 14px",
+                              background: "var(--panel)",
+                              borderRadius: "var(--radius-sm)",
+                              border: "1px solid var(--border-2)",
                             }}
                           >
-                            {item.value}
+                            {entry.imageUrl && (
+                              <img
+                                src={entry.imageUrl}
+                                alt={entry.imageAlt ?? entry.term}
+                                width={80}
+                                height={80}
+                                referrerPolicy="no-referrer"
+                                style={{ objectFit: "contain", borderRadius: "var(--radius-sm)", background: "var(--panel-2)" }}
+                              />
+                            )}
+                            <div>
+                              <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
+                                {entry.term}
+                              </div>
+                              {entry.note && (
+                                <div style={{ fontSize: 12, color: "var(--muted-2)", marginTop: 2 }}>
+                                  {entry.note}
+                                </div>
+                              )}
+                            </div>
+                            <div
+                              style={{
+                                fontSize: 15,
+                                fontWeight: 700,
+                                color: "var(--blue)",
+                                textAlign: "right",
+                              }}
+                            >
+                              {entry.value}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
