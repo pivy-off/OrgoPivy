@@ -1575,6 +1575,7 @@ export default function ProfessorAssignmentCreator({ course: courseProp, topic, 
   }, [selectedTopic]);
 
   function addProblem(suggestion: ProblemSuggestion) {
+    if (!course) return;
     const problem: HomeworkProblem = {
       id: `prof-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       question: suggestion.question,

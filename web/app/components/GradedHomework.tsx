@@ -321,6 +321,7 @@ export default function GradedHomework({ course, topic, assignmentId, backHref }
   const isProfessor = typeof window !== "undefined" && localStorage.getItem("orgopivy-is-professor") === "true";
 
   function exportForStudents() {
+    if (!currentAssignment) return;
     const data = {
       ...currentAssignment,
       courseId: course,
