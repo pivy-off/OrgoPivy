@@ -12,12 +12,15 @@ export default function HomePage() {
     <main style={{ 
       width: "100%",
       padding: "60px 0",
+      paddingBottom: "calc(60px + env(safe-area-inset-bottom))",
       minHeight: "calc(100vh - 120px)"
     }}>
       <div style={{
         maxWidth: 1200,
         margin: "0 auto",
-        padding: "0 24px"
+        padding: "0 24px",
+        paddingLeft: "max(24px, env(safe-area-inset-left))",
+        paddingRight: "max(24px, env(safe-area-inset-right))",
       }}>
         {/* Hero Section */}
         <div style={{
@@ -162,6 +165,7 @@ export default function HomePage() {
         {/* Professor Tools card */}
         <Link
           href="/professor"
+          className="professorCard"
           style={{
             display: "block",
             marginTop: 48,
@@ -196,7 +200,7 @@ export default function HomePage() {
             }}>
               📝
             </div>
-            <div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "var(--text)" }}>
                 Professor Tools
               </div>
@@ -204,7 +208,7 @@ export default function HomePage() {
                 Create assignments and generate practice problems for your students
               </div>
             </div>
-            <span style={{ marginLeft: "auto", fontSize: 20, color: "var(--muted)" }}>→</span>
+            <span className="professorCardArrow" style={{ marginLeft: "auto", fontSize: 20, color: "var(--muted)" }}>→</span>
           </div>
         </Link>
       </div>

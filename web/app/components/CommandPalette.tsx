@@ -3,6 +3,18 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    setIsMobile(mq.matches);
+    const h = () => setIsMobile(mq.matches);
+    mq.addEventListener("change", h);
+    return () => mq.removeEventListener("change", h);
+  }, []);
+  return isMobile;
+}
 import { getCourseTopics, findTopic } from "../lib/curriculum";
 import type { CourseId, Topic } from "../lib/curriculum";
 
@@ -16,6 +28,7 @@ export default function CommandPalette() {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const orgochem1Topics = getCourseTopics("orgochem-1");
   const orgochem2Topics = getCourseTopics("orgochem-2");
@@ -73,8 +86,18 @@ export default function CommandPalette() {
       }
     }
 
+    function handleOpen() {
+      setIsOpen(true);
+      setQuery("");
+      setSelectedIndex(0);
+    }
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("openCommandPalette", handleOpen as EventListener);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("openCommandPalette", handleOpen as EventListener);
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -106,6 +129,7 @@ export default function CommandPalette() {
 
   return (
     <div
+      className="commandPaletteOverlay"
       style={{
         position: "fixed",
         top: 0,
@@ -117,11 +141,15 @@ export default function CommandPalette() {
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
-        paddingTop: "20vh",
+        paddingTop: "max(env(safe-area-inset-top), 20vh)",
+        paddingLeft: "env(safe-area-inset-left)",
+        paddingRight: "env(safe-area-inset-right)",
+        paddingBottom: "env(safe-area-inset-bottom)",
       }}
       onClick={() => setIsOpen(false)}
     >
       <div
+        className="commandPaletteModal"
         style={{
           width: "100%",
           maxWidth: 600,
@@ -130,6 +158,7 @@ export default function CommandPalette() {
           borderRadius: "var(--radius-md)",
           boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
           overflow: "hidden",
+          margin: "0 16px",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -142,7 +171,7 @@ export default function CommandPalette() {
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
-            placeholder="Search topics, courses, or pages... (Cmd/Ctrl+K)"
+            placeholder={isMobile ? "Search topics, courses, or pages..." : "Search topics, courses, or pages... (⌘K)"}
             autoFocus
             style={{
               width: "100%",
@@ -208,19 +237,21 @@ export default function CommandPalette() {
           )}
         </div>
 
-        {/* Footer */}
-        <div style={{ 
-          padding: "12px 16px", 
-          borderTop: "1px solid var(--border)",
-          fontSize: 12,
-          color: "var(--muted)",
-          display: "flex",
-          gap: 16,
-        }}>
-          <span>↑↓ Navigate</span>
-          <span>Enter Select</span>
-          <span>Esc Close</span>
-        </div>
+        {/* Footer - hide on mobile */}
+        {!isMobile && (
+          <div style={{ 
+            padding: "12px 16px", 
+            borderTop: "1px solid var(--border)",
+            fontSize: 12,
+            color: "var(--muted)",
+            display: "flex",
+            gap: 16,
+          }}>
+            <span>↑↓ Navigate</span>
+            <span>Enter Select</span>
+            <span>Esc Close</span>
+          </div>
+        )}
       </div>
     </div>
   );

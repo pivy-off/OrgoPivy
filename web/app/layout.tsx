@@ -2,14 +2,23 @@
 import "./globals.css";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import type { Viewport } from "next";
 import TopNavClient from "./components/TopNavClient";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ThemeToggle from "./components/ThemeToggle";
 import CommandPalette from "./components/CommandPalette";
+import SideNavMobile from "./components/SideNavMobile";
 
 export const metadata = {
   title: "OrgoPivy",
   description: "Orgo tools for students",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
 };
 
 function SideNav() {
@@ -130,7 +139,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ErrorBoundary>
           <div className="container">
             <div className="shell">
-              <SideNav />
+              <div className="sideNavDesktop">
+                <SideNav />
+              </div>
+              <div className="sideNavMobileWrap">
+                <SideNavMobile />
+              </div>
               <div>{children}</div>
             </div>
           </div>

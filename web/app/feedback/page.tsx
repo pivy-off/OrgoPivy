@@ -86,7 +86,7 @@ export default function FeedbackPage() {
                     href={e.videoUrl}
                     target="_blank"
                     rel="noreferrer"
-                    style={{ fontSize: 12, color: "var(--blue)" }}
+                    style={{ fontSize: 12, color: "var(--blue)", wordBreak: "break-all" }}
                   >
                     {e.videoUrl}
                   </a>
