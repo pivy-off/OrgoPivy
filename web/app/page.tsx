@@ -22,28 +22,13 @@ export default function HomePage() {
         {/* Hero Section */}
         <div style={{
           textAlign: "center",
-          marginBottom: 60
+          marginBottom: 40
         }}>
           {/* Search */}
           <HomeSearch />
         </div>
 
-        {/* Stats */}
-        <HomeStats />
-
-        {/* Study Tools Grid */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: 24,
-          marginBottom: 40,
-        }}>
-          <StudyStreak />
-          <QuickReview />
-          <ProgressChart />
-        </div>
-
-        {/* Course Cards Grid */}
+        {/* Course Cards Grid - at top */}
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(2, 1fr)",
@@ -154,9 +139,25 @@ export default function HomePage() {
           </Link>
         </div>
 
+        {/* Stats */}
+        <HomeStats />
+
         {/* Recent Activity & Achievements */}
         <RecentActivity />
         <AchievementsDisplay />
+
+        {/* Study Tools Grid - at bottom */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: 24,
+          marginTop: 48,
+          marginBottom: 40,
+        }}>
+          <StudyStreak />
+          <QuickReview />
+          <ProgressChart />
+        </div>
 
         {/* Professor Tools card */}
         <Link
