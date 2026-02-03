@@ -28,6 +28,8 @@ export default function CommandPalette() {
         { type: "course" as const, id: "orgochem-2", title: "OrgoChem II", href: "/orgochem-2" },
         { type: "page" as const, id: "home", title: "Home", href: "/" },
         { type: "page" as const, id: "practice", title: "Practice", href: "/practice" },
+        { type: "page" as const, id: "assignments", title: "Assignments", href: "/assignments" },
+        { type: "page" as const, id: "professor", title: "Professor Tools", href: "/professor" },
         { type: "page" as const, id: "tools", title: "Study Tools", href: "/tools" },
         { type: "page" as const, id: "uploads", title: "Uploads", href: "/uploads" },
         { type: "page" as const, id: "search", title: "Search", href: "/search" },

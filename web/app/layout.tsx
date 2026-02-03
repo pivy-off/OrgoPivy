@@ -42,6 +42,14 @@ function SideNav() {
             <Link className="navLink" href="/spectra">
               Spectra <span className="subtle">NMR</span>
             </Link>
+
+            <Link className="navLink" href="/assignments">
+              Assignments <span className="subtle">Graded</span>
+            </Link>
+
+            <Link className="navLink" href="/professor">
+              Professor <span className="subtle">Tools</span>
+            </Link>
           </div>
 
           <div style={{ 

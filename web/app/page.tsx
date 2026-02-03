@@ -6,7 +6,6 @@ import HomeSearch from "./components/HomeSearch";
 import StudyStreak from "./components/StudyStreak";
 import QuickReview from "./components/QuickReview";
 import ProgressChart from "./components/ProgressChart";
-import ProfessorAssignmentCreator from "./components/ProfessorAssignmentCreator";
 
 export default function HomePage() {
   return (
@@ -159,21 +158,54 @@ export default function HomePage() {
         <RecentActivity />
         <AchievementsDisplay />
 
-        {/* Professor Mode */}
-        <div style={{ marginTop: 60, maxWidth: 1000, margin: "60px auto 0" }}>
-          <div style={{ marginBottom: 24 }}>
-            <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: "var(--text)" }}>
-              Professor Tools
+        {/* Professor Tools card */}
+        <Link
+          href="/professor"
+          style={{
+            display: "block",
+            marginTop: 48,
+            padding: 24,
+            borderRadius: 16,
+            border: "2px solid rgba(88, 86, 214, 0.3)",
+            background: "linear-gradient(135deg, rgba(88, 86, 214, 0.08) 0%, rgba(0, 122, 255, 0.06) 100%)",
+            textDecoration: "none",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "rgba(88, 86, 214, 0.5)";
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 8px 24px rgba(88, 86, 214, 0.15)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "rgba(88, 86, 214, 0.3)";
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "none";
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{
+              width: 48,
+              height: 48,
+              borderRadius: 12,
+              background: "linear-gradient(135deg, #5856D6 0%, #007AFF 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 24,
+            }}>
+              📝
             </div>
-            <div className="subtle" style={{ fontSize: 14, marginBottom: 24 }}>
-              Create assignments and generate practice problems for your students
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "var(--text)" }}>
+                Professor Tools
+              </div>
+              <div style={{ fontSize: 14, color: "var(--muted)" }}>
+                Create assignments and generate practice problems for your students
+              </div>
             </div>
+            <span style={{ marginLeft: "auto", fontSize: 20, color: "var(--muted)" }}>→</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 24 }}>
-            <ProfessorAssignmentCreator course="orgochem-1" />
-            <ProfessorAssignmentCreator course="orgochem-2" />
-          </div>
-        </div>
+        </Link>
       </div>
     </main>
   );

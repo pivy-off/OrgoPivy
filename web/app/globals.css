@@ -695,19 +695,170 @@ a {
   line-height: 1.5;
 }
 
-.topicMistakes {
-  display: grid;
+/* Must know checklist - compact, scannable */
+.mustKnowChecklist {
+  --mustknow-accent: var(--blue);
+}
+.mustKnowProgress {
+  display: flex;
+  align-items: center;
   gap: 12px;
+  margin-bottom: 16px;
+}
+.mustKnowProgressText {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.mustKnowProgressBar {
+  flex: 1;
+  max-width: 140px;
+  height: 5px;
+  background: var(--border-2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.mustKnowProgressFill {
+  height: 100%;
+  background: var(--mustknow-accent);
+  border-radius: 3px;
+  transition: width 0.25s ease;
+}
+.mustKnowList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mustKnowItem {
+  margin: 0;
+}
+.mustKnowLabel {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.mustKnowLabel:hover {
+  background: var(--border-2);
+}
+.mustKnowItem.isChecked .mustKnowLabel:hover {
+  background: rgba(0, 122, 255, 0.06);
+}
+.mustKnowCheckbox {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: var(--mustknow-accent);
+  flex-shrink: 0;
+}
+.mustKnowContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mustKnowHead {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.mustKnowItem.isChecked .mustKnowHead {
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.mustKnowTail {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.mustKnowVideoLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text);
+  font-size: 12px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.mustKnowVideoLink:hover {
+  border-color: var(--mustknow-accent);
+  background: rgba(0, 122, 255, 0.05);
+}
+.mustKnowVideoThumb {
+  width: 56px;
+  height: 32px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.mustKnowVideoLink span:first-of-type {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.mustKnowVideoArrow {
+  color: var(--mustknow-accent);
+  font-weight: 600;
+}
+.mustKnowVideoRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.mustKnowReportBtn {
+  font-size: 11px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.mustKnowReportBtn:hover {
+  color: var(--red);
+}
+
+.topicMistakes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .topicMistakeItem {
-  padding: 12px 16px;
-  background: rgba(255, 59, 48, 0.06);
-  border: 1px solid rgba(255, 59, 48, 0.2);
-  border-radius: var(--radius-sm);
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.5;
   color: var(--text);
+  padding-left: 16px;
+  position: relative;
+}
+.topicMistakeItem::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .topicTips {

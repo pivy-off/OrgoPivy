@@ -63,6 +63,12 @@ export default function ToolsPage() {
           </Link>
         ))}
       </div>
+
+      <div style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--border)" }}>
+        <Link href="/feedback" className="subtle" style={{ fontSize: 14 }}>
+          View feedback reports (broken videos, etc.) →
+        </Link>
+      </div>
     </main>
   );
 }

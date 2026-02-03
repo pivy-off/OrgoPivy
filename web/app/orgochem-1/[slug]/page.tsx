@@ -522,7 +522,7 @@ export default async function OrgoChem1TopicPage({
 
                       <div className="topicTwoCol">
                         <Section title="Must know checklist">
-                          <MustKnowChecklist items={topic.mustKnow} videos={topic.mustKnowVideos} course="orgochem-1" topic={topic.slug} />
+                          <MustKnowChecklist items={topic.mustKnow} videos={topic.mustKnowVideos} course="orgochem-1" topic={topic.slug} topicTitle={topic.title} />
                         </Section>
 
                         <Section title="Common mistakes">

@@ -17,7 +17,7 @@ type ProblemSuggestion = {
 };
 
 type Props = {
-  course: CourseId;
+  course?: CourseId;
   topic?: string;
   onAssignmentCreated?: (assignmentId: string) => void;
 };
@@ -1507,16 +1507,18 @@ function generateComprehensiveSuggestions(topicData: Topic): ProblemSuggestion[]
     });
   }
   
-  // Remove duplicates and limit
+  // Remove duplicates, keep only multiple-choice (no drawing/synthesis/mechanism/short-answer), and limit
   const uniqueSuggestions = suggestions.filter((s, idx, self) => 
     idx === self.findIndex(t => t.question === s.question)
   );
+  const multipleChoiceOnly = uniqueSuggestions.filter(s => s.type === "multiple-choice");
   
-  return uniqueSuggestions.slice(0, 25); // Return up to 25 diverse problems
+  return multipleChoiceOnly.slice(0, 25); // Return up to 25 multiple-choice problems
 }
 
-export default function ProfessorAssignmentCreator({ course, topic, onAssignmentCreated }: Props) {
+export default function ProfessorAssignmentCreator({ course: courseProp, topic, onAssignmentCreated }: Props) {
   const [isProfessor, setIsProfessor] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<CourseId | null>(courseProp || null);
   const [selectedTopic, setSelectedTopic] = useState<string>(topic || "");
   const [suggestions, setSuggestions] = useState<ProblemSuggestion[]>([]);
   const [selectedProblems, setSelectedProblems] = useState<HomeworkProblem[]>([]);
@@ -1524,12 +1526,13 @@ export default function ProfessorAssignmentCreator({ course, topic, onAssignment
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [filterDifficulty, setFilterDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
-  const [filterType, setFilterType] = useState<"all" | ProblemSuggestion["type"]>("all");
+  const [filterType, setFilterType] = useState<"all" | ProblemSuggestion["type"]>("multiple-choice");
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [editingProblem, setEditingProblem] = useState<ProblemSuggestion | null>(null);
 
-  const courseTopics = getCourseTopics(course);
-  const currentTopic = selectedTopic ? findTopic(course, selectedTopic) : null;
+  const course = courseProp ?? selectedCourse;
+  const courseTopics = course ? getCourseTopics(course) : [];
+  const currentTopic = course && selectedTopic ? findTopic(course, selectedTopic) : null;
 
   // Check if user is professor
   useEffect(() => {
@@ -1575,7 +1578,7 @@ export default function ProfessorAssignmentCreator({ course, topic, onAssignment
     const problem: HomeworkProblem = {
       id: `prof-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       question: suggestion.question,
-      type: suggestion.type === "synthesis" ? "synthesis" : suggestion.type === "mechanism" ? "mechanism" : suggestion.type === "short-answer" ? "short-answer" : "multiple-choice",
+      type: "multiple-choice",
       options: suggestion.options,
       correctAnswer: suggestion.correctAnswer,
       explanation: suggestion.explanation,
@@ -1636,15 +1639,15 @@ export default function ProfessorAssignmentCreator({ course, topic, onAssignment
       alert("Please add at least one problem to the assignment.");
       return;
     }
-
-    if (!assignmentTitle.trim()) {
-      alert("Please enter an assignment title.");
+    if (!course) {
+      alert("Please select a course first.");
       return;
     }
 
+    const title = assignmentTitle.trim() || "Assignment";
     const assignment = {
       id: `prof-assignment-${Date.now()}`,
-      title: assignmentTitle,
+      title,
       courseId: course,
       topic: selectedTopic,
       problems: selectedProblems,
@@ -1666,9 +1669,10 @@ export default function ProfessorAssignmentCreator({ course, topic, onAssignment
 
     if (onAssignmentCreated) {
       onAssignmentCreated(assignment.id);
+      alert(`Assignment "${title}" created successfully!`);
+    } else {
+      window.location.href = `/assignments/${course}/${assignment.id}`;
     }
-
-    alert(`Assignment "${assignmentTitle}" created successfully!`);
   }
 
   function exportAssignment() {
@@ -1700,22 +1704,19 @@ export default function ProfessorAssignmentCreator({ course, topic, onAssignment
 
   if (!isProfessor) {
     return (
-      <div className="card" style={{ padding: 40, textAlign: "center" }}>
-        <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 16, color: "var(--text)" }}>
+      <div className="card" style={{ padding: 32, textAlign: "center" }}>
+        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: "var(--text)" }}>
           Professor Assignment Creator
         </div>
-        <div className="subtle" style={{ fontSize: 15, marginBottom: 24 }}>
-          This tool is for professors only. Enable professor mode to create graded assignments with AI-generated problem suggestions.
+        <div className="subtle" style={{ fontSize: 14, marginBottom: 20, lineHeight: 1.5 }}>
+          Create graded assignments with AI-generated problem suggestions. Pick topics, generate problems, and export for your students.
         </div>
         <button
           type="button"
           className="btn btnPrimary"
           onClick={() => {
-            const confirm = window.confirm("Are you a professor? This will enable assignment creation features.");
-            if (confirm) {
-              localStorage.setItem("orgopivy-is-professor", "true");
-              setIsProfessor(true);
-            }
+            localStorage.setItem("orgopivy-is-professor", "true");
+            setIsProfessor(true);
           }}
         >
           Enable Professor Mode
@@ -1724,29 +1725,89 @@ export default function ProfessorAssignmentCreator({ course, topic, onAssignment
     );
   }
 
+  if (!courseProp && !selectedCourse) {
+    return (
+      <div className="card" style={{ padding: 32 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: "var(--text)" }}>
+          Choose course
+        </div>
+        <div className="subtle" style={{ fontSize: 14, marginBottom: 20 }}>
+          Select which course to create an assignment for.
+        </div>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <button
+            type="button"
+            className="btn btnPrimary"
+            onClick={() => setSelectedCourse("orgochem-1")}
+            style={{ flex: 1, minWidth: 140, padding: 16 }}
+          >
+            OrgoChem I
+          </button>
+          <button
+            type="button"
+            className="btn btnPrimary"
+            onClick={() => setSelectedCourse("orgochem-2")}
+            style={{ flex: 1, minWidth: 140, padding: 16 }}
+          >
+            OrgoChem II
+          </button>
+        </div>
+        <button
+          type="button"
+          className="btn"
+          onClick={() => {
+            localStorage.setItem("orgopivy-is-professor", "false");
+            setIsProfessor(false);
+          }}
+          style={{ marginTop: 16, fontSize: 12 }}
+        >
+          Exit Professor Mode
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="card" style={{ padding: 24 }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <div>
-            <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4, color: "var(--text)" }}>
-              Create New Assignment - {course === "orgochem-1" ? "OrgoChem I" : "OrgoChem II"}
+            <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "var(--text)" }}>
+              Create New Assignment — {course === "orgochem-1" ? "OrgoChem I" : "OrgoChem II"}
             </div>
             <div className="subtle" style={{ fontSize: 13 }}>
-              AI-assisted problem generation with 20+ diverse problem types per topic
+              Pick a topic, generate problems, add to assignment, then create or export
             </div>
           </div>
-          <button
-            type="button"
-            className="btn"
-            onClick={() => {
-              localStorage.setItem("orgopivy-is-professor", "false");
-              setIsProfessor(false);
-            }}
-            style={{ fontSize: 12 }}
-          >
-            Exit Professor Mode
-          </button>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {!courseProp && (
+              <button
+                type="button"
+                className="btn"
+                onClick={() => {
+                  setSelectedCourse(null);
+                  setSelectedTopic("");
+                  setSuggestions([]);
+                  setSelectedProblems([]);
+                }}
+                style={{ fontSize: 12 }}
+              >
+                Change course
+              </button>
+            )}
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                localStorage.setItem("orgopivy-is-professor", "false");
+                setIsProfessor(false);
+                if (!courseProp) setSelectedCourse(null);
+              }}
+              style={{ fontSize: 12 }}
+            >
+              Exit Professor Mode
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1819,11 +1880,8 @@ export default function ProfessorAssignmentCreator({ course, topic, onAssignment
                 onChange={(e) => setFilterType(e.target.value as any)}
                 style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid var(--border)", fontSize: 12, background: "var(--panel)", color: "var(--text)" }}
               >
-                <option value="all">All Types</option>
                 <option value="multiple-choice">Multiple Choice</option>
-                <option value="short-answer">Short Answer</option>
-                <option value="synthesis">Synthesis</option>
-                <option value="mechanism">Mechanism</option>
+                <option value="all">All Types</option>
               </select>
               {categories.length > 0 && (
                 <select
@@ -1993,7 +2051,38 @@ export default function ProfessorAssignmentCreator({ course, topic, onAssignment
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 16, padding: 16, background: "var(--panel-2)", borderRadius: "var(--radius-md)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              createAssignment();
+            }}
+            style={{
+              marginTop: 16,
+              padding: 16,
+              background: "var(--panel-2)",
+              borderRadius: "var(--radius-md)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "100%",
+              border: "1px solid var(--border)",
+              cursor: "pointer",
+              transition: "all 0.2s",
+              textAlign: "left",
+              position: "relative",
+              zIndex: 1,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "var(--blue)";
+              e.currentTarget.style.background = "rgba(0, 122, 255, 0.06)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "var(--border)";
+              e.currentTarget.style.background = "var(--panel-2)";
+            }}
+          >
             <div>
               <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
                 Assignment Summary
@@ -2004,11 +2093,14 @@ export default function ProfessorAssignmentCreator({ course, topic, onAssignment
               <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
                 Difficulty breakdown: {selectedProblems.filter(p => p.difficulty === "easy").length} easy, {selectedProblems.filter(p => p.difficulty === "medium").length} medium, {selectedProblems.filter(p => p.difficulty === "hard").length} hard
               </div>
+              <div style={{ fontSize: 11, color: "var(--blue)", marginTop: 8, fontWeight: 500 }}>
+                Click to open assignment →
+              </div>
             </div>
             <div style={{ fontSize: 18, fontWeight: 700, color: "var(--blue)" }}>
               {selectedProblems.reduce((sum, p) => sum + p.points, 0)} pts
             </div>
-          </div>
+          </button>
         </div>
       )}
 

@@ -595,27 +595,27 @@ const ORGOCHEM_2: Topic[] = [
       {
         url: "https://www.youtube.com/watch?v=X5I2vG576QA",
         title: "Grignard Reagent Synthesis Reaction Mechanism",
-        thumbnail: "https://img.youtube.com/vi/X5I2vG576QA/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/X5I2vG576QA/hqdefault.jpg",
       },
       {
         url: "https://www.youtube.com/watch?v=D5-1qEKtfQ4",
         title: "Addition of Carbon Nucleophiles to Aldehydes and Ketones",
-        thumbnail: "https://img.youtube.com/vi/D5-1qEKtfQ4/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/D5-1qEKtfQ4/hqdefault.jpg",
       },
       {
         url: "https://www.youtube.com/watch?v=_0C7XXWjOpQ",
         title: "Imine and Enamine Formation Reactions",
-        thumbnail: "https://img.youtube.com/vi/_0C7XXWjOpQ/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/_0C7XXWjOpQ/hqdefault.jpg",
       },
       {
-        url: "https://www.youtube.com/watch?v=X5I2vG576QA",
+        url: "https://www.youtube.com/watch?v=PjBGN19tQuw",
         title: "Acetal Formation and Deprotection - Carbonyl Protection",
-        thumbnail: "https://img.youtube.com/vi/X5I2vG576QA/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/PjBGN19tQuw/hqdefault.jpg",
       },
       {
-        url: "https://www.youtube.com/watch?v=X5I2vG576QA",
+        url: "https://www.youtube.com/watch?v=UfulhkYQNmA",
         title: "Carbonyl Reactivity - Aldehydes vs Ketones",
-        thumbnail: "https://img.youtube.com/vi/X5I2vG576QA/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/UfulhkYQNmA/hqdefault.jpg",
       },
     ],
     howToStudy: [
@@ -653,27 +653,27 @@ const ORGOCHEM_2: Topic[] = [
       {
         url: "https://www.youtube.com/watch?v=HaeWpZ3ecyA",
         title: "Nucleophilic Acyl Substitution Reaction Mechanism",
-        thumbnail: "https://img.youtube.com/vi/HaeWpZ3ecyA/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/HaeWpZ3ecyA/hqdefault.jpg",
       },
       {
         url: "https://www.youtube.com/watch?v=Av9x8DilfWU",
         title: "Carboxylic Acid Derivatives Reactivity Ladder",
-        thumbnail: "https://img.youtube.com/vi/Av9x8DilfWU/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/Av9x8DilfWU/hqdefault.jpg",
       },
       {
         url: "https://www.youtube.com/watch?v=4KmNRscPgPA",
         title: "Converting Between Carboxylic Acid Derivatives - Acid Chlorides",
-        thumbnail: "https://img.youtube.com/vi/4KmNRscPgPA/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/4KmNRscPgPA/hqdefault.jpg",
       },
       {
-        url: "https://www.youtube.com/watch?v=HaeWpZ3ecyA",
+        url: "https://www.youtube.com/watch?v=Fz9Ws8e92UI",
         title: "Decarboxylation and Beta-Ketoacids - Acyl Substitution",
-        thumbnail: "https://img.youtube.com/vi/HaeWpZ3ecyA/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/Fz9Ws8e92UI/hqdefault.jpg",
       },
       {
         url: "https://www.youtube.com/watch?v=_Xi5ZVbbftI",
         title: "Spectroscopy of Carboxylic Acid Derivatives - IR",
-        thumbnail: "https://img.youtube.com/vi/_Xi5ZVbbftI/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/_Xi5ZVbbftI/hqdefault.jpg",
       },
     ],
     howToStudy: [
@@ -726,7 +726,7 @@ const ORGOCHEM_2: Topic[] = [
       {
         url: "https://www.youtube.com/watch?v=0j6LAFhV6Bk",
         title: "Claisen Condensation Mechanism - Beta-Ketoester Formation",
-        thumbnail: "https://img.youtube.com/vi/0j6LAFhV6Bk/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/0j6LAFhV6Bk/hqdefault.jpg",
       },
       {
         url: "https://www.youtube.com/watch?v=OBT3otCRBxg",

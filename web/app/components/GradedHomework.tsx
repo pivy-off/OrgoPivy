@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
 import { getHomeworkProblems, getCourseHomeworkProblems, type HomeworkProblem } from "../lib/homework-problems";
 import type { CourseId } from "../lib/curriculum";
 import ProfessorAssignmentCreator from "./ProfessorAssignmentCreator";
@@ -34,9 +35,10 @@ type Props = {
   course: CourseId;
   topic?: string;
   assignmentId?: string; // For viewing specific assignment
+  backHref?: string; // e.g. "/assignments" when on assignment page
 };
 
-export default function GradedHomework({ course, topic, assignmentId }: Props) {
+export default function GradedHomework({ course, topic, assignmentId, backHref }: Props) {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [currentAssignment, setCurrentAssignment] = useState<Assignment | null>(null);
   const [submissions, setSubmissions] = useState<Record<string, Submission>>({});
@@ -316,29 +318,52 @@ export default function GradedHomework({ course, topic, assignmentId }: Props) {
   }
 
   const submission = submissions[currentAssignment.id];
+  const isProfessor = typeof window !== "undefined" && localStorage.getItem("orgopivy-is-professor") === "true";
+
+  function exportForStudents() {
+    const data = {
+      ...currentAssignment,
+      courseId: course,
+      course: course,
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${currentAssignment.title.replace(/[^a-z0-9]/gi, "-")}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div className="card" style={{ padding: 24 }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>{currentAssignment.title}</div>
             <div className="subtle" style={{ fontSize: 13 }}>
               {currentAssignment.problems.length} problems • {totalPoints} total points
             </div>
           </div>
-          {submitted && submission && (
-            <div style={{ textAlign: "right", padding: 16, background: "var(--panel-2)", borderRadius: "var(--radius-md)" }}>
-              <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>Final Score</div>
-              <div style={{ fontSize: 32, fontWeight: 700, color: percentage >= 90 ? "var(--green)" : percentage >= 70 ? "var(--orange)" : "var(--red)" }}>
-                {percentage}%
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {isProfessor && (
+              <button type="button" className="btn" onClick={exportForStudents} style={{ fontSize: 13 }}>
+                Export for students
+              </button>
+            )}
+            {submitted && submission && (
+              <div style={{ textAlign: "right", padding: 16, background: "var(--panel-2)", borderRadius: "var(--radius-md)" }}>
+                <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>Final Score</div>
+                <div style={{ fontSize: 32, fontWeight: 700, color: percentage >= 90 ? "var(--green)" : percentage >= 70 ? "var(--orange)" : "var(--red)" }}>
+                  {percentage}%
+                </div>
+                <div className="subtle" style={{ fontSize: 13 }}>
+                  {submission.score} / {totalPoints} points
+                </div>
               </div>
-              <div className="subtle" style={{ fontSize: 13 }}>
-                {submission.score} / {totalPoints} points
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Progress */}
@@ -552,19 +577,25 @@ export default function GradedHomework({ course, topic, assignmentId }: Props) {
 
       {/* Back button */}
       <div style={{ marginTop: 24, paddingTop: 24, borderTop: "1px solid var(--border)" }}>
-        <button
-          type="button"
-          className="btn"
-          onClick={() => {
-            setCurrentAssignment(null);
-            setCurrentProblemIndex(0);
-            setAnswers({});
-            setSubmitted(false);
-            setShowFeedback({});
-          }}
-        >
-          ← Back to Assignments
-        </button>
+        {backHref ? (
+          <Link href={backHref} className="btn">
+            ← Back to Assignments
+          </Link>
+        ) : (
+          <button
+            type="button"
+            className="btn"
+            onClick={() => {
+              setCurrentAssignment(null);
+              setCurrentProblemIndex(0);
+              setAnswers({});
+              setSubmitted(false);
+              setShowFeedback({});
+            }}
+          >
+            ← Back to Assignments
+          </button>
+        )}
       </div>
     </div>
   );
