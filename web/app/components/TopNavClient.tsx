@@ -43,6 +43,10 @@ export default function TopNavClient() {
       <Link className={pillClass("/practice")} href="/practice">
         Practice
       </Link>
+
+      <Link className={pillClass("/tools")} href="/tools">
+        Tools
+      </Link>
     </div>
   );
 }

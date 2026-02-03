@@ -24,7 +24,7 @@ export type MemorizationItem = {
 };
 
 // Topics before spectroscopy in Orgo 1 — don't show IR/NMR on functional groups yet
-const SLUGS_BEFORE_SPECTROSCOPY = ["alkanes", "cycloalkanes", "stereochemistry", "substitution-elimination", "alkenes"];
+const SLUGS_BEFORE_SPECTROSCOPY = ["resonance-acid-base", "alkanes", "cycloalkanes", "stereochemistry", "substitution-elimination", "alkenes", "alkynes"];
 
 function getTopicFromSlug(slug: string): { topic: any; course: CourseId } | null {
   const orgochem1Topics = getCourseTopics("orgochem-1");
@@ -66,6 +66,8 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
         category = "Stereochemistry";
       } else if (concept.toLowerCase().includes("sn1") || concept.toLowerCase().includes("sn2") || concept.toLowerCase().includes("e1") || concept.toLowerCase().includes("e2") || concept.toLowerCase().includes("substrate") || concept.toLowerCase().includes("nucleophile") || concept.toLowerCase().includes("solvent")) {
         category = "Substitution & Elimination";
+      } else if (concept.toLowerCase().includes("resonance") || concept.toLowerCase().includes("conjugate") || concept.toLowerCase().includes("pka") || concept.toLowerCase().includes("brønsted") || concept.toLowerCase().includes("proton donor")) {
+        category = "Resonance & Acid-Base";
       } else if (concept.toLowerCase().includes("markovnikov") || concept.toLowerCase().includes("addition") || concept.toLowerCase().includes("syn") || concept.toLowerCase().includes("anti") || concept.toLowerCase().includes("rearrangement")) {
         category = "Alkene Reactions";
       } else if (concept.toLowerCase().includes("ir") || concept.toLowerCase().includes("nmr") || concept.toLowerCase().includes("spectroscopy") || concept.toLowerCase().includes("chemical shift") || concept.toLowerCase().includes("splitting")) {
@@ -186,6 +188,58 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
 
   // Add topic-specific valuable memorization items (supplementary to must-know)
   const topicSpecificItems: Record<string, MemorizationItem[]> = {
+    "resonance-acid-base": [
+      functionalGroupsOrgo1,
+      {
+        category: "Resonance Rules (Activity 1)",
+        items: [
+          { term: "Electrons that stay the same", value: "σ (sigma) bonds" },
+          { term: "Electrons that can move", value: "π (pi) bonds and lone pairs" },
+          { term: "What stays fixed", value: "Atom positions and atom connections" },
+          { term: "Resonance forms differ in", value: "Electron placement only" },
+        ],
+      },
+      {
+        category: "Formal Charge Formula",
+        items: [
+          { term: "Charge formula", value: "Formal charge = valence electrons − bonds − lone pairs" },
+          { term: "C (neutral)", value: "4 valence, 4 bonds, 0 lone pairs → charge 0" },
+          { term: "C⁺ (carbocation)", value: "4 valence, 3 bonds, 0 lone pairs → charge +1" },
+          { term: "C⁻ (carbanion)", value: "4 valence, 3 bonds, 2 lone pairs → charge −1" },
+          { term: "O (neutral)", value: "6 valence, 2 bonds, 4 lone pairs → charge 0" },
+          { term: "O⁺ (oxonium)", value: "6 valence, 3 bonds, 2 lone pairs → charge +1" },
+          { term: "O⁻ (alkoxide)", value: "6 valence, 1 bond, 6 lone pairs → charge −1" },
+          { term: "N (neutral)", value: "5 valence, 3 bonds, 2 lone pairs → charge 0" },
+          { term: "N⁺", value: "5 valence, 4 bonds, 0 lone pairs → charge +1" },
+          { term: "N⁻", value: "5 valence, 2 bonds, 4 lone pairs → charge −1" },
+        ],
+      },
+      {
+        category: "Brønsted-Lowry Acid-Base",
+        items: [
+          { term: "Acid", value: "Proton donor (H⁺)" },
+          { term: "Base", value: "Proton acceptor" },
+          { term: "Conjugate acid", value: "Base + H⁺ (what the base becomes after accepting)" },
+          { term: "Conjugate base", value: "Acid − H⁺ (what the acid becomes after donating)" },
+          { term: "Equilibrium favors", value: "Weaker acid (higher pKa)" },
+          { term: "Lower pKa", value: "Stronger acid" },
+          { term: "Conjugates location", value: "On the side of the weaker acid" },
+          { term: "No reaction", value: "Reactants favored; conjugates on left" },
+        ],
+      },
+      {
+        category: "Approximate pKa Values (Table 1)",
+        items: [
+          { term: "H₃O⁺", value: "pKa ≈ −1.7" },
+          { term: "Carboxylic acid (RCOOH)", value: "pKa ≈ 5" },
+          { term: "Phenol", value: "pKa ≈ 10" },
+          { term: "Alcohol (ROH)", value: "pKa ≈ 15–18" },
+          { term: "Terminal alkyne (RC≡CH)", value: "pKa ≈ 25" },
+          { term: "NH₃", value: "pKa ≈ 38" },
+          { term: "Alkane (R–H)", value: "pKa ≈ 50" },
+        ],
+      },
+    ],
     "alkanes": [
       functionalGroupsOrgo1,
       {
@@ -281,6 +335,58 @@ export function getMemorizationItems(slug: string): MemorizationItem[] {
           { term: "Halohydrin", value: "Markovnikov, anti addition" },
           { term: "Oxymercuration", value: "Markovnikov, no rearrangement" },
           { term: "Hydroboration", value: "Anti-Markovnikov, syn addition" },
+        ],
+      },
+    ],
+    "alkynes": [
+      functionalGroupsOrgo1,
+      {
+        category: "Alkyne Addition (Activity 2)",
+        items: [
+          { term: "X₂ (Cl₂, Br₂)", value: "Adds twice; same as alkenes" },
+          { term: "HX (Markovnikov)", value: "H adds to less substituted C; X to more substituted" },
+          { term: "HX + ROOR (peroxide)", value: "Anti-Markovnikov product" },
+          { term: "H₂ + Pd/Pt/Ni", value: "Always adds twice → alkane (cannot stop at alkene)" },
+          { term: "Internal alkyne + HX", value: "Regiochemistry ambiguous (both ends similar)" },
+        ],
+      },
+      {
+        category: "Alkyne Hydration & Tautomerization",
+        items: [
+          { term: "Enol", value: "C=C–OH; alkene + alcohol" },
+          { term: "Keto", value: "C=O; carbonyl (more stable)" },
+          { term: "Tautomers", value: "Isomers differing in H and double bond placement" },
+          { term: "Hg²⁺/H₂O", value: "Markovnikov ketone (internal) or aldehyde (terminal)" },
+          { term: "Hydroboration-oxidation", value: "Anti-Markovnikov aldehyde (terminal alkyne only)" },
+          { term: "BH₃ (0.33 equiv)", value: "For alkenes: one B adds to 3 alkenes" },
+          { term: "Sia₂BH (disiamylborane)", value: "For alkynes: bulky, adds once; prevents double addition" },
+        ],
+      },
+      {
+        category: "Alkyne Reduction",
+        items: [
+          { term: "H₂ + Lindlar (Pd/BaSO₄, quinoline)", value: "cis alkene (syn addition, stops at alkene)" },
+          { term: "Na/NH₃", value: "trans alkene (Na = one-electron donor)" },
+          { term: "H₂ + Pd/Pt/Ni", value: "Alkane (always adds twice)" },
+        ],
+      },
+      {
+        category: "Oxidative Cleavage",
+        items: [
+          { term: "Internal alkyne + O₃ or KMnO₄", value: "Carboxylic acids" },
+          { term: "Terminal alkyne + O₃ or KMnO₄", value: "CO₂ + carboxylic acid" },
+        ],
+      },
+      {
+        category: "Terminal Alkyne Acidity & Alkylation",
+        items: [
+          { term: "RC≡CH pKa", value: "~25 (more acidic than NH₃, alkanes)" },
+          { term: "NaOH + acetylene", value: "No reaction (NaOH conjugate acid H₂O pKa 15.7; acetylene pKa 25)" },
+          { term: "NaNH₂ + acetylene", value: "Deprotonates (NH₃ pKa 38; acetylene pKa 25)" },
+          { term: "BuLi + acetylene", value: "Deprotonates (butane pKa ~50)" },
+          { term: "Acetylide + R–X", value: "SN2 substitution → extended alkyne" },
+          { term: "Acetylide + aldehyde/ketone", value: "Nucleophilic addition → propargyl alcohol (after H₃O⁺ work-up)" },
+          { term: "NaNH₂ twice on acetylene", value: "Double deprotonation → dialkylation possible" },
         ],
       },
     ],

@@ -25,9 +25,47 @@ export type Topic = {
   video?: Video; // Topic-level video
 
   hasMechanism: boolean;
+
+  /** Optional activity PDFs (e.g. M. R. Garrett POGIL-style activities) */
+  activityPdfs?: { url: string; label: string }[];
 };
 
 const ORGOCHEM_1: Topic[] = [
+  {
+    slug: "resonance-acid-base",
+    title: "Resonance & Acid-Base",
+    shortDesc: "Drawing resonance forms, Brønsted-Lowry, pKa, conjugate pairs, equilibrium direction",
+    summary:
+      "Master resonance (π bonds and lone pairs move; σ bonds stay) and acid-base (equilibrium favors weaker acid). Essential foundation for all of orgo.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/2-introduction",
+    externalLabel: "OpenStax Organic Chemistry - Chapter 2: Polar Covalent Bonds, Acids and Bases",
+    video: {
+      url: "https://www.youtube.com/watch?v=9B5FGPDwX_E",
+      title: "Resonance Structures - How To Draw The Resonance Hybrid",
+      thumbnail: "https://img.youtube.com/vi/9B5FGPDwX_E/maxresdefault.jpg",
+    },
+    mustKnow: [
+      "Resonance: π bonds and lone pairs can move; σ bonds and atom positions stay fixed; resonance forms differ only in electron placement",
+      "Charge formula: formal charge = valence − bonds − lone pairs; use to check resonance structures",
+      "Brønsted-Lowry: acid = proton donor; base = proton acceptor; conjugate acid = base + H⁺; conjugate base = acid − H⁺",
+      "Equilibrium favors weaker acid (higher pKa); lower pKa = stronger acid; conjugates are on the side of the weaker acid",
+      "Predicting reactions: label acid, base, conjugate acid, conjugate base; compare pKa; equilibrium arrows point toward weaker acid",
+    ],
+    mustKnowVideos: [
+      { url: "https://www.youtube.com/watch?v=9B5FGPDwX_E", title: "Resonance Structures - Drawing Resonance Hybrid", thumbnail: "https://img.youtube.com/vi/9B5FGPDwX_E/maxresdefault.jpg" },
+      { url: "https://www.youtube.com/watch?v=K07VceUan0k", title: "Acid-Base Reactions and pKa", thumbnail: "https://img.youtube.com/vi/K07VceUan0k/maxresdefault.jpg" },
+      { url: "https://www.youtube.com/watch?v=K07VceUan0k", title: "Conjugate Acid-Base Pairs", thumbnail: "https://img.youtube.com/vi/K07VceUan0k/maxresdefault.jpg" },
+      { url: "https://www.youtube.com/watch?v=K07VceUan0k", title: "Predicting Equilibrium from pKa", thumbnail: "https://img.youtube.com/vi/K07VceUan0k/maxresdefault.jpg" },
+      { url: "https://www.youtube.com/watch?v=K07VceUan0k", title: "pKa Values and Acid Strength", thumbnail: "https://img.youtube.com/vi/K07VceUan0k/maxresdefault.jpg" },
+    ],
+    howToStudy: [
+      "Draw 10 resonance structures with curved arrows; check formal charges",
+      "Label acid, base, conjugate acid, conjugate base on 15 reactions",
+      "Use pKa table to predict equilibrium direction on 20 problems",
+      "Do Activity 1-style problems: electron flow arrows, equilibrium arrows",
+    ],
+    hasMechanism: false,
+  },
   {
     slug: "alkanes",
     title: "Alkanes",
@@ -184,9 +222,9 @@ const ORGOCHEM_1: Topic[] = [
         thumbnail: "https://img.youtube.com/vi/yKyjs4Qb30E/maxresdefault.jpg",
       },
       {
-        url: "https://www.youtube.com/watch?v=8F8jBGXHlq8",
-        title: "E and Z Configuration of Alkenes - Priority Rules",
-        thumbnail: "https://img.youtube.com/vi/8F8jBGXHlq8/maxresdefault.jpg",
+        url: "https://www.youtube.com/watch?v=7He7goTp6BY",
+        title: "E–Z system | Alkenes and alkynes | Khan Academy",
+        thumbnail: "https://img.youtube.com/vi/7He7goTp6BY/maxresdefault.jpg",
       },
       {
         url: "https://www.youtube.com/watch?v=yzfcrwJ37kI",
@@ -272,9 +310,9 @@ const ORGOCHEM_1: Topic[] = [
       "https://upload.wikimedia.org/wikipedia/commons/4/41/Hydroboration-oxidation.png",
     imageAlt: "Hydroboration oxidation overview",
     video: {
-      url: "https://www.youtube.com/watch?v=8F8jBGXHlq8",
-      title: "Alkene Addition Reactions Made Easy! - Organic Chemistry",
-      thumbnail: "https://img.youtube.com/vi/8F8jBGXHlq8/maxresdefault.jpg",
+      url: "https://www.youtube.com/watch?v=hgHJojT6EXU",
+      title: "Alkene Reactions Made Simple - Mechanisms, Markovnikov's Rule, Lots of Practice",
+      thumbnail: "https://img.youtube.com/vi/hgHJojT6EXU/maxresdefault.jpg",
     },
     mustKnow: [
       "Markovnikov: H adds to less substituted C, X adds to more substituted C (HX, acid-catalyzed hydration); anti-Markovnikov: opposite (hydroboration-oxidation)",
@@ -305,9 +343,9 @@ const ORGOCHEM_1: Topic[] = [
         thumbnail: "https://img.youtube.com/vi/AQmZrC7Mgs8/maxresdefault.jpg",
       },
       {
-        url: "https://www.youtube.com/watch?v=8F8jBGXHlq8",
-        title: "Ozonolysis of Alkenes - Cleavage Reactions to Carbonyls",
-        thumbnail: "https://img.youtube.com/vi/8F8jBGXHlq8/maxresdefault.jpg",
+        url: "https://www.youtube.com/watch?v=ID79wLZLzbA",
+        title: "Ozonolysis - Oxidative Cleavage of Alkenes",
+        thumbnail: "https://img.youtube.com/vi/ID79wLZLzbA/maxresdefault.jpg",
       },
     ],
     howToStudy: [
@@ -315,6 +353,41 @@ const ORGOCHEM_1: Topic[] = [
       "Do 25 product predictions across mixed reagents",
       "For every problem label the intermediate first then draw product",
       "Add a second pass of 10 synthesis problems using alkene as a starting point",
+    ],
+    hasMechanism: true,
+  },
+  {
+    slug: "alkynes",
+    title: "Alkynes",
+    shortDesc: "Addition, hydration, reduction, oxidative cleavage, acetylide alkylation",
+    summary:
+      "Alkynes add twice like alkenes. Hydration gives carbonyls via enol tautomerization. Lindlar → cis alkene; Na/NH₃ → trans. Terminal alkynes are acidic (pKa ~25).",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/9-introduction",
+    externalLabel: "OpenStax Organic Chemistry - Chapter 9: Alkynes",
+    video: {
+      url: "https://www.youtube.com/watch?v=W6QwEySRzuM",
+      title: "Alkyne Reduction - Lindlar, Na/NH3, Hydrogenation",
+      thumbnail: "https://img.youtube.com/vi/W6QwEySRzuM/maxresdefault.jpg",
+    },
+    mustKnow: [
+      "Addition: HX (Markovnikov), X₂, H₂ (always adds twice to alkane); same as alkenes but electrophile adds twice",
+      "Hydration: Hg²⁺/H₂O → Markovnikov ketone (enol tautomerizes); hydroboration-oxidation → anti-Markovnikov aldehyde (terminal only)",
+      "Reduction: H₂/Pd → alkane; Lindlar (H₂, Pd/BaSO₄, quinoline) → cis alkene; Na/NH₃ → trans alkene",
+      "Oxidative cleavage: O₃ or KMnO₄; internal alkyne → carboxylic acids; terminal → CO₂ + carboxylic acid",
+      "Acidity: terminal alkyne RC≡CH pKa ~25; NaNH₂, BuLi deprotonate; acetylide + alkyl halide → SN2, extended alkyne",
+    ],
+    mustKnowVideos: [
+      { url: "https://www.youtube.com/watch?v=W6QwEySRzuM", title: "Alkyne Reduction - Lindlar, Na/NH3", thumbnail: "https://img.youtube.com/vi/W6QwEySRzuM/maxresdefault.jpg" },
+      { url: "https://www.youtube.com/watch?v=hgHJojT6EXU", title: "Alkyne Addition - HX, X2 (like alkenes)", thumbnail: "https://img.youtube.com/vi/hgHJojT6EXU/maxresdefault.jpg" },
+      { url: "https://www.youtube.com/watch?v=ID79wLZLzbA", title: "Alkyne Hydration - Enol to Ketone Tautomerization", thumbnail: "https://img.youtube.com/vi/ID79wLZLzbA/maxresdefault.jpg" },
+      { url: "https://www.youtube.com/watch?v=W6QwEySRzuM", title: "Lindlar vs Na/NH3 - cis vs trans alkene", thumbnail: "https://img.youtube.com/vi/W6QwEySRzuM/maxresdefault.jpg" },
+      { url: "https://www.youtube.com/watch?v=K07VceUan0k", title: "Terminal Alkyne Acidity - Acetylide Alkylation", thumbnail: "https://img.youtube.com/vi/K07VceUan0k/maxresdefault.jpg" },
+    ],
+    howToStudy: [
+      "Map alkyne reactions: addition (2×), hydration, reduction (3 pathways), cleavage",
+      "Do 15 product predictions: HX, X2, Hg²⁺, hydroboration, Lindlar, Na/NH3",
+      "Practice acetylide alkylation: deprotonate with NaNH2, then SN2 with R-X",
+      "Synthesis: work backwards from carbonyl to alkyne (hydration reverse)",
     ],
     hasMechanism: true,
   },
@@ -348,14 +421,14 @@ const ORGOCHEM_1: Topic[] = [
         thumbnail: "https://img.youtube.com/vi/_Xi5ZVbbftI/maxresdefault.jpg",
       },
       {
-        url: "https://www.youtube.com/watch?v=vejXDbX5p7U",
-        title: "Proton NMR Spectroscopy - Chemical Shift, Integration, Splitting",
-        thumbnail: "https://img.youtube.com/vi/vejXDbX5p7U/maxresdefault.jpg",
+        url: "https://www.youtube.com/watch?v=hoWiuAwdzKU",
+        title: "How to Read NMR Spectroscopy - Chemical Shift, Integration, Splitting",
+        thumbnail: "https://img.youtube.com/vi/hoWiuAwdzKU/maxresdefault.jpg",
       },
       {
-        url: "https://www.youtube.com/watch?v=vejXDbX5p7U",
-        title: "Carbon-13 NMR Spectroscopy - Chemical Shifts and DEPT",
-        thumbnail: "https://img.youtube.com/vi/vejXDbX5p7U/maxresdefault.jpg",
+        url: "https://www.youtube.com/watch?v=UKm0MtSLLNw",
+        title: "Carbon-13 NMR Spectroscopy Explained",
+        thumbnail: "https://img.youtube.com/vi/UKm0MtSLLNw/maxresdefault.jpg",
       },
       {
         url: "https://www.youtube.com/watch?v=_Xi5ZVbbftI",
@@ -565,9 +638,9 @@ const ORGOCHEM_2: Topic[] = [
       "https://upload.wikimedia.org/wikipedia/commons/6/60/Nucleophilic_acyl_substitution.png",
     imageAlt: "Nucleophilic acyl substitution overview",
     video: {
-      url: "https://www.youtube.com/watch?v=2JXbPyYd2G4",
+      url: "https://www.youtube.com/watch?v=HaeWpZ3ecyA",
       title: "Nucleophilic Acyl Substitution Reaction Mechanism - Carboxylic Acid Derivatives",
-      thumbnail: "https://img.youtube.com/vi/2JXbPyYd2G4/maxresdefault.jpg",
+      thumbnail: "https://img.youtube.com/vi/HaeWpZ3ecyA/maxresdefault.jpg",
     },
     mustKnow: [
       "Reactivity ladder: acyl chloride > anhydride > ester > carboxylic acid > amide (based on leaving group ability; Cl- > RCO2- > RO- > OH- > NH2-)",
@@ -578,29 +651,29 @@ const ORGOCHEM_2: Topic[] = [
     ],
     mustKnowVideos: [
       {
-        url: "https://www.youtube.com/watch?v=2JXbPyYd2G4",
+        url: "https://www.youtube.com/watch?v=HaeWpZ3ecyA",
         title: "Nucleophilic Acyl Substitution Reaction Mechanism",
-        thumbnail: "https://img.youtube.com/vi/2JXbPyYd2G4/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/HaeWpZ3ecyA/maxresdefault.jpg",
       },
       {
-        url: "https://www.youtube.com/watch?v=2JXbPyYd2G4",
+        url: "https://www.youtube.com/watch?v=Av9x8DilfWU",
         title: "Carboxylic Acid Derivatives Reactivity Ladder",
-        thumbnail: "https://img.youtube.com/vi/2JXbPyYd2G4/maxresdefault.jpg",
+        thumbnail: "https://img.youtube.com/vi/Av9x8DilfWU/maxresdefault.jpg",
       },
       {
-        url: "https://www.youtube.com/watch?v=2JXbPyYd2G4",
-        title: "Converting Between Carboxylic Acid Derivatives",
-        thumbnail: "https://img.youtube.com/vi/2JXbPyYd2G4/maxresdefault.jpg",
+        url: "https://www.youtube.com/watch?v=4KmNRscPgPA",
+        title: "Converting Between Carboxylic Acid Derivatives - Acid Chlorides",
+        thumbnail: "https://img.youtube.com/vi/4KmNRscPgPA/maxresdefault.jpg",
       },
       {
-        url: "https://www.youtube.com/watch?v=2JXbPyYd2G4",
-        title: "Decarboxylation of Beta-Ketoacids and Malonic Acids",
-        thumbnail: "https://img.youtube.com/vi/2JXbPyYd2G4/maxresdefault.jpg",
+        url: "https://www.youtube.com/watch?v=HaeWpZ3ecyA",
+        title: "Decarboxylation and Beta-Ketoacids - Acyl Substitution",
+        thumbnail: "https://img.youtube.com/vi/HaeWpZ3ecyA/maxresdefault.jpg",
       },
       {
-        url: "https://www.youtube.com/watch?v=2JXbPyYd2G4",
-        title: "Spectroscopy of Carboxylic Acid Derivatives",
-        thumbnail: "https://img.youtube.com/vi/2JXbPyYd2G4/maxresdefault.jpg",
+        url: "https://www.youtube.com/watch?v=_Xi5ZVbbftI",
+        title: "Spectroscopy of Carboxylic Acid Derivatives - IR",
+        thumbnail: "https://img.youtube.com/vi/_Xi5ZVbbftI/maxresdefault.jpg",
       },
     ],
     howToStudy: [

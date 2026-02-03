@@ -321,6 +321,44 @@ export default async function OrgoChem2TopicPage({
 
   const mechTag = guessMechanismTag(topic.slug);
 
+  const commonMistakes: Record<string, string[]> = {
+    alcohols: [
+      "Using PCC when you need carboxylic acid (PCC stops at aldehyde)",
+      "Forgetting that 3° alcohols don't oxidize",
+      "Not converting OH to tosylate before SN2 when needed",
+    ],
+    "ethers-epoxides": [
+      "Attacking wrong carbon in epoxide (basic: less substituted; acidic: more substituted)",
+      "Forgetting anti addition in epoxide opening",
+      "Using secondary halide in Williamson (favors E2 over SN2)",
+    ],
+    "carbonyls-addition": [
+      "Treating carbonyl addition as substitution (no leaving group on aldehyde/ketone)",
+      "Forgetting Grignard adds twice to esters (RCO2R → R2C(OH)R)",
+      "Not protecting aldehyde when doing selective ketone reduction",
+    ],
+    "carboxylic-acids-derivatives": [
+      "Going up the reactivity ladder (amide → acid chloride) without special reagents",
+      "Using NH3 with ester instead of excess to get amide",
+      "Forgetting decarboxylation needs β-dicarbonyl or β-ketoacid",
+    ],
+    "enolates-aldol-claisen": [
+      "Using wrong base alkoxide in Claisen (must match ester R group)",
+      "Not checking alpha position before enolate formation",
+      "Mixing up kinetic (LDA, less substituted) vs thermodynamic enolate",
+    ],
+    "aromatic-chemistry": [
+      "Wrong order of EAS steps (activating first, then deactivating)",
+      "Putting meta director ortho to another substituent and expecting ortho product",
+      "Forgetting Friedel-Crafts fails with strongly deactivated rings",
+    ],
+    amines: [
+      "Ranking aniline as more basic than aliphatic amines (resonance decreases basicity)",
+      "Using LiAlH4 to reduce nitro to amine (use Sn/HCl or catalytic H2)",
+      "Forgetting reductive amination gives 2° amine from aldehyde + 1° amine",
+    ],
+  };
+
   return (
     <main className="stack">
       <div className="card">
@@ -397,11 +435,10 @@ export default async function OrgoChem2TopicPage({
                         </Section>
 
                         <Section title="Common mistakes">
-                          <Mistakes items={[
+                          <Mistakes items={commonMistakes[topic.slug] || [
                             "Not deciding addition vs substitution first for carbonyls",
                             "Forgetting to check alpha positions before enolate formation",
                             "Ignoring directing effects when planning EAS synthesis order",
-                            "Mixing up kinetic vs thermodynamic enolate conditions",
                           ]} />
                         </Section>
                       </div>
@@ -458,6 +495,17 @@ export default async function OrgoChem2TopicPage({
                   id: "resources",
                   content: (
                     <div className="stack">
+                      {topic.activityPdfs && topic.activityPdfs.length > 0 ? (
+                        <Section title="Activity PDFs">
+                          <div className="topicToolRow">
+                            {topic.activityPdfs.map((pdf, i) => (
+                              <a key={i} className="btn btnPrimary" href={pdf.url} target="_blank" rel="noreferrer">
+                                {pdf.label}
+                              </a>
+                            ))}
+                          </div>
+                        </Section>
+                      ) : null}
                       <Section title="Tools">
                         <div className="topicToolRow">
                           {topic.hasMechanism ? (
@@ -465,9 +513,13 @@ export default async function OrgoChem2TopicPage({
                               Mechanism tool
                             </Link>
                           ) : null}
-                          {!topic.hasMechanism ? (
-                            <div className="subtle">No specialized tools needed for this topic</div>
+                          {(topic.slug === "alcohols" || topic.slug === "amines" || topic.slug === "carbonyls-addition") ? (
+                            <>
+                              <Link className="btn btnPrimary" href="/tools/pka">pKa Trainer</Link>
+                              <Link className="btn btnPrimary" href="/tools/acid-base">Acid-Base Engine</Link>
+                            </>
                           ) : null}
+                          <Link className="btn" href="/tools">All study tools</Link>
                         </div>
 
                         <div className="topicToolRow">

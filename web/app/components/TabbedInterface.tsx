@@ -26,47 +26,55 @@ export default function TabbedInterface({ tabs, defaultTab, children }: Props) {
 
   return (
     <div>
-      {/* Tab Navigation */}
+      {/* Tab Navigation - prominent pill-style tabs */}
       <div style={{
         display: "flex",
-        gap: 4,
-        borderBottom: "2px solid var(--border)",
-        marginBottom: 24,
+        gap: 8,
+        marginBottom: 28,
         overflowX: "auto",
+        padding: 6,
+        background: "var(--panel-2)",
+        borderRadius: "var(--radius-md)",
+        border: "1px solid var(--border)",
       }}>
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              padding: "12px 20px",
-              fontSize: 15,
-              fontWeight: activeTab === tab.id ? 600 : 400,
-              color: activeTab === tab.id ? "var(--blue)" : "var(--muted)",
-              background: "transparent",
-              border: "none",
-              borderBottom: activeTab === tab.id ? "2px solid var(--blue)" : "2px solid transparent",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-              transition: "all 0.2s ease",
-              marginBottom: -2,
-            }}
-            onMouseEnter={(e) => {
-              if (activeTab !== tab.id) {
-                e.currentTarget.style.color = "var(--text)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeTab !== tab.id) {
-                e.currentTarget.style.color = "var(--muted)";
-              }
-            }}
-          >
-            {tab.icon && <span style={{ marginRight: 6 }}>{tab.icon}</span>}
-            {tab.label}
-          </button>
-        ))}
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: "14px 24px",
+                fontSize: 16,
+                fontWeight: isActive ? 700 : 600,
+                color: isActive ? "#fff" : "var(--muted)",
+                background: isActive ? "var(--blue)" : "transparent",
+                border: "none",
+                borderRadius: "var(--radius-sm)",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                transition: "all 0.2s ease",
+                boxShadow: isActive ? "0 2px 8px rgba(0,122,255,0.35)" : "none",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = "var(--panel)";
+                  e.currentTarget.style.color = "var(--text)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = "var(--muted)";
+                }
+              }}
+            >
+              {tab.icon && <span style={{ marginRight: 8, fontSize: 18 }}>{tab.icon}</span>}
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Tab Content */}

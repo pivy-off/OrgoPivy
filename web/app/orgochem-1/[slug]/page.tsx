@@ -43,6 +43,32 @@ function createSVGIllustration(slug: string, title: string) {
     style: { display: "block" },
   };
 
+  if (slug === "resonance-acid-base") {
+    return (
+      <svg {...common}>
+        <defs>
+          <linearGradient id="gRes" x1="0" x2="1">
+            <stop offset="0" stopColor="var(--primary)" stopOpacity="0.2" />
+            <stop offset="1" stopColor="var(--accent)" stopOpacity="0.2" />
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#gRes)" />
+        <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
+          Resonance & Acid-Base
+        </text>
+        <text x="28" y="82" fontSize="13" fill="var(--muted)">
+          π and lone pairs move. Equilibrium favors weaker acid (higher pKa).
+        </text>
+        <path d="M 280 140 L 360 140" stroke="var(--text)" strokeOpacity="0.6" strokeWidth="4" />
+        <path d="M 280 130 L 360 130" stroke="var(--text)" strokeOpacity="0.3" strokeWidth="4" />
+        <circle cx="320" cy="135" r="8" fill="var(--text)" fillOpacity="0.5" />
+        <path d="M 400 135 Q 440 120 480 135" fill="none" stroke="var(--text)" strokeOpacity="0.4" strokeWidth="3" />
+        <text x="520" y="140" fontSize="14" fill="var(--text)" fontWeight="700">↔</text>
+        <text x="600" y="130" fontSize="14" fill="var(--muted)">Rule</text>
+        <text x="600" y="154" fontSize="14" fill="var(--text)" fontWeight="900">Lower pKa = stronger acid</text>
+      </svg>
+    );
+  }
   if (slug === "alkanes") {
     return (
       <svg {...common}>
@@ -222,6 +248,32 @@ function createSVGIllustration(slug: string, title: string) {
     );
   }
 
+  if (slug === "alkynes") {
+    return (
+      <svg {...common}>
+        <defs>
+          <linearGradient id="gAlk" x1="0" x2="1">
+            <stop offset="0" stopColor="var(--primary)" stopOpacity="0.18" />
+            <stop offset="1" stopColor="var(--accent)" stopOpacity="0.18" />
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="900" height="320" rx="18" fill="url(#gAlk)" />
+        <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
+          Alkyne reactions
+        </text>
+        <text x="28" y="82" fontSize="13" fill="var(--muted)">
+          Lindlar → cis | Na/NH₃ → trans | Terminal RC≡CH acidic (pKa ~25)
+        </text>
+        <line x1="280" y1="155" x2="420" y2="155" stroke="var(--text)" strokeOpacity="0.6" strokeWidth="4" />
+        <line x1="280" y1="145" x2="420" y2="145" stroke="var(--text)" strokeOpacity="0.4" strokeWidth="4" />
+        <line x1="280" y1="135" x2="420" y2="135" stroke="var(--text)" strokeOpacity="0.25" strokeWidth="4" />
+        <circle cx="260" cy="145" r="10" fill="var(--text)" fillOpacity="0.4" />
+        <circle cx="440" cy="145" r="10" fill="var(--text)" fillOpacity="0.4" />
+        <text x="520" y="150" fontSize="14" fill="var(--muted)">Adds 2×</text>
+        <text x="600" y="140" fontSize="14" fill="var(--text)" fontWeight="900">HX, X₂, H₂</text>
+      </svg>
+    );
+  }
   if (slug === "spectroscopy") {
     return (
       <svg {...common}>
@@ -354,6 +406,12 @@ export default async function OrgoChem1TopicPage({
   const mechTag = guessMechanismTag(topic.slug);
 
   const commonMistakes: Record<string, string[]> = {
+    "resonance-acid-base": [
+      "Moving σ bonds in resonance (only π and lone pairs move)",
+      "Forgetting conjugate pairs are on the same side of equilibrium",
+      "Equilibrium favors stronger acid (wrong—favors weaker acid, higher pKa)",
+      "Not labeling all four: acid, base, conjugate acid, conjugate base",
+    ],
     alkanes: [
       "Forgetting to number the chain to give the lowest set of locants",
       "Mixing up anti and gauche when comparing stability",
@@ -378,6 +436,12 @@ export default async function OrgoChem1TopicPage({
       "Assuming Markovnikov always applies",
       "Forgetting syn vs anti addition outcomes",
       "Not checking rearrangements in carbocation pathways",
+    ],
+    alkynes: [
+      "Using NaOH to deprotonate terminal alkyne (need NaNH2 or BuLi; pKa ~25)",
+      "Confusing Lindlar (cis) vs Na/NH3 (trans) reduction products",
+      "Forgetting alkyne adds twice with HX or X2 (like alkene but 2×)",
+      "Internal alkyne + HX: regiochemistry ambiguous (both ends similar)",
     ],
     spectroscopy: [
       "Peak hunting without a proposed structure first",
@@ -518,6 +582,17 @@ export default async function OrgoChem1TopicPage({
                   id: "resources",
                   content: (
                     <div className="stack">
+                      {topic.activityPdfs && topic.activityPdfs.length > 0 ? (
+                        <Section title="Activity PDFs">
+                          <div className="topicToolRow">
+                            {topic.activityPdfs.map((pdf, i) => (
+                              <a key={i} className="btn btnPrimary" href={pdf.url} target="_blank" rel="noreferrer">
+                                {pdf.label}
+                              </a>
+                            ))}
+                          </div>
+                        </Section>
+                      ) : null}
                       <Section title="Tools">
                         <div className="topicToolRow">
                           {topic.hasMechanism ? (
@@ -530,9 +605,20 @@ export default async function OrgoChem1TopicPage({
                               NMR Studio
                             </Link>
                           ) : null}
-                          {!topic.hasMechanism && topic.slug !== "spectroscopy" ? (
-                            <div className="subtle">No specialized tools needed for this topic</div>
+                          {topic.slug === "resonance-acid-base" ? (
+                            <>
+                              <Link className="btn btnPrimary" href="/tools/pka">pKa Trainer</Link>
+                              <Link className="btn btnPrimary" href="/tools/acid-base">Acid-Base Engine</Link>
+                            </>
                           ) : null}
+                          {topic.slug === "substitution-elimination" ? (
+                            <>
+                              <Link className="btn btnPrimary" href="/tools/pka">pKa Trainer</Link>
+                              <Link className="btn btnPrimary" href="/tools/acid-base">Acid-Base Engine</Link>
+                              <Link className="btn btnPrimary" href="/tools/sn1-sn2">SN1/SN2/E1/E2</Link>
+                            </>
+                          ) : null}
+                          <Link className="btn" href="/tools">All study tools</Link>
                         </div>
 
                         <div className="topicToolRow">
