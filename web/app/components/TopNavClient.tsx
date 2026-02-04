@@ -26,7 +26,7 @@ export default function TopNavClient() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 640px)");
+    const mq = window.matchMedia("(max-width: 767px)");
     setIsMobile(mq.matches);
     const handler = () => setIsMobile(mq.matches);
     mq.addEventListener("change", handler);

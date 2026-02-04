@@ -7,6 +7,7 @@ import AchieveHomework from "../components/AchieveHomework";
 import GradedHomework from "../components/GradedHomework";
 import { getCourseTopics } from "../lib/curriculum";
 import type { CourseId } from "../lib/curriculum";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function PracticePage() {
   return (
@@ -27,12 +28,13 @@ function PracticePageContent() {
     ? courseParam 
     : "orgochem-1";
 
+  const { t, locale } = useLanguage();
   const [selectedCourse, setSelectedCourse] = useState<CourseId>(course);
   const [selectedTopic, setSelectedTopic] = useState<string>(topicParam);
   const [selectedMode, setSelectedMode] = useState<"interactive" | "graded">(modeParam as "interactive" | "graded" || "interactive");
 
-  const orgochem1Topics = getCourseTopics("orgochem-1");
-  const orgochem2Topics = getCourseTopics("orgochem-2");
+  const orgochem1Topics = getCourseTopics("orgochem-1", locale);
+  const orgochem2Topics = getCourseTopics("orgochem-2", locale);
 
   return (
     <main style={{ padding: "40px 0", minHeight: "calc(100vh - 120px)" }}>
@@ -40,10 +42,10 @@ function PracticePageContent() {
         {/* Header */}
         <div style={{ marginBottom: 40 }}>
           <h1 style={{ fontSize: 48, fontWeight: 700, marginBottom: 8 }}>
-            Practice Problems
+            {t("practiceProblems")}
           </h1>
           <p className="subtle" style={{ fontSize: 16 }}>
-            Interactive homework with immediate feedback, or graded assignments for professors.
+            {t("practiceDesc")}
           </p>
         </div>
 
@@ -61,7 +63,7 @@ function PracticePageContent() {
                 padding: "12px 24px",
               }}
             >
-              Interactive Homework
+              {t("interactiveHomework")}
             </button>
             <button
               type="button"
@@ -74,14 +76,14 @@ function PracticePageContent() {
                 padding: "12px 24px",
               }}
             >
-              Graded Assignments
+              {t("gradedAssignments")}
             </button>
           </div>
 
           {/* Course Selector */}
           <div style={{ marginBottom: 24 }}>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, color: "var(--text)" }}>
-              Select Course:
+              {t("selectCourse")}
             </div>
             <div style={{ display: "flex", gap: 12 }}>
               <button
@@ -98,7 +100,7 @@ function PracticePageContent() {
                   padding: "12px 24px",
                 }}
               >
-                OrgoChem I
+                {t("orgochem1")}
               </button>
               <button
                 type="button"
@@ -114,7 +116,7 @@ function PracticePageContent() {
                   padding: "12px 24px",
                 }}
               >
-                OrgoChem II
+                {t("orgochem2")}
               </button>
             </div>
           </div>
@@ -122,7 +124,7 @@ function PracticePageContent() {
           {/* Topic Selector */}
           <div>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, color: "var(--text)" }}>
-              Select Topic (Optional):
+              {t("selectTopicOptional")}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8 }}>
               <button
@@ -137,7 +139,7 @@ function PracticePageContent() {
                   textAlign: "left",
                 }}
               >
-                All Topics
+                {t("allTopics")}
               </button>
               {(selectedCourse === "orgochem-1" ? orgochem1Topics : orgochem2Topics).map((topic) => (
                 <button
@@ -166,10 +168,10 @@ function PracticePageContent() {
             <div>
               <div style={{ marginBottom: 16 }}>
                 <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>
-                  Interactive Homework
+                  {t("interactiveHomework")}
                 </h2>
                 <p className="subtle" style={{ fontSize: 14 }}>
-                  Achieve-style practice with immediate feedback, hints, and achievements. Perfect for self-study.
+                  {t("interactiveHomeworkDesc")}
                 </p>
               </div>
               <AchieveHomework course={selectedCourse} topic={selectedTopic || undefined} />
@@ -178,11 +180,10 @@ function PracticePageContent() {
             <div>
               <div style={{ marginBottom: 16 }}>
                 <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>
-                  Graded Assignments
+                  {t("gradedAssignments")}
                 </h2>
                 <p className="subtle" style={{ fontSize: 14 }}>
-                  Professional-grade assignments with automatic grading, detailed feedback, and comprehensive problems.
-                  Perfect for professors to assign and students to practice.
+                  {t("gradedAssignmentsDesc")}
                 </p>
               </div>
               <GradedHomework course={selectedCourse} topic={selectedTopic || undefined} />

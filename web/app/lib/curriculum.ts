@@ -860,11 +860,40 @@ const ORGOCHEM_2: Topic[] = [
   },
 ];
 
-export function getCourseTopics(course: CourseId): Topic[] {
-  if (course === "orgochem-1") return ORGOCHEM_1;
-  return ORGOCHEM_2;
+import type { Locale } from "./i18n";
+import {
+  getTranslatedTopicShortDesc,
+  getTranslatedTopicTitle,
+} from "./curriculum-i18n";
+
+export function getCourseTopics(
+  course: CourseId,
+  locale?: Locale
+): Topic[] {
+  const topics = course === "orgochem-1" ? ORGOCHEM_1 : ORGOCHEM_2;
+  if (locale === "fr") {
+    return topics.map((t) => ({
+      ...t,
+      title: getTranslatedTopicTitle(t.slug, "fr", t.title),
+      shortDesc: getTranslatedTopicShortDesc(t.slug, "fr", t.shortDesc),
+    }));
+  }
+  return topics;
 }
 
-export function findTopic(course: CourseId, slug: string): Topic | undefined {
-  return getCourseTopics(course).find((t) => t.slug === slug);
+export function findTopic(
+  course: CourseId,
+  slug: string,
+  locale?: Locale
+): Topic | undefined {
+  const raw = (course === "orgochem-1" ? ORGOCHEM_1 : ORGOCHEM_2).find(
+    (t) => t.slug === slug
+  );
+  if (!raw) return undefined;
+  if (locale !== "fr") return raw;
+  return {
+    ...raw,
+    title: getTranslatedTopicTitle(raw.slug, "fr", raw.title),
+    shortDesc: getTranslatedTopicShortDesc(raw.slug, "fr", raw.shortDesc),
+  };
 }

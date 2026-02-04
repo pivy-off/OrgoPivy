@@ -3,6 +3,7 @@
 import { useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "../contexts/LanguageContext";
 
 type AskContext = {
   stored_filename?: string;
@@ -17,6 +18,7 @@ type AskResponse = {
 };
 
 function AskPageContent() {
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const courseParam = searchParams?.get("course") || "";
   const topicParam = searchParams?.get("topic") || "";
@@ -40,7 +42,7 @@ function AskPageContent() {
 
     const q = question.trim();
     if (!q) {
-      setError("Please enter a question");
+      setError(t("pleaseEnterQuestion"));
       return;
     }
 
@@ -78,9 +80,9 @@ function AskPageContent() {
         <div className="cardInner">
           <div className="stack">
             <div>
-              <div className="h1">Ask Questions</div>
+              <div className="h1">{t("askQuestions")}</div>
               <div className="subtle" style={{ marginTop: 8, fontSize: 15, lineHeight: 1.6 }}>
-                Ask questions about your uploaded notes. The AI will search through your documents and provide answers with source references.
+                {t("askQuestionsDesc")}
               </div>
             </div>
 
@@ -93,11 +95,11 @@ function AskPageContent() {
                 fontSize: 14
               }}>
                 <div style={{ fontWeight: 600, marginBottom: 4, color: "#007AFF" }}>
-                  Context: {courseParam ? courseParam.replace("orgochem-", "OrgoChem ").replace("-", " ").toUpperCase() : ""} 
+                  {t("context")}: {courseParam ? courseParam.replace("orgochem-", "OrgoChem ").replace("-", " ").toUpperCase() : ""} 
                   {topicParam ? ` • ${topicParam.charAt(0).toUpperCase() + topicParam.slice(1).replace(/-/g, " ")}` : ""}
                 </div>
                 <div style={{ color: "var(--muted)", fontSize: 13 }}>
-                  Your questions will be focused on this {courseParam ? "course" : ""} {topicParam ? "and topic" : ""}.
+                  Your questions will be focused on this {courseParam ? t("course") : ""} {topicParam ? t("andTopic") : ""}.
                 </div>
               </div>
             )}
@@ -109,7 +111,7 @@ function AskPageContent() {
               border: "1px solid var(--border)"
             }}>
               <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: "var(--text)" }}>
-                How to use:
+                {t("howToUse")}
               </div>
               <ul style={{ 
                 margin: 0, 
@@ -119,22 +121,22 @@ function AskPageContent() {
                 color: "var(--muted)",
                 listStyle: "disc"
               }}>
-                <li>Upload your notes first using the Upload page</li>
-                <li>Ask specific questions about concepts, reactions, or mechanisms</li>
-                <li>The AI searches through your uploaded documents to find relevant information</li>
-                <li>Answers include source references so you can verify the information</li>
-                <li>Use topic-specific questions for better, focused answers</li>
+                <li>{t("askHowTo1")}</li>
+                <li>{t("askHowTo2")}</li>
+                <li>{t("askHowTo3")}</li>
+                <li>{t("askHowTo4")}</li>
+                <li>{t("askHowTo5")}</li>
               </ul>
             </div>
 
             <form onSubmit={onAsk} style={{ display: "grid", gap: 16, marginTop: 8 }}>
               <label style={{ display: "grid", gap: 8 }}>
-                <div style={{ fontSize: 15, fontWeight: 600 }}>Your Question</div>
+                <div style={{ fontSize: 15, fontWeight: 600 }}>{t("yourQuestion")}</div>
                 <textarea
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   rows={5}
-                  placeholder="Example: What is the mechanism for SN2 reactions? How does stereochemistry work in alkene additions?"
+                  placeholder={t("askPlaceholder")}
                   style={{ 
                     width: "100%", 
                     padding: 16, 
@@ -152,7 +154,7 @@ function AskPageContent() {
 
               <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
                 <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <div style={{ fontSize: 14, color: "var(--muted)" }}>Top K:</div>
+                  <div style={{ fontSize: 14, color: "var(--muted)" }}>{t("topK")}</div>
                   <input
                     type="number"
                     min={1}
@@ -169,7 +171,7 @@ function AskPageContent() {
                     disabled={loading}
                   />
                   <div style={{ fontSize: 12, color: "var(--muted-2)" }}>
-                    (number of source chunks to search)
+                    {t("topKHint")}
                   </div>
                 </label>
 
@@ -179,7 +181,7 @@ function AskPageContent() {
                   className="btn btnPrimary"
                   style={{ minWidth: 120 }}
                 >
-                  {loading ? "Searching..." : "Ask Question"}
+                  {loading ? t("searching") : t("askQuestion")}
                 </button>
               </div>
             </form>
@@ -191,7 +193,7 @@ function AskPageContent() {
                 boxShadow: "none"
               }}>
                 <div className="cardInner" style={{ padding: 16 }}>
-                  <div style={{ fontWeight: 600, color: "#FF3B30", marginBottom: 4 }}>Error</div>
+                  <div style={{ fontWeight: 600, color: "#FF3B30", marginBottom: 4 }}>{t("error")}</div>
                   <div style={{ fontSize: 14, color: "var(--muted)" }}>{error}</div>
                 </div>
               </div>
@@ -202,9 +204,9 @@ function AskPageContent() {
                 <div className="cardInner">
                   <div className="stack">
                     <div>
-                      <div className="h2" style={{ fontSize: 20, marginBottom: 4 }}>Answer</div>
+                      <div className="h2" style={{ fontSize: 20, marginBottom: 4 }}>{t("answer")}</div>
                       <div className="subtle" style={{ fontSize: 13 }}>
-                        Based on your uploaded notes
+                        {t("basedOnNotes")}
                       </div>
                     </div>
                     <div style={{
@@ -229,9 +231,9 @@ function AskPageContent() {
                 <div className="cardInner">
                   <div className="stack">
                     <div>
-                      <div className="h2" style={{ fontSize: 18, marginBottom: 4 }}>Sources</div>
+                      <div className="h2" style={{ fontSize: 18, marginBottom: 4 }}>{t("sources")}</div>
                       <div className="subtle" style={{ fontSize: 13 }}>
-                        {contexts.length} source{contexts.length !== 1 ? "s" : ""} found
+                        {contexts.length} {contexts.length !== 1 ? t("sourcesFound") : t("sourceFound")}
                       </div>
                     </div>
                     <div style={{ display: "grid", gap: 12 }}>

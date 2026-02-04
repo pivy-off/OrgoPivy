@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { CourseId, Topic } from "../lib/curriculum";
+import { useLanguage } from "../contexts/LanguageContext";
 
 type ProgressMap = Record<string, boolean>;
 
@@ -28,6 +29,7 @@ export default function CourseProgressClient({
   course: CourseId;
   topics: Topic[];
 }) {
+  const { t } = useLanguage();
   const [progress, setProgress] = useState<ProgressMap>({});
 
   useEffect(() => {
@@ -42,8 +44,8 @@ export default function CourseProgressClient({
 
   const doneCount = useMemo(() => {
     let n = 0;
-    for (const t of topics) {
-      if (progress[t.slug]) n += 1;
+    for (const topic of topics) {
+      if (progress[topic.slug]) n += 1;
     }
     return n;
   }, [progress, topics]);
@@ -54,7 +56,7 @@ export default function CourseProgressClient({
   }, [doneCount, topics.length]);
 
   const nextTopic = useMemo(() => {
-    const firstIncomplete = topics.find((t) => !progress[t.slug]);
+    const firstIncomplete = topics.find((topic) => !progress[topic.slug]);
     return firstIncomplete || topics[0] || null;
   }, [topics, progress]);
 
@@ -72,9 +74,9 @@ export default function CourseProgressClient({
       <div className="cardInner" style={{ display: "grid", gap: 12 }}>
         <div className="row">
           <div style={{ display: "grid", gap: 4 }}>
-            <div style={{ fontWeight: 950 }}>Progress</div>
+            <div style={{ fontWeight: 950 }}>{t("progress")}</div>
             <div className="subtle">
-              {doneCount} of {topics.length} topics completed
+              {doneCount} {t("of")} {topics.length} {t("topicsCompletedCount")}
             </div>
           </div>
 
@@ -83,12 +85,12 @@ export default function CourseProgressClient({
 
             {nextTopic ? (
               <Link className="btn btnPrimary" href={`/${course}/${nextTopic.slug}`}>
-                Continue
+                {t("continue")}
               </Link>
             ) : null}
 
             <button className="btn" type="button" onClick={resetAll}>
-              Reset
+              {t("reset")}
             </button>
           </div>
         </div>
@@ -96,13 +98,13 @@ export default function CourseProgressClient({
         <div className="divider" />
 
         <div style={{ display: "grid", gap: 10 }}>
-          {topics.map((t, idx) => {
-            const checked = Boolean(progress[t.slug]);
-            const isNext = nextTopic?.slug === t.slug;
+          {topics.map((topic, idx) => {
+            const checked = Boolean(progress[topic.slug]);
+            const isNext = nextTopic?.slug === topic.slug;
 
             return (
               <div 
-                key={t.slug} 
+                key={topic.slug} 
                 className="progressRow"
                 style={{
                   borderColor: isNext ? "rgba(0, 122, 255, 0.4)" : undefined,
@@ -113,7 +115,7 @@ export default function CourseProgressClient({
                   type="button"
                   className={checked ? "progressCheck progressCheckOn" : "progressCheck"}
                   aria-label={checked ? "Mark incomplete" : "Mark complete"}
-                  onClick={() => toggle(t.slug)}
+                  onClick={() => toggle(topic.slug)}
                   style={{ flexShrink: 0 }}
                 >
                   {checked ? "✓" : ""}
@@ -121,16 +123,16 @@ export default function CourseProgressClient({
 
                 <div className="progressRowLeft">
                   <div className="progressRowTitle" style={{ opacity: checked ? 0.6 : 1 }}>
-                    {idx + 1}. {t.title}
+                    {idx + 1}. {topic.title}
                   </div>
                   <div className="progressRowDesc" style={{ opacity: checked ? 0.7 : 1 }}>
-                    {t.shortDesc}
+                    {topic.shortDesc}
                   </div>
                 </div>
 
                 <div className="progressRowAction">
-                  <Link className="btn" href={`/${course}/${t.slug}`}>
-                    Open
+                  <Link className="btn" href={`/${course}/${topic.slug}`}>
+                    {t("open")}
                   </Link>
                 </div>
               </div>

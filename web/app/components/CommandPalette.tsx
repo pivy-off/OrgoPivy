@@ -8,7 +8,7 @@ import { useLanguage } from "../contexts/LanguageContext";
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 640px)");
+    const mq = window.matchMedia("(max-width: 767px)");
     setIsMobile(mq.matches);
     const h = () => setIsMobile(mq.matches);
     mq.addEventListener("change", h);
@@ -30,10 +30,10 @@ export default function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
   const isMobile = useIsMobile();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
 
-  const orgochem1Topics = getCourseTopics("orgochem-1");
-  const orgochem2Topics = getCourseTopics("orgochem-2");
+  const orgochem1Topics = getCourseTopics("orgochem-1", locale);
+  const orgochem2Topics = getCourseTopics("orgochem-2", locale);
   const allTopics = [...orgochem1Topics, ...orgochem2Topics];
 
   const results = useMemo((): SearchResult[] => {

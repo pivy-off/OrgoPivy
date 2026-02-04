@@ -8,7 +8,7 @@ import { getCourseTopics, findTopic } from "../lib/curriculum";
 import type { CourseId } from "../lib/curriculum";
 
 export default function HomeStats() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [stats, setStats] = useState<ReturnType<typeof getStats> | null>(null);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function HomeStats() {
 }
 
 export function RecentActivity() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [stats, setStats] = useState<ReturnType<typeof getStats> | null>(null);
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export function RecentActivity() {
             </div>
             <div style={{ display: "grid", gap: 8 }}>
               {stats.recentSessions.map((session) => {
-                const topic = findTopic(session.course, session.topic);
+                const topic = findTopic(session.course, session.topic, locale);
                 return (
                   <div
                     key={session.id}
@@ -117,7 +117,7 @@ export function RecentActivity() {
             </div>
             <div style={{ display: "grid", gap: 8 }}>
               {stats.bookmarks.map((bookmark) => {
-                const topic = findTopic(bookmark.course, bookmark.topic);
+                const topic = findTopic(bookmark.course, bookmark.topic, locale);
                 return (
                   <div
                     key={bookmark.id}

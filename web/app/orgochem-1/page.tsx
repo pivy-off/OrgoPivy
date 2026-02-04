@@ -1,10 +1,13 @@
-// app/orgochem-1/page.tsx
+"use client";
+
 import Link from "next/link";
 import { getCourseTopics } from "../lib/curriculum";
 import CourseProgressClient from "../components/CourseProgressClient";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function OrgoChem1Page() {
-  const topics = getCourseTopics("orgochem-1");
+  const { t, locale } = useLanguage();
+  const topics = getCourseTopics("orgochem-1", locale);
 
   return (
     <main className="stack">
@@ -13,15 +16,13 @@ export default function OrgoChem1Page() {
           <div className="stack">
             <div className="row">
               <div>
-                <h1 className="h1">OrgoChem Ι</h1>
-                <div className="subtle">
-                  Foundations, stereochemistry, and reaction logic. Follow the topics in order.
-                </div>
+                <h1 className="h1">{t("orgochem1")}</h1>
+                <div className="subtle">{t("foundationsDesc")}</div>
               </div>
 
               <div className="row">
                 <Link className="btn" href="/">
-                  Back
+                  {t("back")}
                 </Link>
               </div>
             </div>
@@ -34,18 +35,16 @@ export default function OrgoChem1Page() {
 
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <Link className="btn btnPrimary" href="/practice?course=orgochem-1">
-                Practice Problems
+                {t("practiceProblemsBtn")}
               </Link>
               <Link className="btn" href="/orgochem-1/exams">
-                Exam Mode
+                {t("examMode")}
               </Link>
             </div>
 
             <div className="divider" />
 
-            <div className="subtle">
-              Tip: when stuck, identify the intermediate first. Then map reagents to that pathway.
-            </div>
+            <div className="subtle">{t("tipStuck")}</div>
           </div>
         </div>
       </div>

@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { CourseId } from "../lib/curriculum";
 import { getAssignments, importAssignment, type Assignment } from "../lib/assignments";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function AssignmentsPage() {
+  const { t } = useLanguage();
   const [orgochem1, setOrgoChem1] = useState<Assignment[]>([]);
   const [orgochem2, setOrgoChem2] = useState<Assignment[]>([]);
   const [showImport, setShowImport] = useState(false);
@@ -40,11 +42,11 @@ export default function AssignmentsPage() {
     <main className="stack" style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
       <div>
         <Link href="/" className="btn" style={{ marginBottom: 16 }}>
-          ← Back
+          {t("back")}
         </Link>
-        <h1 className="h1" style={{ marginBottom: 8 }}>Assignments</h1>
+        <h1 className="h1" style={{ marginBottom: 8 }}>{t("assignments")}</h1>
         <p className="subtle" style={{ fontSize: 15 }}>
-          Take graded assignments and get instant feedback. Professors can share assignments via export.
+          {t("assignmentsDesc")}
         </p>
       </div>
 
@@ -64,7 +66,7 @@ export default function AssignmentsPage() {
 
           {showImport && (
             <div style={{ marginBottom: 24, padding: 16, background: "var(--panel-2)", borderRadius: 12, border: "1px solid var(--border)" }}>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Paste exported assignment JSON</div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{t("pasteExported")}</div>
               <textarea
                 value={importText}
                 onChange={(e) => setImportText(e.target.value)}
@@ -91,21 +93,21 @@ export default function AssignmentsPage() {
 
           {total === 0 && !showImport ? (
             <div style={{ padding: 32, textAlign: "center", color: "var(--muted)" }}>
-              <div style={{ fontSize: 15, marginBottom: 8 }}>No assignments yet</div>
+              <div style={{ fontSize: 15, marginBottom: 8 }}>{t("noAssignments")}</div>
               <div style={{ fontSize: 13 }}>
-                Assignments appear here when you create them (Professor Tools) or import one shared by your professor.
+                {t("noAssignmentsDesc")}
               </div>
               <Link href="/" className="btn btnPrimary" style={{ marginTop: 16, display: "inline-block" }}>
-                Go to Home
+                {t("goToHome")}
               </Link>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {orgochem1.map((a) => (
-                <AssignmentCard key={a.id} assignment={a} course="orgochem-1" />
+                <AssignmentCard key={a.id} assignment={a} course="orgochem-1" t={t} />
               ))}
               {orgochem2.map((a) => (
-                <AssignmentCard key={a.id} assignment={a} course="orgochem-2" />
+                <AssignmentCard key={a.id} assignment={a} course="orgochem-2" t={t} />
               ))}
             </div>
           )}
@@ -115,7 +117,7 @@ export default function AssignmentsPage() {
   );
 }
 
-function AssignmentCard({ assignment, course }: { assignment: Assignment; course: CourseId }) {
+function AssignmentCard({ assignment, course, t }: { assignment: Assignment; course: CourseId; t: (k: import("../lib/i18n").TranslationKey) => string }) {
   const [submission, setSubmission] = useState<{ score: number; percentage: number } | null>(null);
 
   useEffect(() => {
@@ -165,7 +167,7 @@ function AssignmentCard({ assignment, course }: { assignment: Assignment; course
             <div className="subtle" style={{ fontSize: 12 }}>{submission.score}/{assignment.totalPoints}</div>
           </div>
         )}
-        {!submission && <span style={{ fontSize: 14, color: "var(--muted)" }}>Start →</span>}
+        {!submission && <span style={{ fontSize: 14, color: "var(--muted)" }}>{t("start")} →</span>}
       </div>
     </Link>
   );

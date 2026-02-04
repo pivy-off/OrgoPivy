@@ -1,10 +1,13 @@
-// app/orgochem-2/page.tsx
+"use client";
+
 import Link from "next/link";
 import { getCourseTopics } from "../lib/curriculum";
 import CourseProgressClient from "../components/CourseProgressClient";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function OrgoChem2Page() {
-  const topics = getCourseTopics("orgochem-2");
+  const { t, locale } = useLanguage();
+  const topics = getCourseTopics("orgochem-2", locale);
 
   return (
     <main className="stack">
@@ -13,15 +16,13 @@ export default function OrgoChem2Page() {
           <div className="stack">
             <div className="row">
               <div>
-                <h1 className="h1">OrgoChem ΙΙ</h1>
-                <div className="subtle">
-                  Carbonyl logic, synthesis, and structure proof. Follow the topics in order.
-                </div>
+                <h1 className="h1">{t("orgochem2")}</h1>
+                <div className="subtle">{t("foundationsDesc2")}</div>
               </div>
 
               <div className="row">
                 <Link className="btn" href="/">
-                  Back
+                  {t("back")}
                 </Link>
               </div>
             </div>
@@ -34,18 +35,16 @@ export default function OrgoChem2Page() {
 
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <Link className="btn btnPrimary" href="/practice?course=orgochem-2">
-                Practice Problems
+                {t("practiceProblemsBtn")}
               </Link>
               <Link className="btn" href="/orgochem-2/exams">
-                Exam Mode
+                {t("examMode")}
               </Link>
             </div>
 
             <div className="divider" />
 
-            <div className="subtle">
-              Tip: predict the product first. Use spectroscopy as proof.
-            </div>
+            <div className="subtle">{t("tipStuck2")}</div>
           </div>
         </div>
       </div>

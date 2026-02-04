@@ -7,12 +7,12 @@ import { getCourseTopics, findTopic } from "../lib/curriculum";
 import type { CourseId, Topic } from "../lib/curriculum";
 
 export default function HomeSearch() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
-  const orgochem1Topics = getCourseTopics("orgochem-1");
-  const orgochem2Topics = getCourseTopics("orgochem-2");
+  const orgochem1Topics = getCourseTopics("orgochem-1", locale);
+  const orgochem2Topics = getCourseTopics("orgochem-2", locale);
   const allTopics = [...orgochem1Topics, ...orgochem2Topics];
 
   const results = useMemo(() => {

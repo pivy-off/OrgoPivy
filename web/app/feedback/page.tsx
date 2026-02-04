@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useLanguage } from "../contexts/LanguageContext";
 
 type FeedbackEntry = {
   id: string;
@@ -17,6 +18,7 @@ type FeedbackEntry = {
 };
 
 export default function FeedbackPage() {
+  const { t } = useLanguage();
   const [entries, setEntries] = useState<FeedbackEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,16 +35,16 @@ export default function FeedbackPage() {
         <div className="cardInner">
         <div style={{ marginBottom: 24 }}>
           <Link href="/" className="btn" style={{ marginBottom: 16 }}>
-            ← Back
+            {t("back")}
           </Link>
-          <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Feedback Reports</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>{t("feedbackReports")}</h1>
           <p style={{ color: "var(--muted)", fontSize: 14 }}>
-            Broken video reports and other feedback. Use these to improve OrgoPivy.
+            {t("feedbackDesc")}
           </p>
         </div>
 
         {loading ? (
-          <div style={{ padding: 32, textAlign: "center", color: "var(--muted)" }}>Loading…</div>
+          <div style={{ padding: 32, textAlign: "center", color: "var(--muted)" }}>{t("loading")}</div>
         ) : entries.length === 0 ? (
           <div
             style={{
@@ -53,9 +55,9 @@ export default function FeedbackPage() {
               border: "1px solid var(--border)",
             }}
           >
-            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>No feedback yet</div>
+            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>{t("noFeedback")}</div>
             <div style={{ color: "var(--muted)", fontSize: 14 }}>
-              Reports from the &quot;Report broken&quot; button on topic pages will appear here.
+              {t("noFeedbackDesc")}
             </div>
           </div>
         ) : (
@@ -78,7 +80,7 @@ export default function FeedbackPage() {
                 </div>
                 {e.videoTitle && (
                   <div style={{ fontSize: 13, marginBottom: 4 }}>
-                    Video: {e.videoTitle}
+                    {t("video")}: {e.videoTitle}
                   </div>
                 )}
                 {e.videoUrl && (
