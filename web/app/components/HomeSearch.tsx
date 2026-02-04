@@ -2,10 +2,12 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { useLanguage } from "../contexts/LanguageContext";
 import { getCourseTopics, findTopic } from "../lib/curriculum";
 import type { CourseId, Topic } from "../lib/curriculum";
 
 export default function HomeSearch() {
+  const { t } = useLanguage();
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -41,7 +43,7 @@ export default function HomeSearch() {
           }}
           onFocus={() => setIsOpen(true)}
           onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-          placeholder="Search topics, chapters, concepts..."
+          placeholder={t("searchPlaceholder")}
           style={{
             width: "100%",
             maxWidth: 600,

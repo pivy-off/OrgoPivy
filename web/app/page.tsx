@@ -6,8 +6,10 @@ import HomeSearch from "./components/HomeSearch";
 import StudyStreak from "./components/StudyStreak";
 import QuickReview from "./components/QuickReview";
 import ProgressChart from "./components/ProgressChart";
+import { useLanguage } from "./contexts/LanguageContext";
 
 export default function HomePage() {
+  const { t } = useLanguage();
   return (
     <main style={{ 
       width: "100%",
@@ -63,7 +65,7 @@ export default function HomePage() {
               <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column" }}>
                 <div className="courseCardTop" style={{ marginBottom: 20 }}>
                   <div className="courseCardTitle" style={{ fontSize: 36, marginBottom: 0 }}>
-                    OrgoChem I
+                    {t("orgochem1")}
                   </div>
                 </div>
 
@@ -74,13 +76,12 @@ export default function HomePage() {
                   marginBottom: 24,
                   flex: 1
                 }}>
-                  Foundations, stereochemistry, and reaction logic. Build your understanding step by step through 
-                  alkanes, cycloalkanes, stereochemistry, substitution and elimination reactions, alkenes, and spectroscopy.
+                  {t("orgo1Desc")}
                 </div>
 
                 <div className="courseCardFooter" style={{ marginTop: "auto" }}>
                   <span className="courseCardCta" style={{ fontSize: 16 }}>
-                    View topics
+                    {t("viewTopics")}
                   </span>
                   <span className="courseCardArrow" style={{ fontSize: 20 }}>
                     →
@@ -114,7 +115,7 @@ export default function HomePage() {
               <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column" }}>
                 <div className="courseCardTop" style={{ marginBottom: 20 }}>
                   <div className="courseCardTitle" style={{ fontSize: 36, marginBottom: 0 }}>
-                    OrgoChem II
+                    {t("orgochem2")}
                   </div>
                 </div>
 
@@ -125,13 +126,12 @@ export default function HomePage() {
                   marginBottom: 24,
                   flex: 1
                 }}>
-                  Carbonyl logic, synthesis, and structure proof. Master advanced transformations including 
-                  alcohols, ethers, carbonyls, carboxylic acids, enolates, aromatic chemistry, and amines.
+                  {t("orgo2Desc")}
                 </div>
 
                 <div className="courseCardFooter" style={{ marginTop: "auto" }}>
                   <span className="courseCardCta" style={{ fontSize: 16, color: "#5856D6" }}>
-                    View topics
+                    {t("viewTopics")}
                   </span>
                   <span className="courseCardArrow" style={{ fontSize: 20, color: "#5856D6" }}>
                     →
@@ -202,10 +202,10 @@ export default function HomePage() {
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "var(--text)" }}>
-                Professor Tools
+                {t("professorTools")}
               </div>
               <div style={{ fontSize: 14, color: "var(--muted)" }}>
-                Create assignments and generate practice problems for your students
+                {t("professorToolsDesc")}
               </div>
             </div>
             <span className="professorCardArrow" style={{ marginLeft: "auto", fontSize: 20, color: "var(--muted)" }}>→</span>

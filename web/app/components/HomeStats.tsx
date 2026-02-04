@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useLanguage } from "../contexts/LanguageContext";
 import { getStats } from "../lib/progress";
 import { getCourseTopics, findTopic } from "../lib/curriculum";
 import type { CourseId } from "../lib/curriculum";
 
 export default function HomeStats() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState<ReturnType<typeof getStats> | null>(null);
 
   useEffect(() => {
@@ -26,30 +28,31 @@ export default function HomeStats() {
     >
       <div className="card" style={{ padding: 20 }}>
         <div style={{ fontSize: 32, fontWeight: 700, marginBottom: 4 }}>{stats.totalCompleted}</div>
-        <div style={{ fontSize: 14, color: "var(--muted)" }}>Topics Completed</div>
+        <div style={{ fontSize: 14, color: "var(--muted)" }}>{t("topicsCompleted")}</div>
       </div>
 
       <div className="card" style={{ padding: 20 }}>
         <div style={{ fontSize: 32, fontWeight: 700, marginBottom: 4 }}>
           {Math.floor(stats.totalTime / 60)}h {stats.totalTime % 60}m
         </div>
-        <div style={{ fontSize: 14, color: "var(--muted)" }}>Study Time</div>
+        <div style={{ fontSize: 14, color: "var(--muted)" }}>{t("studyTime")}</div>
       </div>
 
       <div className="card" style={{ padding: 20 }}>
         <div style={{ fontSize: 32, fontWeight: 700, marginBottom: 4 }}>{stats.totalBookmarks}</div>
-        <div style={{ fontSize: 14, color: "var(--muted)" }}>Bookmarks</div>
+        <div style={{ fontSize: 14, color: "var(--muted)" }}>{t("bookmarks")}</div>
       </div>
 
       <div className="card" style={{ padding: 20 }}>
         <div style={{ fontSize: 32, fontWeight: 700, marginBottom: 4 }}>{stats.totalAchievements}</div>
-        <div style={{ fontSize: 14, color: "var(--muted)" }}>Achievements</div>
+        <div style={{ fontSize: 14, color: "var(--muted)" }}>{t("achievements")}</div>
       </div>
     </div>
   );
 }
 
 export function RecentActivity() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState<ReturnType<typeof getStats> | null>(null);
 
   useEffect(() => {
@@ -63,12 +66,12 @@ export function RecentActivity() {
   return (
     <div className="card" style={{ marginTop: 40 }}>
       <div className="cardInner">
-        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Recent Activity</div>
+        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>{t("recentActivity")}</div>
         
         {stats.recentSessions.length > 0 && (
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, color: "var(--muted)" }}>
-              Recent Study Sessions
+              {t("recentSessions")}
             </div>
             <div style={{ display: "grid", gap: 8 }}>
               {stats.recentSessions.map((session) => {
@@ -98,7 +101,7 @@ export function RecentActivity() {
                       className="btn"
                       style={{ fontSize: 12, padding: "6px 12px" }}
                     >
-                      Open
+                      {t("open")}
                     </Link>
                   </div>
                 );
@@ -110,7 +113,7 @@ export function RecentActivity() {
         {stats.bookmarks.length > 0 && (
           <div>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, color: "var(--muted)" }}>
-              Bookmarked Topics
+              {t("bookmarkedTopics")}
             </div>
             <div style={{ display: "grid", gap: 8 }}>
               {stats.bookmarks.map((bookmark) => {
@@ -140,7 +143,7 @@ export function RecentActivity() {
                       className="btn"
                       style={{ fontSize: 12, padding: "6px 12px" }}
                     >
-                      Open
+                      {t("open")}
                     </Link>
                   </div>
                 );
@@ -154,6 +157,7 @@ export function RecentActivity() {
 }
 
 export function AchievementsDisplay() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState<ReturnType<typeof getStats> | null>(null);
 
   useEffect(() => {
@@ -167,7 +171,7 @@ export function AchievementsDisplay() {
   return (
     <div className="card" style={{ marginTop: 40 }}>
       <div className="cardInner">
-        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Recent Achievements</div>
+        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>{t("recentAchievements")}</div>
         <div style={{ display: "grid", gap: 12 }}>
           {stats.achievements.map((achievement) => (
             <div

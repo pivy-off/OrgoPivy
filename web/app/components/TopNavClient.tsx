@@ -1,26 +1,27 @@
-// web/app/components/TopNavClient.tsx
-
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLanguage } from "../contexts/LanguageContext";
+import type { TranslationKey } from "../lib/i18n";
 
-const NAV_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/orgochem-1", label: "OrgoChem I" },
-  { href: "/orgochem-2", label: "OrgoChem II" },
-  { href: "/uploads", label: "Upload" },
-  { href: "/search", label: "Search" },
-  { href: "/ask", label: "Ask" },
-  { href: "/practice", label: "Practice" },
-  { href: "/assignments", label: "Assignments" },
-  { href: "/professor", label: "Professor" },
-  { href: "/tools", label: "Tools" },
-] as const;
+const NAV_LINKS: { href: string; labelKey: TranslationKey }[] = [
+  { href: "/", labelKey: "home" },
+  { href: "/orgochem-1", labelKey: "orgochem1" },
+  { href: "/orgochem-2", labelKey: "orgochem2" },
+  { href: "/uploads", labelKey: "upload" },
+  { href: "/search", labelKey: "search" },
+  { href: "/ask", labelKey: "ask" },
+  { href: "/practice", labelKey: "practice" },
+  { href: "/assignments", labelKey: "assignments" },
+  { href: "/professor", labelKey: "professor" },
+  { href: "/tools", labelKey: "tools" },
+];
 
 export default function TopNavClient() {
   const path = usePathname() || "/";
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -118,18 +119,18 @@ export default function TopNavClient() {
               onClick={(e) => e.stopPropagation()}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-                <span style={{ fontSize: 18, fontWeight: 700 }}>Menu</span>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>{t("menu")}</span>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
                   className="btn"
                   style={{ padding: "8px 16px" }}
                 >
-                  Close
+                  {t("close")}
                 </button>
               </div>
               <nav style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {NAV_LINKS.map(({ href, label }) => (
+                {NAV_LINKS.map(({ href, labelKey }) => (
                   <Link
                     key={href}
                     href={href}
@@ -141,7 +142,7 @@ export default function TopNavClient() {
                     }}
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    {label}
+                    {t(labelKey)}
                   </Link>
                 ))}
               </nav>
@@ -154,9 +155,9 @@ export default function TopNavClient() {
 
   return (
     <div className="topNav">
-      {NAV_LINKS.map(({ href, label }) => (
+      {NAV_LINKS.map(({ href, labelKey }) => (
         <Link key={href} className={pillClass(href)} href={href}>
-          {label}
+          {t(labelKey)}
         </Link>
       ))}
     </div>

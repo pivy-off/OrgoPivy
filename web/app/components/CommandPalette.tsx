@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "../contexts/LanguageContext";
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -29,6 +30,7 @@ export default function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
 
   const orgochem1Topics = getCourseTopics("orgochem-1");
   const orgochem2Topics = getCourseTopics("orgochem-2");
@@ -171,7 +173,7 @@ export default function CommandPalette() {
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
-            placeholder={isMobile ? "Search topics, courses, or pages..." : "Search topics, courses, or pages... (⌘K)"}
+            placeholder={isMobile ? t("searchPalettePlaceholderShort") : t("searchPalettePlaceholder")}
             autoFocus
             style={{
               width: "100%",

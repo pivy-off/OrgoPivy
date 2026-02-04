@@ -3,18 +3,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function SideNavMobile() {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useLanguage();
 
   const links = [
-    { href: "/", label: "Home", sub: "Overview" },
-    { href: "/uploads", label: "Uploads", sub: "Files" },
-    { href: "/ask", label: "Ask", sub: "QA" },
-    { href: "/mechanisms", label: "Mechanisms", sub: "Steps" },
-    { href: "/spectra", label: "Spectra", sub: "NMR" },
-    { href: "/assignments", label: "Assignments", sub: "Graded" },
-    { href: "/professor", label: "Professor", sub: "Tools" },
+    { href: "/", labelKey: "home" as const, subKey: "overview" as const },
+    { href: "/uploads", labelKey: "uploads" as const, subKey: "files" as const },
+    { href: "/ask", labelKey: "ask" as const, subKey: "qa" as const },
+    { href: "/mechanisms", labelKey: "mechanisms" as const, subKey: "steps" as const },
+    { href: "/spectra", labelKey: "spectra" as const, subKey: "nmr" as const },
+    { href: "/assignments", labelKey: "assignments" as const, subKey: "graded" as const },
+    { href: "/professor", labelKey: "professor" as const, subKey: "tools" as const },
   ];
 
   return (
@@ -30,8 +32,8 @@ export default function SideNavMobile() {
         }}
       >
         <div>
-          <div className="cardTitle">Workspace</div>
-          <div className="subtle">Pick a tool and stay in flow</div>
+          <div className="cardTitle">{t("workspace")}</div>
+          <div className="subtle">{t("workspaceSub")}</div>
         </div>
         <span style={{ fontSize: 18, transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "none" }}>
           ▼
@@ -40,9 +42,9 @@ export default function SideNavMobile() {
       {isOpen && (
         <div style={{ padding: "0 var(--space-4) var(--space-4)", marginTop: -8 }}>
           <div className="nav" style={{ marginBottom: "var(--space-3)" }}>
-            {links.map(({ href, label, sub }) => (
+            {links.map(({ href, labelKey, subKey }) => (
               <Link key={href} className="navLink" href={href}>
-                {label} <span className="subtle">{sub}</span>
+                {t(labelKey)} <span className="subtle">{t(subKey)}</span>
               </Link>
             ))}
           </div>
@@ -57,7 +59,7 @@ export default function SideNavMobile() {
             }}
           >
             <span className="subtle" style={{ fontSize: 13 }}>
-              Theme
+              {t("theme")}
             </span>
             <ThemeToggle />
           </div>
