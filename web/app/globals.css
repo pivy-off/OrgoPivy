@@ -472,6 +472,7 @@ a {
   position: sticky;
   top: 0;
   z-index: 10;
+  overflow: visible;
   background: color-mix(in srgb, var(--bg) 75%, transparent);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-2);
@@ -489,6 +490,7 @@ a {
   gap: var(--space-3);
   flex-wrap: wrap;
   min-width: 0;
+  overflow: visible;
 }
 
 .brand {

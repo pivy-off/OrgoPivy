@@ -33,17 +33,6 @@ export default function TopNavClient() {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [mobileMenuOpen]);
-
   function pillClass(href: string) {
     const active = path === href || (href !== "/" && path.startsWith(href));
     return active ? "pill pillActive" : "pill";
@@ -55,7 +44,7 @@ export default function TopNavClient() {
 
   if (isMobile) {
     return (
-      <>
+      <div style={{ position: "relative" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <button
             type="button"
@@ -75,7 +64,7 @@ export default function TopNavClient() {
           </button>
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(true)}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="pill"
             style={{
               padding: "10px 12px",
@@ -86,57 +75,43 @@ export default function TopNavClient() {
               justifyContent: "center",
             }}
             aria-label="Open menu"
+            aria-expanded={mobileMenuOpen}
           >
             ☰
           </button>
         </div>
 
         {mobileMenuOpen && (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              zIndex: 50,
-              background: "rgba(0,0,0,0.4)",
-              backdropFilter: "blur(4px)",
-            }}
-            onClick={() => setMobileMenuOpen(false)}
-            aria-hidden="true"
-          >
+          <>
+            <div
+              style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 49,
+              }}
+              onClick={() => setMobileMenuOpen(false)}
+              aria-hidden="true"
+            />
             <div
               style={{
                 position: "absolute",
-                top: 0,
+                top: "100%",
                 right: 0,
-                bottom: 0,
-                left: 0,
+                marginTop: 8,
+                zIndex: 50,
+                minWidth: 220,
                 background: "var(--panel)",
-                padding: "calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 16px)",
-                display: "flex",
-                flexDirection: "column",
-                overflow: "hidden",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius-md)",
+                boxShadow: "var(--shadow)",
+                padding: 8,
               }}
-              onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexShrink: 0 }}>
-                <span style={{ fontSize: 18, fontWeight: 700 }}>{t("menu")}</span>
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="btn"
-                  style={{ padding: "8px 16px" }}
-                >
-                  {t("close")}
-                </button>
-              </div>
               <nav
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 1fr",
-                  gap: 8,
-                  flex: 1,
-                  alignContent: "start",
-                  overflowY: "auto",
+                  gap: 6,
                 }}
               >
                 {NAV_LINKS.map(({ href, labelKey }) => (
@@ -146,9 +121,9 @@ export default function TopNavClient() {
                     className={pillClass(href)}
                     style={{
                       display: "block",
-                      padding: "12px 14px",
+                      padding: "10px 12px",
                       textAlign: "left",
-                      minHeight: 44,
+                      fontSize: 14,
                     }}
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -157,9 +132,9 @@ export default function TopNavClient() {
                 ))}
               </nav>
             </div>
-          </div>
+          </>
         )}
-      </>
+      </div>
     );
   }
 
