@@ -109,16 +109,16 @@ export default function TopNavClient() {
                 top: 0,
                 right: 0,
                 bottom: 0,
-                width: "min(320px, 85vw)",
+                left: 0,
                 background: "var(--panel)",
-                borderLeft: "1px solid var(--border)",
-                boxShadow: "-10px 0 40px rgba(0,0,0,0.2)",
-                padding: "calc(env(safe-area-inset-top) + 16px) 16px 16px",
-                overflowY: "auto",
+                padding: "calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 16px)",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden",
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexShrink: 0 }}>
                 <span style={{ fontSize: 18, fontWeight: 700 }}>{t("menu")}</span>
                 <button
                   type="button"
@@ -129,7 +129,16 @@ export default function TopNavClient() {
                   {t("close")}
                 </button>
               </div>
-              <nav style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <nav
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 8,
+                  flex: 1,
+                  alignContent: "start",
+                  overflowY: "auto",
+                }}
+              >
                 {NAV_LINKS.map(({ href, labelKey }) => (
                   <Link
                     key={href}
@@ -137,8 +146,9 @@ export default function TopNavClient() {
                     className={pillClass(href)}
                     style={{
                       display: "block",
-                      padding: "14px 16px",
+                      padding: "12px 14px",
                       textAlign: "left",
+                      minHeight: 44,
                     }}
                     onClick={() => setMobileMenuOpen(false)}
                   >
