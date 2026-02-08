@@ -13,16 +13,19 @@ export default function HomePage() {
   return (
     <main style={{ 
       width: "100%",
-      padding: "60px 0",
-      paddingBottom: "calc(60px + env(safe-area-inset-bottom))",
+      minWidth: 0,
+      padding: "40px 0",
+      paddingBottom: "calc(40px + env(safe-area-inset-bottom))",
       minHeight: "calc(100vh - 120px)"
     }}>
       <div style={{
+        width: "100%",
         maxWidth: 1200,
         margin: "0 auto",
         padding: "0 24px",
         paddingLeft: "max(24px, env(safe-area-inset-left))",
         paddingRight: "max(24px, env(safe-area-inset-right))",
+        minWidth: 0,
       }}>
         {/* Hero Section */}
         <div style={{
