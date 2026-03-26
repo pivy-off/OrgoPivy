@@ -5,14 +5,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCallback } from "react";
 
 export default function TopNavClient() {
   const path = usePathname() || "/";
 
-  function pillClass(href: string) {
-    const active = path === href || (href !== "/" && path.startsWith(href));
-    return active ? "pill pillActive" : "pill";
-  }
+  const pillClass = useCallback(
+    (href: string) => {
+      const active = path === href || (href !== "/" && path.startsWith(href));
+      return active ? "pill pillActive" : "pill";
+    },
+    [path]
+  );
 
   return (
     <div className="topNav">
@@ -42,6 +46,18 @@ export default function TopNavClient() {
 
       <Link className={pillClass("/practice")} href="/practice">
         Practice
+      </Link>
+
+      <Link className={pillClass("/studio")} href="/studio">
+        Assignments
+      </Link>
+
+      <Link className={pillClass("/studio")} href="/studio">
+        Professor
+      </Link>
+
+      <Link className={pillClass("/mechanisms")} href="/mechanisms">
+        Tools
       </Link>
     </div>
   );

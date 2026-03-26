@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { getCourse } from "../../lib/courses"
+import { getCourse } from "../../../lib/courses"
 
 type Props = {
   params: { courseId?: string }

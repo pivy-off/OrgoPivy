@@ -1,5 +1,19 @@
 export type CourseId = "orgochem-1" | "orgochem-2";
 
+export type TopicVideo = {
+  topic: string;
+  subtopic: string;
+  title: string;
+  channel: string;
+  url: string;
+  thumbnail: string;
+  whyUseful: string;
+  level: string;
+  length: string;
+  bestTime: string;
+  useType: string;
+};
+
 export type Topic = {
   slug: string;
   title: string;
@@ -16,9 +30,209 @@ export type Topic = {
   howToStudy: string[];
 
   hasMechanism: boolean;
+
+  // Optional richer curriculum metadata (Phase 1 upgrade)
+  unit?: string;
+  prerequisites?: string[];
+  skills?: string[];
+  commonMistakes?: string[];
+  practiceTypes?: string[];
+  reviewTriggers?: string[];
+  relatedTopics?: string[];
+  bestVideos?: TopicVideo[];
+  mustKnowMap?: {
+    definitions?: string[];
+    patterns?: string[];
+    reactionsToKnow?: string[];
+    mechanismsToKnow?: string[];
+    stereochemicalOutcomes?: string[];
+    regiochemistry?: string[];
+    spectroscopy?: string[];
+    classicTraps?: string[];
+    minimumPassing?: string;
+    targetA?: string;
+  };
+  masteryGoal?: string;
+  studyPlan?: string[];
 };
 
 const ORGOCHEM_1: Topic[] = [
+  {
+    slug: "structure-bonding",
+    title: "Structure and Bonding",
+    shortDesc: "Hybridization, geometry, formal charge, and polarity as the basis for mechanisms",
+    summary:
+      "Make structure, hybridization, and formal charge completely automatic so you can focus on mechanisms later. Every acid–base, resonance, and mechanism problem quietly uses these ideas.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/1-introduction",
+    externalLabel: "OpenStax Organic Chemistry - Structure and Bonding",
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/c/cb/Sp3_Hybridized_Orbitals.svg",
+    imageAlt: "Illustration of sp3 hybrid orbitals",
+    mustKnow: [
+      "How to draw complete Lewis structures with all lone pairs and charges",
+      "Hybridization patterns sp3 sp2 sp and their typical geometries",
+      "What sigma vs pi bonds are and where p orbitals live in a structure",
+      "How formal charge is calculated and how it predicts basicity and nucleophilicity",
+      "How increasing s character changes acidity and bond strength",
+    ],
+    howToStudy: [
+      "Redraw a page of lecture notes adding all lone pairs and formal charges until it feels natural",
+      "Drill 20 mixed structures where you assign hybridization geometry and formal charge for each atom",
+      "Create a mini deck of flashcards with one structure on the front and hybridization geometry charges on the back",
+      "Once per week redraw a full mechanism from class with all lone pairs and charges as a warmup",
+    ],
+    hasMechanism: false,
+    unit: "Foundations",
+    skills: [
+      "Assigning hybridization and geometry without hesitation",
+      "Tracking formal charge through resonance and mechanisms",
+      "Relating bond type and hybridization to acidity basicity and stability",
+    ],
+    commonMistakes: [
+      "Forgetting lone pairs when deciding geometry and formal charge",
+      "Assigning hybridization mechanically instead of checking for multiple bonds or resonance",
+      "Ignoring formal charge when predicting where reactions start in a mechanism",
+    ],
+    practiceTypes: [
+      "Hybridization and geometry identification drills",
+      "Formal charge bookkeeping in short mechanisms",
+      "Concept questions comparing bond length strength and acidity",
+    ],
+    reviewTriggers: [
+      "Any time a mechanism step gives the wrong charge pattern",
+      "Difficulty explaining why one proton is more acidic than another",
+    ],
+    relatedTopics: ["functional-groups", "spectroscopy"],
+    bestVideos: [
+      {
+        topic: "Structure and Bonding",
+        subtopic: "Orbital hybridization and sigma vs pi bonds",
+        title: "Orbital Hybridization & Bonding – Crash Course Organic Chemistry",
+        channel: "CrashCourse",
+        url: "https://www.youtube.com/watch?v=5yw3XBnzYX8",
+        thumbnail: "https://i.ytimg.com/vi/5yw3XBnzYX8/hqdefault.jpg",
+        whyUseful:
+          "Fast animated overview that builds intuition for hybridization and bond types before heavy mechanism work.",
+        level: "All Orgo 1",
+        length: "≈10–15 min",
+        bestTime: "Before first week on bonding and again before spectroscopy",
+        useType: "Concept understanding",
+      },
+      {
+        topic: "Structure and Bonding",
+        subtopic: "Hybridization and formal charge practice",
+        title: "Hybridization Practice – Organic Chemistry",
+        channel: "The Organic Chemistry Tutor",
+        url: "https://www.youtube.com/watch?v=AijP2z5KxYQ",
+        thumbnail: "https://i.ytimg.com/vi/AijP2z5KxYQ/hqdefault.jpg",
+        whyUseful:
+          "Slow walkthrough of many exam-style problems to convert the rules into automatic pattern recognition.",
+        level: "Foundations and review",
+        length: "≈30–45 min",
+        bestTime: "After first reading and during homework sets",
+        useType: "Problem practice",
+      },
+    ],
+    mustKnowMap: {
+      definitions: [
+        "Sigma bond",
+        "Pi bond",
+        "Hybridization",
+        "Formal charge",
+        "Electronegativity",
+      ],
+      patterns: [
+        "More s character means greater electronegativity and stronger shorter bonds",
+        "Formal charge tracks where electrons come from and where mechanisms begin",
+      ],
+      classicTraps: [
+        "Treating atoms in resonance systems as pure sp3 when they share p orbitals",
+        "Forgetting that lone pairs can participate in resonance and change acidity",
+      ],
+      minimumPassing:
+        "Can draw correct Lewis structures and usually assign hybridization with some hesitation.",
+      targetA:
+        "Assigns hybridization geometry and formal charge instantly and uses them actively to reason about acidity and mechanisms.",
+    },
+    masteryGoal:
+      "Be able to assign hybridization geometry and formal charge for any main-group atom in seconds and use that information to predict acidity basicity and likely reaction sites.",
+    studyPlan: [
+      "Day 1–2: Work through lecture or textbook examples and fill in all missing lone pairs and charges.",
+      "Day 3: Do a 20 question drill mixing hybridization geometry and formal charge questions from different molecules.",
+      "Day 4–5: Redraw at least 3 mechanisms from class adding charges and lone pairs on every intermediate.",
+      "Day 6: Do a timed 10–15 minute checkpoint where you assign hybridization and formal charges for a mixed problem set without notes.",
+    ],
+  },
+  {
+    slug: "functional-groups",
+    title: "Functional Groups and Representations",
+    shortDesc: "Spot every functional group instantly and translate any drawing style",
+    summary:
+      "Treat functional group recognition as a reflex. You should be able to look at any line-angle or skeletal drawing and instantly label the key functional groups and what they tend to do in reactions.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/2-introduction",
+    externalLabel: "OpenStax Organic Chemistry - Organic Structures and Functional Groups",
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/9/9c/Organic_Functional_Groups.png",
+    imageAlt: "Chart of common organic functional groups",
+    mustKnow: [
+      "The core list of functional groups covered in Orgo 1 and 2 and how to recognize them quickly in line angle form",
+      "How each functional group tends to behave in terms of electrophilicity nucleophilicity and acidity basicity",
+      "How to convert between line angle condensed and full Lewis structures without losing functional group information",
+      "The difference between look alike groups such as aldehydes vs ketones esters vs ethers and amides vs amines",
+    ],
+    howToStudy: [
+      "Build a one page functional group map with names generic structures and one sentence describing typical reactivity",
+      "Do timed drills where you circle and label all functional groups in a complex molecule in under 60 seconds",
+      "Practice redrawing the same molecule in line angle condensed and full Lewis form to keep recognition flexible",
+      "Integrate functional group labeling into every new mechanism or synthesis problem you solve",
+    ],
+    hasMechanism: false,
+    unit: "Foundations",
+    skills: [
+      "Instant recognition of major functional groups in line angle drawings",
+      "Predicting whether a site is likely to behave as electrophile nucleophile acid or base",
+      "Switching comfortably between structural representations",
+    ],
+    commonMistakes: [
+      "Missing functional groups that are partially hidden in ring systems or condensed notation",
+      "Confusing aldehydes with ketones and esters with ethers in quick scans",
+      "Treating functional group identification as pure memorization instead of pattern recognition around heteroatoms and pi bonds",
+    ],
+    practiceTypes: [
+      "Functional group find and label worksheets",
+      "Mixed classification questions tied to mechanisms and spectroscopy",
+      "Short timed drills that mix purely structural and reactivity based prompts",
+    ],
+    reviewTriggers: [
+      "Frequent wrong answers on which molecule reacts fastest with a given reagent",
+      "Difficulty matching IR or NMR features to the right functional group in spectroscopy problems",
+    ],
+    relatedTopics: ["structure-bonding", "spectroscopy", "substitution-elimination"],
+    bestVideos: [
+      {
+        topic: "Functional Groups",
+        subtopic: "Overview and recognition practice",
+        title: "Functional Groups in Organic Chemistry",
+        channel: "The Organic Chemistry Tutor",
+        url: "https://www.youtube.com/watch?v=NjSFR40SY58",
+        thumbnail: "https://i.ytimg.com/vi/NjSFR40SY58/hqdefault.jpg",
+        whyUseful:
+          "Systematic walkthrough of all major functional groups with many practice identifications.",
+        level: "All Orgo students",
+        length: "≈45–60 min",
+        bestTime: "Early in the course and before any spectroscopy or synthesis exam",
+        useType: "Concept plus practice",
+      },
+    ],
+    masteryGoal:
+      "Identify and name every common functional group in a complex molecule within a few seconds and explain what each group is likely to do in a reaction.",
+    studyPlan: [
+      "Day 1: Build or copy a functional group summary sheet with names structures and one line reactivity notes.",
+      "Day 2–3: Do two or three 10 minute timed drills labeling functional groups on mixed structures.",
+      "Day 4: Integrate functional group labeling into 10 mechanism or synthesis problems from lecture or homework.",
+      "Weekly: Revisit the summary sheet and add examples from mechanisms or exam style problems.",
+    ],
+  },
   {
     slug: "alkanes",
     title: "Alkanes",

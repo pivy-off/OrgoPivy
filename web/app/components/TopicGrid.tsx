@@ -11,11 +11,11 @@ export default function TopicGrid({
 
   return (
     <div style={{ display: "grid", gap: 10 }}>
-      {topics.map((t, idx) => (
+      {topics.map((t) => (
         <TopicCard
           key={t.slug}
           topic={t}
-          href={`/${course}/topic/${t.slug}`}
+          href={`/${course}/${t.slug}`}
         />
       ))}
     </div>

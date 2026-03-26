@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { getCourse, normalizeCourseId } from "../../lib/courses"
+import { getCourse, normalizeCourseId } from "../../../lib/courses"
 
 type Props = {
   params: Record<string, string | string[] | undefined>

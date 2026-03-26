@@ -35,7 +35,7 @@ export default function TopicQueryPage({ searchParams }: Props) {
                 Home
               </Link>
               {courseId ? (
-                <Link className="btn" href={ROUTES.courseTopics(course.id as CourseId)}>
+                <Link className="btn" href={ROUTES.course(courseId as CourseId)}>
                   Back to topics
                 </Link>
               ) : null}
@@ -75,7 +75,7 @@ export default function TopicQueryPage({ searchParams }: Props) {
           </div>
 
           <div className="row">
-            <Link className="btn" href={ROUTES.courseTopics(course.id as CourseId)}>
+            <Link className="btn" href={ROUTES.course(course.id as CourseId)}>
               Back to topics
             </Link>
             <Link className="btn" href={ROUTES.home}>

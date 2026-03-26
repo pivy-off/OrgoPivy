@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import PracticeAchievements from "../components/PracticeAchievements";
 
@@ -33,7 +33,7 @@ type AnswerResponse = {
   question?: PracticeQuestion;
 };
 
-export default function PracticePage() {
+function PracticePageContent() {
   const searchParams = useSearchParams();
   const courseParam = searchParams?.get("course") || "";
   const topicParam = searchParams?.get("topic") || "";
@@ -414,5 +414,23 @@ export default function PracticePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function PracticePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="stack" style={{ padding: 18, maxWidth: 980 }}>
+          <div className="card">
+            <div className="cardInner">
+              <div className="subtle">Loading practice…</div>
+            </div>
+          </div>
+        </main>
+      }
+    >
+      <PracticePageContent />
+    </Suspense>
   );
 }

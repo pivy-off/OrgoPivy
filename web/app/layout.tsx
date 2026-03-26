@@ -3,6 +3,8 @@ import "./globals.css";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import TopNavClient from "./components/TopNavClient";
+import TopBarThemeToggle from "./components/TopBarThemeToggle";
+import SideNavTheme from "./components/SideNavTheme";
 
 export const metadata = {
   title: "OrgoPivy",
@@ -39,8 +41,17 @@ function SideNav() {
             <Link className="navLink" href="/spectra">
               Spectra <span className="subtle">NMR</span>
             </Link>
+
+            <Link className="navLink" href="/studio">
+              Assignments <span className="subtle">Graded</span>
+            </Link>
+
+            <Link className="navLink" href="/studio">
+              Professor <span className="subtle">Tools</span>
+            </Link>
           </div>
 
+          <SideNavTheme />
         </div>
       </div>
     </div>
@@ -81,22 +92,35 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ThemeBootScript />
 
         <div className="topbar">
-          <div className="topbarInner">
-            <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
-              <div className="brand">
-                <span className="brandDot" style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: 6,
-                  background: "linear-gradient(135deg, #007AFF 0%, #5856D6 100%)",
-                  display: "inline-block",
-                  marginRight: 8,
-                  verticalAlign: "middle"
-                }} />
-                <span>OrgoPivy</span>
-                <span className="badge">Orgo Studio</span>
+          <div className="topbarInner topbarInnerStack">
+            <div className="topbarRowTop">
+              <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
+                <div className="brand">
+                  <span
+                    className="brandMark"
+                    style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: 6,
+                      background: "linear-gradient(135deg, #007AFF 0%, #5856D6 100%)",
+                      display: "inline-block",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span>OrgoPivy</span>
+                </div>
+              </Link>
+
+              <div className="topbarQuick">
+                <Link className="pill" href="/studio">
+                  Orgo Studio
+                </Link>
+                <button type="button" className="pill">
+                  Traduire
+                </button>
+                <TopBarThemeToggle />
               </div>
-            </Link>
+            </div>
 
             <TopNavClient />
           </div>
