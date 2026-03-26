@@ -193,6 +193,11 @@ a {
   transform: translateY(0) scale(0.98);
 }
 
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
 .btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -213,6 +218,11 @@ a {
 
 .btnPrimary:active {
   transform: translateY(0) scale(0.98);
+}
+
+.btnPrimary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus), 0 4px 14px rgba(0, 122, 255, 0.25);
 }
 
 .input,
@@ -345,6 +355,14 @@ a {
   transition: background 120ms ease, transform 120ms ease, border-color 120ms ease;
 }
 
+a.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+}
+
 .pill:hover {
   background: var(--panel-2);
   border-color: rgba(37, 99, 235, 0.25);
@@ -354,6 +372,25 @@ a {
 .pillActive {
   border-color: rgba(37, 99, 235, 0.35);
   box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
+}
+
+.pill:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+a.pill:active,
+button.pill:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.navLink:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.navLink:active {
+  transform: translateY(0) scale(0.99);
 }
 
 .warnCard {
@@ -548,13 +585,58 @@ a {
   align-items: flex-start;
 }
 
+.topicCheckItemBtn {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  margin: 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+}
+
+.topicCheckItemBtn:hover {
+  border-color: rgba(0, 122, 255, 0.28);
+  background: color-mix(in srgb, var(--blue) 5%, var(--panel));
+}
+
+.topicCheckItemBtn:active {
+  transform: scale(0.995);
+}
+
+.topicCheckItemBtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
 .topicCheckBox {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border: 2px solid var(--border);
   border-radius: 6px;
   flex-shrink: 0;
   margin-top: 2px;
+  box-sizing: border-box;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.topicCheckBoxOn {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .topicCheckText {
@@ -697,9 +779,161 @@ a {
   max-width: 100%;
 }
 
+/* Press + lift: cards and primary CTAs (touch-friendly) */
+.homeCardMotion {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.45, 0.64, 1),
+    box-shadow 0.22s ease;
+}
+
+a.homeCourseCard.homeCardMotion {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.homeCardMotion:active,
+.homeCardMotion.homePressableDown {
+  transform: translateY(5px) scale(0.985);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07);
+}
+
+@media (hover: hover) {
+  .homeCardMotion:hover:not(:active):not(.homePressableDown) {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.homeProfessorBar.homeCardMotion:active,
+.homeProfessorBar.homeCardMotion.homePressableDown {
+  transform: translateY(4px) scale(0.988);
+}
+
+@media (hover: hover) {
+  .homeProfessorBar.homeCardMotion:hover:not(:active):not(.homePressableDown) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px color-mix(in srgb, var(--purple) 18%, transparent);
+  }
+}
+
+.homeBtnMotion {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.5, 0.64, 1),
+    box-shadow 0.2s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.homeBtnMotion:active {
+  transform: translateY(4px) scale(0.94);
+}
+
+.btnPrimary.homeBtnMotion:active {
+  transform: translateY(4px) scale(0.96);
+  box-shadow: 0 2px 10px rgba(0, 122, 255, 0.22);
+}
+
 .homeSearchWrap {
   position: relative;
+  z-index: 3;
   margin-bottom: var(--space-4);
+}
+
+.homeSearchResults {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 40;
+  animation: homeSearchDrop 0.18s ease;
+}
+
+@keyframes homeSearchDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.homeSearchResultsInner {
+  padding: 12px !important;
+  max-height: min(70vh, 360px);
+  overflow: auto;
+}
+
+.homeSearchList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.homeSearchHit {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-2);
+  text-decoration: none;
+  color: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.2s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+.homeSearchHit:hover {
+  background: var(--panel-2);
+  border-color: rgba(0, 122, 255, 0.28);
+}
+
+.homeSearchHit:active {
+  transform: translateY(3px) scale(0.99);
+}
+
+.homeSearchHit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.homeSearchHitCourse {
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.homeSearchHitTitle {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.homeSearchHitDesc {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.homeSearchEmpty {
+  padding: 8px 4px;
+  font-size: 14px;
+}
+
+.homeSearchHint {
+  margin-top: 10px;
+  font-size: 11px;
 }
 
 .homeSearchInput {
@@ -781,10 +1015,18 @@ a {
   font-size: 15px;
   font-weight: 600;
   color: var(--blue);
+  text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.12s ease;
 }
 
 .homeCourseCta:hover {
   opacity: 0.88;
+}
+
+.homeCourseCta:focus-visible {
+  outline: none;
+  border-radius: 6px;
+  box-shadow: 0 0 0 3px var(--focus);
 }
 
 .homeMetricsRow {
@@ -921,13 +1163,23 @@ a {
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
 }
 
 .homeEditBtn:hover {
   background: var(--border-2);
   color: var(--text);
+}
+
+.homeEditBtn:active {
+  transform: scale(0.96);
+}
+
+.homeEditBtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus);
 }
 
 .homeDailyGoalMeta {
@@ -1019,12 +1271,37 @@ a {
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
 }
 
 .homeDiceBtn:hover {
   background: var(--border-2);
   border-color: var(--border);
+}
+
+.homeDiceBtn:active {
+  transform: scale(0.98);
+}
+
+.homeDiceBtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+@keyframes homeDicePop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.homeDiceBtnPulse {
+  animation: homeDicePop 0.28s ease;
 }
 
 [data-theme="dark"] .homeDiceBtn {
@@ -1102,13 +1379,12 @@ a {
   background: color-mix(in srgb, var(--purple) 9%, var(--panel));
   text-decoration: none;
   color: inherit;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
   box-shadow: 0 2px 12px color-mix(in srgb, var(--purple) 8%, transparent);
 }
 
-.homeProfessorBar:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--purple) 14%, transparent);
+.homeProfessorBar:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus), 0 6px 20px color-mix(in srgb, var(--purple) 14%, transparent);
 }
 
 .homeProfessorIcon {

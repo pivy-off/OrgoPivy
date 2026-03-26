@@ -1,5 +1,7 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import TopicToolsClient from "./TopicToolsClient";
+import TopicChecklistClient from "./TopicChecklistClient";
 import type { Topic } from "../lib/curriculum";
 
 function Section({
@@ -8,8 +10,8 @@ function Section({
   children,
 }: {
   title: string;
-  right?: React.ReactNode;
-  children: React.ReactNode;
+  right?: ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="card topicSection" style={{ boxShadow: "none" }}>
@@ -20,27 +22,6 @@ function Section({
         </div>
         <div className="topicSectionBody">{children}</div>
       </div>
-    </div>
-  );
-}
-
-function Checklist({ items }: { items: string[] }) {
-  return (
-    <div className="topicChecklist">
-      {items.map((raw, i) => {
-        const parts = raw.split(":");
-        const head = (parts[0] || "").trim();
-        const tail = parts.slice(1).join(":").trim();
-        return (
-          <div key={`${i}-${raw}`} className="topicCheckItem">
-            <div className="topicCheckBox" aria-hidden="true" />
-            <div className="topicCheckText">
-              <div className="topicCheckHead">{head}</div>
-              {tail ? <div className="topicCheckTail">{tail}</div> : null}
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 }
@@ -113,7 +94,7 @@ export default function TopicPage({
 
             <div className="topicTwoCol">
               <Section title="Must know checklist">
-                <Checklist items={topic.mustKnow} />
+                <TopicChecklistClient items={topic.mustKnow} />
               </Section>
 
               <Section title="Common mistakes">
@@ -130,7 +111,7 @@ export default function TopicPage({
             </div>
 
             <Section title="Study steps">
-              <Checklist items={topic.howToStudy} />
+              <TopicChecklistClient items={topic.howToStudy} />
             </Section>
 
             <Section title="Tools">

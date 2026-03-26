@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import HomePressable from "./components/HomePressable";
 import { getCourseTopics, type CourseId, type Topic } from "./lib/curriculum";
 
 type ProgressMap = Record<string, boolean>;
 
-const DAILY_GOAL_MIN = 30;
+const GOAL_STORAGE = "orgopivy-daily-goal-minutes";
+const DEFAULT_GOAL_MIN = 30;
 
 function storageKey(course: CourseId) {
   return `orgopivy-progress-${course}`;
@@ -40,6 +42,9 @@ export default function HomePage() {
   const [totalTopics, setTotalTopics] = useState(0);
   const [review, setReview] = useState<{ course: CourseId; topic: Topic } | null>(null);
   const [studyMinutesToday, setStudyMinutesToday] = useState(0);
+  const [dailyGoalMin, setDailyGoalMin] = useState(DEFAULT_GOAL_MIN);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dicePulse, setDicePulse] = useState(false);
 
   useEffect(() => {
     const all = [...getCourseTopics("orgochem-1"), ...getCourseTopics("orgochem-2")];
@@ -55,7 +60,10 @@ export default function HomePage() {
       });
       const raw = localStorage.getItem("orgopivy-study-minutes-today");
       const n = raw ? Number(raw) : 0;
-      if (!Number.isNaN(n) && n >= 0) setStudyMinutesToday(Math.min(n, DAILY_GOAL_MIN * 4));
+      if (!Number.isNaN(n) && n >= 0) setStudyMinutesToday(Math.min(n, DEFAULT_GOAL_MIN * 8));
+      const goalRaw = localStorage.getItem(GOAL_STORAGE);
+      const g = goalRaw ? Number(goalRaw) : NaN;
+      if (!Number.isNaN(g) && g >= 5 && g <= 240) setDailyGoalMin(g);
     }
     setCompletedCount(done);
     setReview(randomTopic());
@@ -66,8 +74,53 @@ export default function HomePage() {
     return Math.round((completedCount / totalTopics) * 100);
   }, [completedCount, totalTopics]);
 
-  const dailyLeft = Math.max(0, DAILY_GOAL_MIN - studyMinutesToday);
-  const dailyPct = Math.min(100, Math.round((studyMinutesToday / DAILY_GOAL_MIN) * 100));
+  const dailyLeft = Math.max(0, dailyGoalMin - studyMinutesToday);
+  const dailyPct =
+    dailyGoalMin > 0 ? Math.min(100, Math.round((studyMinutesToday / dailyGoalMin) * 100)) : 0;
+
+  const searchResults = useMemo(() => {
+    const needle = searchQuery.trim().toLowerCase();
+    if (needle.length < 2) return [];
+    const out: { course: CourseId; topic: Topic }[] = [];
+    for (const c of ["orgochem-1", "orgochem-2"] as CourseId[]) {
+      for (const t of getCourseTopics(c)) {
+        if (
+          t.title.toLowerCase().includes(needle) ||
+          t.slug.includes(needle) ||
+          t.shortDesc.toLowerCase().includes(needle)
+        ) {
+          out.push({ course: c, topic: t });
+        }
+      }
+    }
+    return out.slice(0, 10);
+  }, [searchQuery]);
+
+  function editDailyGoal() {
+    if (typeof window === "undefined") return;
+    const raw = window.prompt(
+      "Daily study goal in minutes (5–180)?",
+      String(dailyGoalMin)
+    );
+    if (raw === null) return;
+    const next = Number(String(raw).trim());
+    if (Number.isNaN(next) || next < 5 || next > 180) {
+      window.alert("Please enter a number between 5 and 180.");
+      return;
+    }
+    try {
+      localStorage.setItem(GOAL_STORAGE, String(next));
+    } catch {
+      // ignore
+    }
+    setDailyGoalMin(next);
+  }
+
+  function pickAnotherTopic() {
+    setDicePulse(true);
+    setReview(randomTopic());
+    window.setTimeout(() => setDicePulse(false), 280);
+  }
 
   const studyTimeLabel = "0h 0m";
   const streakDays = 0;
@@ -77,20 +130,55 @@ export default function HomePage() {
 
   return (
     <main className="homeMain">
-      <div className="homeSearchWrap">
+      <form
+        className="homeSearchWrap"
+        role="search"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const first = searchResults[0];
+          if (first) window.location.assign(`/${first.course}/${first.topic.slug}`);
+        }}
+      >
         <input
           type="search"
           className="homeSearchInput"
           placeholder="Search topics, chapters, concepts..."
           aria-label="Search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          autoComplete="off"
         />
         <span className="homeSearchIcon" aria-hidden>
           🔍
         </span>
-      </div>
+        {searchQuery.trim().length >= 2 ? (
+          <div className="homeSearchResults card">
+            <div className="cardInner homeSearchResultsInner">
+              {searchResults.length === 0 ? (
+                <div className="subtle homeSearchEmpty">No topics match. Try another term.</div>
+              ) : (
+                <ul className="homeSearchList">
+                  {searchResults.map(({ course, topic: t }) => (
+                    <li key={`${course}-${t.slug}`}>
+                      <Link className="homeSearchHit" href={`/${course}/${t.slug}`}>
+                        <span className="homeSearchHitCourse">{courseLabel(course)}</span>
+                        <span className="homeSearchHitTitle">{t.title}</span>
+                        <span className="subtle homeSearchHitDesc">{t.shortDesc}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {searchResults.length > 0 ? (
+                <div className="subtle homeSearchHint">Enter opens the first result</div>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+      </form>
 
       <div className="homeCourseGrid">
-        <div className="card homeCourseCard">
+        <Link href="/orgochem-1" className="card homeCourseCard homeCardMotion">
           <div className="homeCourseBlob" aria-hidden />
           <div className="cardInner homeCourseCardInner">
             <h2 className="homeCourseTitle">OrgoChem I</h2>
@@ -99,13 +187,13 @@ export default function HomePage() {
               through alkanes, cycloalkanes, stereochemistry, substitution and elimination reactions,
               alkenes, and spectroscopy.
             </p>
-            <Link href="/orgochem-1" className="homeCourseCta">
+            <span className="homeCourseCta">
               View topics <span aria-hidden>→</span>
-            </Link>
+            </span>
           </div>
-        </div>
+        </Link>
 
-        <div className="card homeCourseCard">
+        <Link href="/orgochem-2" className="card homeCourseCard homeCardMotion">
           <div className="homeCourseBlob" aria-hidden />
           <div className="cardInner homeCourseCardInner">
             <h2 className="homeCourseTitle">OrgoChem II</h2>
@@ -114,47 +202,47 @@ export default function HomePage() {
               including alcohols, ethers, carbonyls, carboxylic acids, enolates, aromatic chemistry,
               and amines.
             </p>
-            <Link href="/orgochem-2" className="homeCourseCta">
+            <span className="homeCourseCta">
               View topics <span aria-hidden>→</span>
-            </Link>
+            </span>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Section 1 (above the fold): first three metrics */}
       <div className="homeMetricsRow homeMetricsRow3">
-        <div className="card homeMetricCard">
+        <HomePressable className="card homeMetricCard homeCardMotion">
           <div className="cardInner homeMetricInner">
             <div className="homeMetricValue">{completedCount}</div>
             <div className="homeMetricLabel">Topics Completed</div>
           </div>
-        </div>
-        <div className="card homeMetricCard">
+        </HomePressable>
+        <HomePressable className="card homeMetricCard homeCardMotion">
           <div className="cardInner homeMetricInner">
             <div className="homeMetricValue">{studyTimeLabel}</div>
             <div className="homeMetricLabel">Study Time</div>
           </div>
-        </div>
-        <div className="card homeMetricCard">
+        </HomePressable>
+        <HomePressable className="card homeMetricCard homeCardMotion">
           <div className="cardInner homeMetricInner">
             <div className="homeMetricValue">{bookmarks}</div>
             <div className="homeMetricLabel">Bookmarks</div>
           </div>
-        </div>
+        </HomePressable>
       </div>
 
       {/* Section 2 (scroll): achievements + streak + quick review */}
       <div className="homeMetricsRow homeMetricsAchievements">
-        <div className="card homeMetricCard">
+        <HomePressable className="card homeMetricCard homeCardMotion">
           <div className="cardInner homeMetricInner">
             <div className="homeMetricValue">{achievements}</div>
             <div className="homeMetricLabel">Achievements</div>
           </div>
-        </div>
+        </HomePressable>
       </div>
 
       <div className="homeStreakReviewGrid">
-        <div className="card">
+        <HomePressable className="card homeCardMotion">
           <div className="cardInner homePanelInner">
             <div className="homePanelHead">
               <div className="homePanelTitle">Study Streak</div>
@@ -169,13 +257,13 @@ export default function HomePage() {
             <div className="homeDailyGoal">
               <div className="homeDailyGoalTop">
                 <span className="homeDailyGoalLabel">Daily Goal</span>
-                <button type="button" className="homeEditBtn">
+                <button type="button" className="homeEditBtn homeBtnMotion" onClick={editDailyGoal}>
                   Edit
                 </button>
               </div>
               <div className="homeDailyGoalMeta">
                 <span>
-                  {studyMinutesToday} / {DAILY_GOAL_MIN} minutes
+                  {studyMinutesToday} / {dailyGoalMin} minutes
                 </span>
                 <span className="subtle">{dailyLeft} min left</span>
               </div>
@@ -195,9 +283,9 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </div>
+        </HomePressable>
 
-        <div className="card">
+        <HomePressable className="card homeCardMotion">
           <div className="cardInner homePanelInner">
             <div className="homePanelHead">
               <div className="homePanelTitle">Quick Review</div>
@@ -209,21 +297,28 @@ export default function HomePage() {
                 <div className="homeQuickBadge">{courseLabel(review.course)}</div>
                 <div className="homeQuickTopicTitle">{review.topic.title}</div>
                 <div className="subtle homeQuickTopicDesc">{review.topic.shortDesc}</div>
-                <Link href={`/${review.course}/${review.topic.slug}`} className="btn btnPrimary homeReviewCta">
+                <Link
+                  href={`/${review.course}/${review.topic.slug}`}
+                  className="btn btnPrimary homeReviewCta homeBtnMotion"
+                >
                   Review Topic
                 </Link>
               </div>
             )}
 
-            <button type="button" className="homeDiceBtn" onClick={() => setReview(randomTopic())}>
+            <button
+              type="button"
+              className={`homeDiceBtn homeBtnMotion${dicePulse ? " homeDiceBtnPulse" : ""}`}
+              onClick={pickAnotherTopic}
+            >
               Get Another Topic
             </button>
           </div>
-        </div>
+        </HomePressable>
       </div>
 
       {/* Section 3 (scroll): progress + professor bar */}
-      <div className="card homeProgressCard">
+      <HomePressable className="card homeProgressCard homeCardMotion">
         <div className="cardInner homeProgressInner">
           <div className="homePanelHead">
             <div className="homePanelTitle">Progress Overview</div>
@@ -260,9 +355,9 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </div>
+      </HomePressable>
 
-      <Link href="/studio" className="homeProfessorBar">
+      <Link href="/studio" className="homeProfessorBar homeCardMotion">
         <span className="homeProfessorIcon" aria-hidden>
           📝
         </span>

@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import TopNavClient from "./components/TopNavClient";
 import TopBarThemeToggle from "./components/TopBarThemeToggle";
 import SideNavTheme from "./components/SideNavTheme";
+import TraduireButton from "./components/TraduireButton";
 
 export const metadata = {
   title: "OrgoPivy",
@@ -115,9 +116,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <Link className="pill" href="/studio">
                   Orgo Studio
                 </Link>
-                <button type="button" className="pill">
-                  Traduire
-                </button>
+                <TraduireButton />
                 <TopBarThemeToggle />
               </div>
             </div>
