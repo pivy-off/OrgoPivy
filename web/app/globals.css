@@ -1426,3 +1426,410 @@ a.homeCourseCard.homeCardMotion {
   color: var(--blue);
   opacity: 0.85;
 }
+
+/* —— Study OS / shared tool surfaces —— */
+.opToolPage {
+  padding: var(--space-4);
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.opToolInner {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.opToolHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.opEyebrow {
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.opToolTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+}
+
+.opToolSubtitle {
+  margin: 10px 0 0;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 62ch;
+}
+
+.opToolActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.opPanel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: var(--space-4);
+}
+
+.opPanelMuted {
+  background: var(--panel-2);
+  box-shadow: none;
+}
+
+.opPanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.opPanelTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 850;
+  letter-spacing: -0.2px;
+}
+
+.opPanelBody {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.opBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+.opBadge-success {
+  border-color: color-mix(in srgb, var(--green) 35%, var(--border));
+  background: color-mix(in srgb, var(--green) 12%, var(--panel));
+  color: var(--text);
+}
+
+.opBadge-warn {
+  border-color: color-mix(in srgb, var(--orange) 45%, var(--border));
+  background: var(--warn-bg);
+}
+
+.opBadge-info {
+  border-color: color-mix(in srgb, var(--blue) 35%, var(--border));
+  background: color-mix(in srgb, var(--blue) 10%, var(--panel));
+}
+
+.opEmpty {
+  text-align: center;
+  padding: var(--space-5) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border);
+  background: var(--panel-2);
+}
+
+.opEmptyTitle {
+  font-weight: 850;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.opEmptyDesc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+  max-width: 48ch;
+  margin: 0 auto;
+}
+
+.opEmptyActions {
+  margin-top: var(--space-3);
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.opSpinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.opSpinnerDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  animation: opSpinPulse 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes opSpinPulse {
+  from {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.opContextBanner {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--blue) 28%, var(--border));
+  background: color-mix(in srgb, var(--blue) 8%, var(--panel));
+}
+
+.opContextBannerTitle {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--blue);
+}
+
+.opContextBannerBody {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.opResultCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  padding: 14px 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.opResultCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.opResultCardMeta {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--blue);
+}
+
+.opResultCardScore {
+  font-size: 12px;
+  font-weight: 850;
+  color: var(--muted);
+}
+
+.opResultCardSnippet {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.opResultCardFoot {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.opHighlight {
+  background: color-mix(in srgb, var(--orange) 22%, transparent);
+  color: var(--text);
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+.opFieldLabel {
+  display: block;
+  font-size: 13px;
+  font-weight: 750;
+  margin-bottom: 8px;
+}
+
+.opTextarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.opTextarea:focus {
+  outline: none;
+  border-color: rgba(0, 122, 255, 0.45);
+  box-shadow: 0 0 0 4px var(--focus);
+}
+
+.opFieldRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.opDropZone {
+  border: 2px dashed color-mix(in srgb, var(--blue) 35%, var(--border));
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  text-align: center;
+  background: color-mix(in srgb, var(--blue) 5%, var(--panel));
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.opDropZoneActive {
+  border-color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 10%, var(--panel));
+}
+
+.opDropZoneHint {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.opHero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--blue) 12%, var(--panel)) 0%,
+    color-mix(in srgb, var(--purple) 10%, var(--panel)) 100%
+  );
+  padding: var(--space-5);
+  box-shadow: var(--shadow);
+}
+
+.opHeroTitle {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 850;
+  letter-spacing: -0.4px;
+}
+
+.opHeroSub {
+  margin: 10px 0 0;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 52ch;
+}
+
+.opQuickGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.opQuickCard {
+  display: block;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  touch-action: manipulation;
+}
+
+.opQuickCard:hover {
+  border-color: color-mix(in srgb, var(--blue) 30%, var(--border));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.opQuickCard:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.opQuickCardKicker {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.opQuickCardTitle {
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.opQuickCardDesc {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.opActivityList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.opActivityItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-2);
+  background: var(--panel-2);
+  font-size: 13px;
+}
+
+.opActivityItem a {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.opRecBanner {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--purple) 25%, var(--border));
+  background: color-mix(in srgb, var(--purple) 8%, var(--panel));
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.opRecBanner strong {
+  font-weight: 850;
+}

@@ -1,302 +1,266 @@
 "use client";
 
-import { useMemo, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import {
+  OpBadge,
+  OpContextBanner,
+  OpEmptyState,
+  OpPanel,
+  OpSearchResultCard,
+  OpSpinner,
+  ToolPageLayout,
+} from "../components/op";
+import { apiUrl } from "../lib/api";
+import { highlightSnippet } from "../lib/highlight";
+import { logActivity } from "../lib/activity";
 
 type AskContext = {
   stored_filename?: string;
+  upload_id?: string;
   chunk_id?: number;
   snippet?: string;
   text?: string;
+  score?: number;
+  meta?: Record<string, unknown>;
 };
 
 type AskResponse = {
   answer?: string;
   contexts?: AskContext[];
+  confidence_tier?: string;
+  top_match_score?: number;
+  semantic_ready?: boolean;
+  follow_up_suggestions?: string[];
 };
+
+function tierBadge(tier: string | undefined) {
+  const t = (tier || "low").toLowerCase();
+  if (t === "high") return { tone: "success" as const, label: "High confidence" };
+  if (t === "medium") return { tone: "info" as const, label: "Medium confidence" };
+  return { tone: "warn" as const, label: "Low confidence" };
+}
 
 function AskPageContent() {
   const searchParams = useSearchParams();
   const courseParam = searchParams?.get("course") || "";
   const topicParam = searchParams?.get("topic") || "";
 
-  const apiBase = useMemo(() => {
-    return process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
-  }, []);
-
   const [question, setQuestion] = useState("");
-  const [topK, setTopK] = useState<number>(5);
+  const [topK, setTopK] = useState(5);
   const [loading, setLoading] = useState(false);
-  const [answer, setAnswer] = useState("");
-  const [contexts, setContexts] = useState<AskContext[]>([]);
+  const [payload, setPayload] = useState<AskResponse | null>(null);
   const [error, setError] = useState("");
 
-  async function onAsk(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    setAnswer("");
-    setContexts([]);
-
-    const q = question.trim();
+  async function submitQuestion(text: string) {
+    const q = text.trim();
     if (!q) {
       setError("Please enter a question");
       return;
     }
-
+    setError("");
     setLoading(true);
+    setPayload(null);
     try {
-      const body: any = { question: q, top_k: Number(topK) };
+      const body: Record<string, unknown> = { question: q, top_k: Number(topK) };
       if (courseParam) body.course = courseParam;
       if (topicParam) body.topic = topicParam;
 
-      const res = await fetch(`${apiBase}/ask`, {
+      const res = await fetch(apiUrl("/ask"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Ask failed ${res.status} ${text}`);
+        const t = await res.text();
+        throw new Error(`Ask failed ${res.status} ${t}`);
       }
 
       const data = (await res.json()) as AskResponse;
-
-      setAnswer(data.answer || "");
-      setContexts(Array.isArray(data.contexts) ? data.contexts : []);
-    } catch (err: any) {
-      setError(err?.message || "Ask failed");
+      setPayload(data);
+      logActivity({
+        kind: "ask",
+        label: `Ask: ${q.slice(0, 40)}…`,
+        detail: data.confidence_tier || "",
+        href: "/ask",
+      });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Ask failed");
     } finally {
       setLoading(false);
     }
   }
 
+  function onAsk(e: React.FormEvent) {
+    e.preventDefault();
+    void submitQuestion(question);
+  }
+
+  const tier = tierBadge(payload?.confidence_tier);
+  const lowConfidence = (payload?.confidence_tier || "").toLowerCase() === "low" && (payload?.contexts?.length || 0) > 0;
+
   return (
-    <main style={{ maxWidth: 1000, margin: "0 auto", padding: "40px 20px" }}>
-      <div className="card">
-        <div className="cardInner">
-          <div className="stack">
-            <div>
-              <div className="h1">Ask Questions</div>
-              <div className="subtle" style={{ marginTop: 8, fontSize: 15, lineHeight: 1.6 }}>
-                Ask questions about your uploaded notes. The AI will search through your documents and provide answers with source references.
-              </div>
-            </div>
+    <ToolPageLayout
+      eyebrow="Study OS"
+      title="Ask your notes"
+      subtitle="Grounded answers from ingested chunks. Upload .txt files, run ingest from Uploads, then ask mechanism and exam-style questions."
+      actions={
+        <>
+          <Link className="btn" href="/search">
+            Search
+          </Link>
+          <Link className="btn btnPrimary" href="/uploads">
+            Uploads
+          </Link>
+        </>
+      }
+    >
+      {(courseParam || topicParam) && (
+        <OpContextBanner
+          title={`Context: ${courseParam ? courseParam.replace("orgochem-", "OrgoChem ").replace("-", " ").toUpperCase() : "All"}${topicParam ? ` · ${topicParam.replace(/-/g, " ")}` : ""}`}
+        >
+          The API receives optional course/topic filters with each question.
+        </OpContextBanner>
+      )}
 
-            {(courseParam || topicParam) && (
-              <div style={{
-                padding: 12,
-                background: "rgba(0, 122, 255, 0.06)",
-                borderRadius: 12,
-                border: "1px solid rgba(0, 122, 255, 0.2)",
-                fontSize: 14
-              }}>
-                <div style={{ fontWeight: 600, marginBottom: 4, color: "#007AFF" }}>
-                  Context: {courseParam ? courseParam.replace("orgochem-", "OrgoChem ").replace("-", " ").toUpperCase() : ""} 
-                  {topicParam ? ` • ${topicParam.charAt(0).toUpperCase() + topicParam.slice(1).replace(/-/g, " ")}` : ""}
-                </div>
-                <div style={{ color: "rgba(0, 0, 0, 0.6)", fontSize: 13 }}>
-                  Your questions will be focused on this {courseParam ? "course" : ""} {topicParam ? "and topic" : ""}.
-                </div>
-              </div>
-            )}
-
-            <div style={{
-              padding: 20,
-              background: "rgba(0, 0, 0, 0.02)",
-              borderRadius: 16,
-              border: "1px solid rgba(0, 0, 0, 0.08)"
-            }}>
-              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: "rgba(0, 0, 0, 0.8)" }}>
-                How to use:
-              </div>
-              <ul style={{ 
-                margin: 0, 
-                paddingLeft: 20, 
-                fontSize: 14, 
-                lineHeight: 1.8, 
-                color: "rgba(0, 0, 0, 0.7)",
-                listStyle: "disc"
-              }}>
-                <li>Upload your notes first using the Upload page</li>
-                <li>Ask specific questions about concepts, reactions, or mechanisms</li>
-                <li>The AI searches through your uploaded documents to find relevant information</li>
-                <li>Answers include source references so you can verify the information</li>
-                <li>Use topic-specific questions for better, focused answers</li>
-              </ul>
-            </div>
-
-            <form onSubmit={onAsk} style={{ display: "grid", gap: 16, marginTop: 8 }}>
-              <label style={{ display: "grid", gap: 8 }}>
-                <div style={{ fontSize: 15, fontWeight: 600 }}>Your Question</div>
-                <textarea
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  rows={5}
-                  placeholder="Example: What is the mechanism for SN2 reactions? How does stereochemistry work in alkene additions?"
-                  style={{ 
-                    width: "100%", 
-                    padding: 16, 
-                    borderRadius: 12, 
-                    border: "1px solid var(--border)",
-                    fontFamily: "inherit",
-                    fontSize: 15,
-                    lineHeight: 1.6,
-                    resize: "vertical",
-                    background: "var(--panel)"
-                  }}
-                  disabled={loading}
-                />
-              </label>
-
-              <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
-                <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.6)" }}>Top K:</div>
-                  <input
-                    type="number"
-                    min={1}
-                    max={20}
-                    value={topK}
-                    onChange={(e) => setTopK(Number(e.target.value))}
-                    style={{ 
-                      padding: "8px 12px", 
-                      borderRadius: 8, 
-                      border: "1px solid var(--border)",
-                      width: 80,
-                      fontSize: 14
-                    }}
-                    disabled={loading}
-                  />
-                  <div style={{ fontSize: 12, color: "rgba(0, 0, 0, 0.5)" }}>
-                    (number of source chunks to search)
-                  </div>
-                </label>
-
-                <button
-                  type="submit"
-                  disabled={loading || !question.trim()}
-                  className="btn btnPrimary"
-                  style={{ minWidth: 120 }}
-                >
-                  {loading ? "Searching..." : "Ask Question"}
-                </button>
-              </div>
-            </form>
-
-            {error ? (
-              <div className="card" style={{ 
-                background: "rgba(255, 59, 48, 0.06)", 
-                border: "1px solid rgba(255, 59, 48, 0.2)",
-                boxShadow: "none"
-              }}>
-                <div className="cardInner" style={{ padding: 16 }}>
-                  <div style={{ fontWeight: 600, color: "#FF3B30", marginBottom: 4 }}>Error</div>
-                  <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.7)" }}>{error}</div>
-                </div>
-              </div>
-            ) : null}
-
-            {answer ? (
-              <div className="card" style={{ boxShadow: "none", marginTop: 24 }}>
-                <div className="cardInner">
-                  <div className="stack">
-                    <div>
-                      <div className="h2" style={{ fontSize: 20, marginBottom: 4 }}>Answer</div>
-                      <div className="subtle" style={{ fontSize: 13 }}>
-                        Based on your uploaded notes
-                      </div>
-                    </div>
-                    <div style={{ 
-                      whiteSpace: "pre-wrap", 
-                      padding: 20, 
-                      borderRadius: 12, 
-                      background: "rgba(0, 0, 0, 0.02)",
-                      border: "1px solid var(--border)",
-                      fontSize: 15,
-                      lineHeight: 1.7,
-                      color: "var(--text)"
-                    }}>
-                      {answer}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
-            {contexts.length > 0 ? (
-              <div className="card" style={{ boxShadow: "none", marginTop: 16 }}>
-                <div className="cardInner">
-                  <div className="stack">
-                    <div>
-                      <div className="h2" style={{ fontSize: 18, marginBottom: 4 }}>Sources</div>
-                      <div className="subtle" style={{ fontSize: 13 }}>
-                        {contexts.length} source{contexts.length !== 1 ? "s" : ""} found
-                      </div>
-                    </div>
-                    <div style={{ display: "grid", gap: 12 }}>
-                      {contexts.map((c, i) => (
-                        <div 
-                          key={i} 
-                          style={{ 
-                            padding: 16, 
-                            borderRadius: 12, 
-                            border: "1px solid var(--border)",
-                            background: "var(--panel)"
-                          }}
-                        >
-                          <div style={{ 
-                            fontSize: 12, 
-                            fontWeight: 600,
-                            color: "#007AFF", 
-                            marginBottom: 8 
-                          }}>
-                            {(c.stored_filename || "unknown file") + (typeof c.chunk_id === "number" ? ` • chunk ${c.chunk_id}` : "")}
-                          </div>
-                          <div style={{ 
-                            whiteSpace: "pre-wrap", 
-                            fontSize: 14, 
-                            lineHeight: 1.6,
-                            color: "rgba(0, 0, 0, 0.8)"
-                          }}>
-                            {c.snippet || c.text || ""}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
-            {!answer && !loading && (
-              <div style={{
-                padding: 20,
-                textAlign: "center",
-                color: "rgba(0, 0, 0, 0.5)",
-                fontSize: 14
-              }}>
-                Enter a question above to get started
-              </div>
-            )}
+      <OpPanel title="Your question">
+        <form onSubmit={onAsk} className="opPanelBody">
+          <label className="opFieldLabel" htmlFor="ask-q">
+            Question
+          </label>
+          <textarea
+            id="ask-q"
+            className="opTextarea"
+            rows={5}
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Example: When does SN2 beat E2 for a primary substrate?"
+            disabled={loading}
+          />
+          <div className="opFieldRow">
+            <label className="subtle" style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              Source chunks (top_k)
+              <input
+                className="input"
+                type="number"
+                min={1}
+                max={20}
+                value={topK}
+                onChange={(e) => setTopK(Number(e.target.value))}
+                style={{ width: 72 }}
+                disabled={loading}
+              />
+            </label>
+            <button type="submit" className="btn btnPrimary" disabled={loading || !question.trim()}>
+              {loading ? "Working…" : "Ask"}
+            </button>
           </div>
-        </div>
-      </div>
-    </main>
+        </form>
+      </OpPanel>
+
+      {error ? (
+        <OpPanel title="Error" variant="muted">
+          <div style={{ color: "var(--red)", fontWeight: 700 }}>{error}</div>
+        </OpPanel>
+      ) : null}
+
+      {loading ? <OpSpinner label="Retrieving grounded answer…" /> : null}
+
+      {payload?.answer ? (
+        <OpPanel
+          title="Answer"
+          right={
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <OpBadge tone={tier.tone}>{tier.label}</OpBadge>
+              {typeof payload.top_match_score === "number" ? (
+                <OpBadge tone="neutral">top lexical score {payload.top_match_score}</OpBadge>
+              ) : null}
+              {payload.semantic_ready === false ? <OpBadge tone="info">semantic-ready API: off</OpBadge> : null}
+            </div>
+          }
+        >
+          {lowConfidence ? (
+            <div className="opContextBanner" style={{ marginBottom: 12, borderColor: "var(--warn-border)", background: "var(--warn-bg)" }}>
+              <div className="opContextBannerTitle" style={{ color: "var(--text)" }}>
+                Low confidence match
+              </div>
+              <div className="opContextBannerBody" style={{ color: "var(--text)" }}>
+                Verify against the source cards below or rephrase with vocabulary from your notes.
+              </div>
+            </div>
+          ) : null}
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              padding: 16,
+              borderRadius: "var(--radius-md)",
+              border: "1px solid var(--border)",
+              background: "var(--panel-2)",
+              fontSize: 15,
+              lineHeight: 1.65,
+            }}
+          >
+            {payload.answer}
+          </div>
+        </OpPanel>
+      ) : null}
+
+      {payload?.contexts && payload.contexts.length > 0 ? (
+        <OpPanel title="Supporting contexts">
+          <div style={{ display: "grid", gap: 12 }}>
+            {payload.contexts.map((c, i) => (
+              <OpSearchResultCard
+                key={i}
+                metaLeft={
+                  <>
+                    {(c.stored_filename || c.upload_id || "source") +
+                      (typeof c.chunk_id === "number" ? ` · chunk ${c.chunk_id}` : "")}
+                  </>
+                }
+                metaRight={typeof c.score === "number" ? <OpBadge tone="neutral">score {c.score}</OpBadge> : null}
+                snippet={highlightSnippet((c.snippet || c.text || "").slice(0, 400), question)}
+              />
+            ))}
+          </div>
+        </OpPanel>
+      ) : null}
+
+      {payload?.follow_up_suggestions && payload.follow_up_suggestions.length > 0 ? (
+        <OpPanel title="Follow up">
+          <div className="subtle" style={{ marginBottom: 10 }}>
+            Load a suggestion into the question box, edit if you want, then press Ask.
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {payload.follow_up_suggestions.map((s) => (
+              <button key={s} type="button" className="btn" onClick={() => setQuestion(s)}>
+                {s}
+              </button>
+            ))}
+          </div>
+        </OpPanel>
+      ) : null}
+
+      {!payload && !loading && !error ? (
+        <OpEmptyState
+          title="Ask grounded questions"
+          description="Upload notes (Uploads), ensure ingest shows Ready, then ask about mechanisms, selectivity, and exam traps."
+        />
+      ) : null}
+    </ToolPageLayout>
   );
 }
 
 export default function AskPage() {
   return (
-    <Suspense fallback={
-      <main style={{ maxWidth: 1000, margin: "0 auto", padding: "40px 20px" }}>
-        <div className="card">
-          <div className="cardInner">
-            <div>Loading...</div>
-          </div>
-        </div>
-      </main>
-    }>
+    <Suspense
+      fallback={
+        <ToolPageLayout title="Ask" subtitle="Loading…">
+          <OpSpinner />
+        </ToolPageLayout>
+      }
+    >
       <AskPageContent />
     </Suspense>
   );

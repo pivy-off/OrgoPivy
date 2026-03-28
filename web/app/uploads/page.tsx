@@ -1,37 +1,32 @@
-// web/app/uploads/page.tsx
-// Full replacement file
-
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getCourseTopics, type CourseId } from "../lib/curriculum";
+import { apiUrl } from "../lib/api";
+import { logActivity } from "../lib/activity";
+import {
+  OpBadge,
+  OpContextBanner,
+  OpEmptyState,
+  OpPanel,
+  OpSpinner,
+  ToolPageLayout,
+} from "../components/op";
 
 type UploadItem = {
+  upload_id: string;
   stored_filename: string;
   original_filename: string;
-  display_name: string;
+  display_name?: string;
   bytes: number;
-  uploaded_at: string | null;
-  status: string;
-  indexed_at: string | null;
+  indexed: boolean;
+  chunk_count: number;
   course?: string | null;
   topic?: string | null;
-  source_url?: string | null;
-  source_title?: string | null;
 };
 
-type UploadListResponse = {
-  count: number;
-  items: UploadItem[];
-};
-
-type UploadResponse = {
-  original_filename: string;
-  stored_filename: string;
-  bytes: number;
-  status: string;
-  chunk_count: number;
-};
+type UploadListResponse = { count: number; items: UploadItem[] };
 
 function formatBytes(n: number) {
   if (!Number.isFinite(n)) return "";
@@ -40,470 +35,440 @@ function formatBytes(n: number) {
   return `${Math.round((n / (1024 * 1024)) * 10) / 10} MB`;
 }
 
-function formatDate(iso: string | null) {
-  if (!iso) return "Unknown";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "Unknown";
-  return d.toLocaleString();
+function statusForItem(it: UploadItem) {
+  const isTxt = it.stored_filename.toLowerCase().endsWith(".txt");
+  if (!isTxt) return { label: "Uploaded", tone: "warn" as const };
+  if (it.indexed) return { label: `Indexed · ${it.chunk_count} chunks`, tone: "success" as const };
+  return { label: "Uploaded (txt)", tone: "info" as const };
 }
 
 export default function UploadsPage() {
-  const apiBase = useMemo(() => {
-    return process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
-  }, []);
-
-  const [apiStatus, setApiStatus] = useState<string>("unknown");
+  const [apiStatus, setApiStatus] = useState<string>("…");
   const [busy, setBusy] = useState(false);
+  const [uploadPct, setUploadPct] = useState<number | null>(null);
+  const [items, setItems] = useState<UploadItem[]>([]);
+  const [selectedId, setSelectedId] = useState<string>("");
+  const [previewText, setPreviewText] = useState("");
+  const [message, setMessage] = useState("");
+  const [dragOver, setDragOver] = useState(false);
+  const [previewBusy, setPreviewBusy] = useState(false);
 
   const [file, setFile] = useState<File | null>(null);
-  const [items, setItems] = useState<UploadItem[]>([]);
-  const [selected, setSelected] = useState<string>("");
-
-  const [previewText, setPreviewText] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
-
-  const [course, setCourse] = useState<CourseId>("orgochem-1");
+  const [course, setCourse] = useState<CourseId>("orgochem-2");
   const topics = useMemo(() => getCourseTopics(course), [course]);
-  const [topicSlug, setTopicSlug] = useState<string>(topics[0]?.slug || "");
-
-  const [sourceTitle, setSourceTitle] = useState<string>("");
-  const [sourceUrl, setSourceUrl] = useState<string>("");
+  const [topicSlug, setTopicSlug] = useState(topics[0]?.slug || "");
+  const [sourceTitle, setSourceTitle] = useState("");
+  const [sourceUrl, setSourceUrl] = useState("");
 
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
 
-  async function checkHealth() {
+  const selected = useMemo(() => items.find((x) => x.upload_id === selectedId) || null, [items, selectedId]);
+
+  const checkHealth = useCallback(async () => {
     try {
-      const res = await fetch(`${apiBase}/health`, { cache: "no-store" });
+      const res = await fetch(apiUrl("/health"), { cache: "no-store" });
       const data = await res.json();
       setApiStatus(String(data?.status || "unknown"));
     } catch {
       setApiStatus("down");
     }
-  }
+  }, []);
 
-  async function loadUploads(nextSelect?: string) {
+  const loadUploads = useCallback(async (preferId?: string) => {
     setMessage("");
     try {
-      const res = await fetch(`${apiBase}/uploads`, { cache: "no-store" });
+      const res = await fetch(apiUrl("/uploads"), { cache: "no-store" });
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as UploadListResponse;
       const list = Array.isArray(data?.items) ? data.items : [];
       setItems(list);
-
-      const desired = nextSelect || selected;
-      if (desired && list.some((x) => x.stored_filename === desired)) {
-        setSelected(desired);
-      } else if (list.length) {
-        setSelected(list[0].stored_filename);
-      } else {
-        setSelected("");
-      }
-    } catch (e: any) {
-      setMessage(e?.message || "Failed to load files");
+      setSelectedId((cur) => {
+        if (preferId && list.some((x) => x.upload_id === preferId)) return preferId;
+        if (cur && list.some((x) => x.upload_id === cur)) return cur;
+        return list[0]?.upload_id || "";
+      });
+    } catch (e: unknown) {
+      setMessage(e instanceof Error ? e.message : "Failed to load files");
     }
+  }, []);
+
+  useEffect(() => {
+    void checkHealth();
+    void loadUploads();
+  }, [checkHealth, loadUploads]);
+
+  useEffect(() => {
+    const next = getCourseTopics(course);
+    const first = next[0]?.slug || "";
+    setTopicSlug((prev) => (next.some((t) => t.slug === prev) ? prev : first));
+  }, [course]);
+
+  useEffect(() => {
+    if (!selectedId) {
+      setPreviewText("");
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setPreviewBusy(true);
+      try {
+        const res = await fetch(apiUrl(`/uploads/${encodeURIComponent(selectedId)}/text`), { cache: "no-store" });
+        if (!res.ok) {
+          if (!cancelled) setPreviewText("Preview available for .txt files after upload.");
+          return;
+        }
+        const data = await res.json();
+        const text = String(data?.text || "");
+        if (!cancelled) setPreviewText(text.slice(0, 4000) + (text.length > 4000 ? "\n\n…truncated" : ""));
+      } catch {
+        if (!cancelled) setPreviewText("");
+      } finally {
+        if (!cancelled) setPreviewBusy(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedId]);
+
+  function uploadWithProgress(fd: FormData, url: string): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", url);
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) setUploadPct(Math.round((100 * e.loaded) / e.total));
+      };
+      xhr.onload = () => {
+        setUploadPct(null);
+        resolve(new Response(xhr.responseText, { status: xhr.status, statusText: xhr.statusText }));
+      };
+      xhr.onerror = () => {
+        setUploadPct(null);
+        reject(new Error("Network error"));
+      };
+      xhr.send(fd);
+    });
   }
 
   async function doUpload() {
     if (!file) {
-      setMessage("Pick a file first");
+      setMessage("Choose a .txt file (first-class) or another file for storage.");
       return;
     }
-
     setBusy(true);
     setMessage("");
     setPreviewText("");
-
+    setUploadPct(0);
     try {
       const fd = new FormData();
       fd.append("file", file);
-
       const qs = new URLSearchParams();
       qs.set("course", course);
       qs.set("topic", topicSlug);
       if (sourceUrl.trim()) qs.set("source_url", sourceUrl.trim());
       if (sourceTitle.trim()) qs.set("source_title", sourceTitle.trim());
 
-      const res = await fetch(`${apiBase}/upload?${qs.toString()}`, {
-        method: "POST",
-        body: fd,
-      });
-
+      const res = await uploadWithProgress(fd, apiUrl(`/upload?${qs.toString()}`));
       if (!res.ok) throw new Error(await res.text());
-
-      const data = (await res.json()) as UploadResponse;
-
-      setMessage(`Uploaded ${data.original_filename}`);
+      const data = (await res.json()) as { upload_id?: string; chunk_count?: number };
       setFile(null);
-
-      await loadUploads(data.stored_filename);
-    } catch (e: any) {
-      setMessage(e?.message || "Upload failed");
+      setMessage(`Uploaded · chunks ${data.chunk_count ?? 0}`);
+      logActivity({
+        kind: "upload",
+        label: file.name,
+        detail: `${data.chunk_count ?? 0} chunks`,
+        href: "/uploads",
+      });
+      await loadUploads(data.upload_id);
+    } catch (e: unknown) {
+      setMessage(e instanceof Error ? e.message : "Upload failed");
     } finally {
       setBusy(false);
+      setUploadPct(null);
     }
   }
 
-  async function loadPreview(name?: string) {
-    const target = name || selected;
-    if (!target) return;
-
+  async function doIngest(id: string) {
     setBusy(true);
     setMessage("");
-    setPreviewText("");
-
     try {
-      const res = await fetch(`${apiBase}/uploads/${encodeURIComponent(target)}/text`, {
-        cache: "no-store",
-      });
-
-      if (!res.ok) {
-        setPreviewText("Preview works for txt files only");
-        return;
-      }
-
-      const data = await res.json();
-      const text = String(data?.text || "");
-      setPreviewText(text.slice(0, 4000));
-      if (text.length > 4000) setPreviewText((t) => `${t}\n\nPreview truncated`);
-    } catch (e: any) {
-      setMessage(e?.message || "Preview failed");
+      const res = await fetch(apiUrl(`/uploads/${encodeURIComponent(id)}/ingest`), { method: "POST" });
+      if (!res.ok) throw new Error(await res.text());
+      const data = (await res.json()) as { chunk_count?: number };
+      setMessage(`Ingest complete · ${data.chunk_count ?? 0} chunks`);
+      await loadUploads(id);
+    } catch (e: unknown) {
+      setMessage(e instanceof Error ? e.message : "Ingest failed");
     } finally {
       setBusy(false);
     }
   }
 
-  async function doRename(newName: string) {
-    const target = selected;
-    if (!target) return;
-
-    const name = newName.trim();
+  async function doRename() {
+    if (!selectedId) return;
+    const name = renameValue.trim();
     if (!name) {
       setMessage("Name required");
       return;
     }
-
     setBusy(true);
-    setMessage("");
-
     try {
-      const res = await fetch(`${apiBase}/uploads/${encodeURIComponent(target)}/rename`, {
+      const res = await fetch(apiUrl(`/uploads/${encodeURIComponent(selectedId)}/rename`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ display_name: name }),
       });
-
       if (!res.ok) throw new Error(await res.text());
-
       setRenameOpen(false);
-      await loadUploads(target);
-      setMessage("Updated name");
-    } catch (e: any) {
-      setMessage(e?.message || "Rename failed");
+      await loadUploads(selectedId);
+      setMessage("Renamed");
+    } catch (e: unknown) {
+      setMessage(e instanceof Error ? e.message : "Rename failed");
     } finally {
       setBusy(false);
     }
   }
 
   async function doDelete() {
-    const target = selected;
-    if (!target) return;
-
-    const item = items.find((x) => x.stored_filename === target);
-    const label = item?.display_name || item?.original_filename || target;
-
-    const ok = window.confirm(`Delete ${label} ?`);
+    if (!selectedId || !selected) return;
+    const ok = window.confirm(`Delete ${selected.display_name || selected.original_filename}?`);
     if (!ok) return;
-
     setBusy(true);
-    setMessage("");
-
     try {
-      const res = await fetch(`${apiBase}/uploads/${encodeURIComponent(target)}`, { method: "DELETE" });
+      const res = await fetch(apiUrl(`/uploads/${encodeURIComponent(selectedId)}`), { method: "DELETE" });
       if (!res.ok) throw new Error(await res.text());
-
       setPreviewText("");
       setRenameOpen(false);
-      setRenameValue("");
-
       await loadUploads();
       setMessage("Deleted");
-    } catch (e: any) {
-      setMessage(e?.message || "Delete failed");
+    } catch (e: unknown) {
+      setMessage(e instanceof Error ? e.message : "Delete failed");
     } finally {
       setBusy(false);
     }
   }
 
-  useEffect(() => {
-    checkHealth();
-    loadUploads();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const next = getCourseTopics(course);
-    const first = next[0]?.slug || "";
-    setTopicSlug((prev) => {
-      if (next.some((t) => t.slug === prev)) return prev;
-      return first;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [course]);
-
-  useEffect(() => {
-    if (selected) loadPreview(selected);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected]);
-
-  const selectedItem = useMemo(() => items.find((x) => x.stored_filename === selected), [items, selected]);
-
   return (
-    <main className="stack" style={{ padding: 18 }}>
-      <div className="card">
-        <div className="cardInner" style={{ display: "grid", gap: 12 }}>
-          <div className="row">
-            <div style={{ flex: 1 }}>
-              <div className="subtle">Upload Your Notes</div>
-              <div className="h1">Upload Notes to Ask Questions & Generate Practice</div>
-              <div style={{ 
-                marginTop: 12, 
-                padding: 16, 
-                background: "rgba(0, 122, 255, 0.06)", 
-                borderRadius: 12,
-                border: "1px solid rgba(0, 122, 255, 0.2)"
-              }}>
-                <div style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.8)" }}>
-                  <strong>How it works:</strong> Upload your class notes, textbook summaries, or study materials as text files. 
-                  Once uploaded, you can ask questions about your notes using the <strong>Ask</strong> tool, and the system will 
-                  generate personalized practice homework based on your uploaded content. Organize your notes by course and topic 
-                  for better results.
-                </div>
-              </div>
-            </div>
+    <ToolPageLayout
+      eyebrow="Study OS"
+      title="Uploads & ingest"
+      subtitle="Drop .txt notes, tag by Orgo II topic, and index them for Search and Ask. Other formats are stored for future pipelines."
+      actions={
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          <OpBadge tone={apiStatus === "ok" ? "success" : apiStatus === "down" ? "warn" : "neutral"}>
+            API {apiStatus}
+          </OpBadge>
+          <button type="button" className="btn" onClick={() => void checkHealth()} disabled={busy}>
+            Ping health
+          </button>
+        </div>
+      }
+    >
+      <OpContextBanner title="Workflow">
+        Upload → (txt auto-indexes on upload) → Search / Ask. Use <strong>Ingest</strong> to rebuild the index if you replace file content
+        manually.
+      </OpContextBanner>
 
-            <div className="badge">API {apiStatus}</div>
+      <OpPanel title="Organize metadata">
+        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "140px 1fr", alignItems: "center" }}>
+          <span className="subtle" style={{ fontWeight: 800 }}>
+            Course
+          </span>
+          <select className="input" value={course} onChange={(e) => setCourse(e.target.value as CourseId)} disabled={busy}>
+            <option value="orgochem-1">OrgoChem I</option>
+            <option value="orgochem-2">OrgoChem II</option>
+          </select>
+          <span className="subtle" style={{ fontWeight: 800 }}>
+            Topic
+          </span>
+          <select className="input" value={topicSlug} onChange={(e) => setTopicSlug(e.target.value)} disabled={busy}>
+            {topics.map((t) => (
+              <option key={t.slug} value={t.slug}>
+                {t.title}
+              </option>
+            ))}
+          </select>
+          <span className="subtle" style={{ fontWeight: 800 }}>
+            Source title
+          </span>
+          <input className="input" value={sourceTitle} onChange={(e) => setSourceTitle(e.target.value)} placeholder="Optional" disabled={busy} />
+          <span className="subtle" style={{ fontWeight: 800 }}>
+            Source URL
+          </span>
+          <input className="input" value={sourceUrl} onChange={(e) => setSourceUrl(e.target.value)} placeholder="Optional https://…" disabled={busy} />
+        </div>
+      </OpPanel>
+
+      <OpPanel title="Upload">
+        <div
+          className={`opDropZone ${dragOver ? "opDropZoneActive" : ""}`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            const f = e.dataTransfer.files?.[0];
+            if (f) setFile(f);
+          }}
+        >
+          <div style={{ fontWeight: 900 }}>Drag & drop a file</div>
+          <div className="opDropZoneHint">.txt recommended for Search / Ask indexing</div>
+          <div style={{ marginTop: 12 }}>
+            <input
+              type="file"
+              accept=".txt,text/plain"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+              disabled={busy}
+            />
           </div>
-
-          <div className="divider" />
-
-          <div className="topicTwoCol">
-            <div className="card" style={{ boxShadow: "none" }}>
-              <div className="cardInner" style={{ padding: 14, display: "grid", gap: 10 }}>
-                <div style={{ fontWeight: 950 }}>Organize</div>
-
-                <div style={{ display: "grid", gap: 10, gridTemplateColumns: "160px 1fr", alignItems: "center" }}>
-                  <div className="subtle" style={{ fontWeight: 900 }}>
-                    Course
-                  </div>
-                  <select className="input" value={course} onChange={(e) => setCourse(e.target.value as CourseId)} disabled={busy}>
-                    <option value="orgochem-1">OrgoChem I</option>
-                    <option value="orgochem-2">OrgoChem II</option>
-                  </select>
-
-                  <div className="subtle" style={{ fontWeight: 900 }}>
-                    Topic
-                  </div>
-                  <select className="input" value={topicSlug} onChange={(e) => setTopicSlug(e.target.value)} disabled={busy}>
-                    {topics.map((t) => (
-                      <option key={t.slug} value={t.slug}>
-                        {t.title}
-                      </option>
-                    ))}
-                  </select>
-
-                  <div className="subtle" style={{ fontWeight: 900 }}>
-                    Source title
-                  </div>
-                  <input className="input" value={sourceTitle} onChange={(e) => setSourceTitle(e.target.value)} placeholder="Optional" disabled={busy} />
-
-                  <div className="subtle" style={{ fontWeight: 900 }}>
-                    Source link
-                  </div>
-                  <input className="input" value={sourceUrl} onChange={(e) => setSourceUrl(e.target.value)} placeholder="Optional" disabled={busy} />
-                </div>
-
-                <div className="subtle">Old files from before this update do not have the original filename saved so use Rename</div>
+          {uploadPct !== null ? (
+            <div style={{ marginTop: 14 }}>
+              <div className="subtle" style={{ marginBottom: 6 }}>
+                Uploading {uploadPct}%
               </div>
-            </div>
-
-            <div className="card" style={{ boxShadow: "none" }}>
-              <div className="cardInner" style={{ padding: 14, display: "grid", gap: 10 }}>
-                <div style={{ fontWeight: 950 }}>Upload</div>
-
-                <div className="row" style={{ alignItems: "center" }}>
-                  <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} disabled={busy} />
-                  <button type="button" className="btn btnPrimary" onClick={doUpload} disabled={busy}>
-                    {busy ? "Working" : "Upload"}
-                  </button>
-                  <button type="button" className="btn" onClick={() => loadUploads()} disabled={busy}>
-                    Refresh
-                  </button>
-                </div>
-
-                <div className="subtle">Txt works now  PDF and images will be used in NMR studio next</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="divider" />
-
-          <div className="stack">
-            <div className="row">
-              <div style={{ fontWeight: 950 }}>Files</div>
-              <div className="subtle">{items.length} total</div>
-            </div>
-
-            {items.length === 0 ? (
-              <div className="card" style={{ boxShadow: "none" }}>
-                <div className="cardInner" style={{ padding: 14 }}>
-                  <div style={{ fontWeight: 950 }}>No files yet</div>
-                  <div className="subtle">Upload a txt note then go to Ask</div>
-                </div>
-              </div>
-            ) : (
-              <div className="stack">
-                {items.map((it) => {
-                  const isSelected = it.stored_filename === selected;
-                  const ready = it.status === "ready";
-
-                  return (
-                    <button
-                      key={it.stored_filename}
-                      type="button"
-                      onClick={() => setSelected(it.stored_filename)}
-                      className="progressRow"
-                      style={{
-                        textAlign: "left",
-                        cursor: "pointer",
-                        outline: "none",
-                        borderColor: isSelected ? "color-mix(in srgb, var(--accent) 35%, var(--border))" : "var(--border)",
-                      }}
-                      disabled={busy}
-                    >
-                      <div className="progressRowLeft">
-                        <div className="progressRowTitle">{it.display_name || it.original_filename || it.stored_filename}</div>
-                        <div className="progressRowDesc">
-                          {formatBytes(it.bytes)}  Uploaded {formatDate(it.uploaded_at)}  {ready ? "Ready" : "Stored"}
-                        </div>
-                      </div>
-
-                      <div className="progressRowAction">{ready ? <span className="badge">Ready</span> : <span className="badge">Stored</span>}</div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            <div className="card" style={{ boxShadow: "none" }}>
-              <div className="cardInner" style={{ padding: 14, display: "grid", gap: 10 }}>
-                <div className="row">
-                  <div>
-                    <div style={{ fontWeight: 950 }}>Selected</div>
-                    <div className="subtle" style={{ color: "var(--text)" }}>
-                      {selectedItem ? selectedItem.display_name : "None"}
-                    </div>
-                    <div className="subtle">{selectedItem ? selectedItem.stored_filename : ""}</div>
-                  </div>
-
-                  <div className="row" style={{ justifyContent: "flex-end" }}>
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => {
-                        setRenameValue(selectedItem?.display_name || "");
-                        setRenameOpen(true);
-                      }}
-                      disabled={busy || !selectedItem}
-                    >
-                      Rename
-                    </button>
-
-                    <button type="button" className="btn" onClick={doDelete} disabled={busy || !selectedItem}>
-                      Delete
-                    </button>
-
-                    <button type="button" className="btn" onClick={() => loadPreview()} disabled={busy || !selected}>
-                      Preview
-                    </button>
-
-                    <a className="btn btnPrimary" href="/ask">
-                      Ask
-                    </a>
-
-                    <a className="btn" href="/search">
-                      Search
-                    </a>
-                  </div>
-                </div>
-
-                {renameOpen ? (
-                  <div className="card" style={{ boxShadow: "none" }}>
-                    <div className="cardInner" style={{ padding: 12, display: "grid", gap: 10 }}>
-                      <div style={{ fontWeight: 950 }}>Rename file</div>
-                      <input className="input" value={renameValue} onChange={(e) => setRenameValue(e.target.value)} disabled={busy} />
-                      <div className="row" style={{ justifyContent: "flex-end" }}>
-                        <button type="button" className="btn" onClick={() => setRenameOpen(false)} disabled={busy}>
-                          Cancel
-                        </button>
-                        <button type="button" className="btn btnPrimary" onClick={() => doRename(renameValue)} disabled={busy}>
-                          Save
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-
-                <div className="divider" />
-
-                <div style={{ display: "grid", gap: 10, gridTemplateColumns: "1fr 1fr", alignItems: "start" }}>
-                  <div>
-                    <div style={{ fontWeight: 950, marginBottom: 8 }}>Preview</div>
-                    <div className="card" style={{ boxShadow: "none", minHeight: 220 }}>
-                      <div className="cardInner" style={{ padding: 12 }}>
-                        {previewText ? (
-                          <pre style={{ whiteSpace: "pre-wrap", margin: 0, fontSize: 12, color: "var(--muted)", lineHeight: 1.6 }}>{previewText}</pre>
-                        ) : (
-                          <div className="subtle">Preview works for txt files only</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div style={{ fontWeight: 950, marginBottom: 8 }}>How it works</div>
-                    <div className="card" style={{ boxShadow: "none" }}>
-                      <div className="cardInner" style={{ padding: 12, display: "grid", gap: 10 }}>
-                        <div className="topicSummaryText">Txt notes are prepared automatically so Ask can answer from them</div>
-                        <div className="topicToolRow">
-                          <a className="btn btnPrimary" href="/ask">
-                            Ask from notes
-                          </a>
-                          <a className="btn" href="/spectra">
-                            NMR studio
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-
-          {message ? (
-            <div className="card" style={{ boxShadow: "none" }}>
-              <div className="cardInner" style={{ padding: 12 }}>
-                <div style={{ fontWeight: 950 }}>Status</div>
-                <div className="subtle" style={{ marginTop: 4 }}>
-                  {message}
-                </div>
+              <div className="homeProgressTrack">
+                <div className="homeProgressFill" style={{ width: `${uploadPct}%` }} />
               </div>
             </div>
           ) : null}
+          <div style={{ marginTop: 14 }} className="opFieldRow">
+            <button type="button" className="btn btnPrimary" onClick={() => void doUpload()} disabled={busy || !file}>
+              {busy ? "Working…" : "Upload"}
+            </button>
+            <button type="button" className="btn" onClick={() => void loadUploads()} disabled={busy}>
+              Refresh list
+            </button>
+          </div>
         </div>
-      </div>
-    </main>
+      </OpPanel>
+
+      <OpPanel
+        title={`Library (${items.length})`}
+        right={
+          <div className="opFieldRow">
+            <Link className="btn btnPrimary" href="/search">
+              Search
+            </Link>
+            <Link className="btn" href="/ask">
+              Ask
+            </Link>
+          </div>
+        }
+      >
+        {items.length === 0 ? (
+          <OpEmptyState
+            title="No uploads yet"
+            description="Seed a demo: create a small .txt with reaction summaries, upload here, then open Search."
+          >
+            <Link className="btn btnPrimary" href="/search">
+              Try Search
+            </Link>
+          </OpEmptyState>
+        ) : (
+          <div className="stack" style={{ display: "grid", gap: 10 }}>
+            {items.map((it) => {
+              const st = statusForItem(it);
+              const active = it.upload_id === selectedId;
+              return (
+                <button
+                  key={it.upload_id}
+                  type="button"
+                  className="progressRow"
+                  style={{
+                    textAlign: "left",
+                    cursor: "pointer",
+                    borderColor: active ? "color-mix(in srgb, var(--blue) 35%, var(--border))" : undefined,
+                  }}
+                  onClick={() => setSelectedId(it.upload_id)}
+                  disabled={busy}
+                >
+                  <div className="progressRowLeft">
+                    <div className="progressRowTitle">{it.display_name || it.original_filename}</div>
+                    <div className="progressRowDesc">
+                      {formatBytes(it.bytes)} · {it.stored_filename}
+                    </div>
+                  </div>
+                  <div className="progressRowAction">
+                    <OpBadge tone={st.tone}>{st.label}</OpBadge>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </OpPanel>
+
+      {selected ? (
+        <OpPanel title="Selected file">
+          <div className="opFieldRow" style={{ justifyContent: "flex-start", flexWrap: "wrap" }}>
+            <button type="button" className="btn" onClick={() => { setRenameValue(selected.display_name || ""); setRenameOpen(true); }} disabled={busy}>
+              Rename
+            </button>
+            <button type="button" className="btn" onClick={() => void doDelete()} disabled={busy}>
+              Delete
+            </button>
+            {selected.stored_filename.toLowerCase().endsWith(".txt") ? (
+              <button type="button" className="btn btnPrimary" onClick={() => void doIngest(selected.upload_id)} disabled={busy}>
+                Ingest / re-index
+              </button>
+            ) : null}
+          </div>
+          {renameOpen ? (
+            <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
+              <input className="input" value={renameValue} onChange={(e) => setRenameValue(e.target.value)} disabled={busy} />
+              <div className="opFieldRow">
+                <button type="button" className="btn" onClick={() => setRenameOpen(false)}>
+                  Cancel
+                </button>
+                <button type="button" className="btn btnPrimary" onClick={() => void doRename()} disabled={busy}>
+                  Save name
+                </button>
+              </div>
+            </div>
+          ) : null}
+          <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }} className="topicTwoCol">
+            <div>
+              <div style={{ fontWeight: 850, marginBottom: 8 }}>Preview</div>
+              <div className="card" style={{ boxShadow: "none", minHeight: 200 }}>
+                <div className="cardInner" style={{ padding: 12 }}>
+                  {busy && !previewText ? <OpSpinner label="Loading preview…" /> : null}
+                  {previewText ? (
+                    <pre style={{ whiteSpace: "pre-wrap", margin: 0, fontSize: 12, color: "var(--muted)", lineHeight: 1.55 }}>{previewText}</pre>
+                  ) : (
+                    !busy && <div className="subtle">No text preview</div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontWeight: 850, marginBottom: 8 }}>Details</div>
+              <div className="subtle" style={{ display: "grid", gap: 6, fontSize: 13 }}>
+                <div>
+                  <strong>upload_id</strong> {selected.upload_id}
+                </div>
+                <div>
+                  <strong>Chunks</strong> {selected.chunk_count}
+                </div>
+                <div>
+                  <strong>Indexed</strong> {selected.indexed ? "yes" : "no"}
+                </div>
+              </div>
+            </div>
+          </div>
+        </OpPanel>
+      ) : null}
+
+      {message ? (
+        <OpPanel title="Status" variant="muted">
+          <div className="subtle" style={{ color: "var(--text)" }}>
+            {message}
+          </div>
+        </OpPanel>
+      ) : null}
+    </ToolPageLayout>
   );
 }

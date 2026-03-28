@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import HomePressable from "./components/HomePressable";
+import HomeStudyOsSection from "./components/dashboard/HomeStudyOsSection";
 import { getCourseTopics, type CourseId, type Topic } from "./lib/curriculum";
 
 type ProgressMap = Record<string, boolean>;
@@ -130,6 +131,8 @@ export default function HomePage() {
 
   return (
     <main className="homeMain">
+      <HomeStudyOsSection completedTopics={completedCount} totalTopics={totalTopics} />
+
       <form
         className="homeSearchWrap"
         role="search"

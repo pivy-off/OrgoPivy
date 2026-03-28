@@ -9,6 +9,7 @@ import re
 import os
 
 from app.ingest import chunk_text, score, make_answer
+from app import pharmasim as psim
 from app.security import (
     limiter,
     SecurityHeadersMiddleware,
@@ -122,6 +123,25 @@ def find_manifest_item(upload_id: str) -> Optional[Dict[str, Any]]:
         if str(it.get("upload_id")) == upload_id:
             return it
     return None
+
+
+def update_manifest_item(upload_id: str, updates: Dict[str, Any]) -> bool:
+    m = load_manifest()
+    items = m.get("items", [])
+    if not isinstance(items, list):
+        return False
+    changed = False
+    for i, it in enumerate(items):
+        if str(it.get("upload_id")) == upload_id:
+            merged = {**it, **updates}
+            items[i] = merged
+            changed = True
+            break
+    if not changed:
+        return False
+    m["items"] = items
+    save_manifest(m)
+    return True
 
 
 def build_index(upload_id: str, stored_filename: str, text: str, course: Optional[str], topic: Optional[str], source_url: Optional[str], source_title: Optional[str]) -> int:
@@ -254,6 +274,7 @@ def list_uploads(request: Request):
             {
                 "upload_id": upload_id,
                 "original_filename": it.get("original_filename") or stored,
+                "display_name": it.get("display_name") or it.get("original_filename") or stored,
                 "stored_filename": stored,
                 "bytes": int(path.stat().st_size),
                 "indexed": bool(it.get("indexed")),
@@ -317,6 +338,67 @@ def get_upload_text(request: Request, upload_id: str):
     return {"upload_id": upload_id, "original_filename": it.get("original_filename"), "text": text}
 
 
+class RenameUploadBody(BaseModel):
+    display_name: str = Field(..., min_length=1, max_length=MAX_TITLE_LENGTH)
+
+
+@app.post("/uploads/{upload_id}/rename")
+@limiter.limit("30/minute")
+def rename_upload(request: Request, upload_id: str, body: RenameUploadBody):
+    if not upload_id or not re.match(r"^[a-f0-9]{32}$", upload_id):
+        raise HTTPException(status_code=400, detail="Invalid upload ID format")
+    if not find_manifest_item(upload_id):
+        raise HTTPException(status_code=404, detail="Upload not found")
+    name = sanitize_string(body.display_name, max_length=MAX_TITLE_LENGTH)
+    if not name:
+        raise HTTPException(status_code=400, detail="Invalid name")
+    update_manifest_item(upload_id, {"display_name": name})
+    return {"ok": True, "display_name": name}
+
+
+@app.post("/uploads/{upload_id}/ingest")
+@limiter.limit("20/minute")
+def ingest_upload(request: Request, upload_id: str):
+    if not upload_id or not re.match(r"^[a-f0-9]{32}$", upload_id):
+        raise HTTPException(status_code=400, detail="Invalid upload ID format")
+    it = find_manifest_item(upload_id)
+    if not it:
+        raise HTTPException(status_code=404, detail="Upload not found")
+    stored = str(it.get("stored_filename") or "")
+    path = UPLOAD_DIR / stored
+    if not path.exists() or not path.is_file():
+        raise HTTPException(status_code=404, detail="File not found")
+    if path.suffix.lower() != ".txt":
+        raise HTTPException(status_code=415, detail="Only .txt files can be indexed for search")
+    text = path.read_text(encoding="utf-8", errors="ignore")
+    try:
+        course_n = validate_course_id(str(it.get("course") or "")) if it.get("course") else ""
+    except HTTPException:
+        course_n = ""
+    topic_n = sanitize_string(str(it.get("topic") or ""), max_length=100) if it.get("topic") else ""
+    source_url_sanitized = None
+    if it.get("source_url"):
+        try:
+            u = validate_url(str(it.get("source_url") or ""))
+            source_url_sanitized = u or None
+        except HTTPException:
+            source_url_sanitized = None
+    source_title_sanitized = (
+        sanitize_string(str(it.get("source_title") or ""), max_length=MAX_TITLE_LENGTH) if it.get("source_title") else None
+    )
+    chunk_count = build_index(
+        upload_id=upload_id,
+        stored_filename=stored,
+        text=text,
+        course=course_n or None,
+        topic=topic_n or None,
+        source_url=source_url_sanitized,
+        source_title=source_title_sanitized,
+    )
+    update_manifest_item(upload_id, {"indexed": True, "chunk_count": chunk_count})
+    return {"upload_id": upload_id, "indexed": True, "chunk_count": chunk_count}
+
+
 def match_scope(meta: Dict[str, Any], course: str, topic: str) -> bool:
     mc = norm(meta.get("course"))
     mt = norm(meta.get("topic"))
@@ -334,7 +416,7 @@ def search_impl(q: str, k: int = 5, course: str = "", topic: str = "") -> Dict[s
     topic = norm(topic)
 
     if not q.strip():
-        return {"q": q, "k": k, "course": course or None, "topic": topic or None, "results": []}
+        return {"q": q, "k": k, "course": course or None, "topic": topic or None, "results": [], "engine": "lexical"}
 
     results: List[Dict[str, Any]] = []
 
@@ -363,7 +445,14 @@ def search_impl(q: str, k: int = 5, course: str = "", topic: str = "") -> Dict[s
                 )
 
     results.sort(key=lambda r: r["score"], reverse=True)
-    return {"q": q, "k": k, "course": course or None, "topic": topic or None, "results": results[:k]}
+    return {
+        "q": q,
+        "k": k,
+        "course": course or None,
+        "topic": topic or None,
+        "results": results[:k],
+        "engine": "lexical",
+    }
 
 
 @app.get("/search")
@@ -384,6 +473,14 @@ def search(
     return search_impl(q=query, k=top_k, course=course_n, topic=topic_n)
 
 
+def confidence_tier_from_score(score: float) -> str:
+    if score >= 4:
+        return "high"
+    if score >= 1:
+        return "medium"
+    return "low"
+
+
 def looks_like_math_question(q: str) -> bool:
     s = (q or "").lower()
     if "mole" in s or "moles" in s:
@@ -401,7 +498,15 @@ def ask_impl(question: str, top_k: int = 5, course: str = "", topic: str = "") -
     topic = norm(topic)
 
     if not question.strip():
-        return {"answer": "", "contexts": [], "course": course or None, "topic": topic or None}
+        return {
+            "answer": "",
+            "contexts": [],
+            "course": course or None,
+            "topic": topic or None,
+            "confidence_tier": "low",
+            "top_match_score": 0.0,
+            "semantic_ready": False,
+        }
 
     search_payload = search_impl(q=question, k=top_k, course=course, topic=topic)
     results = search_payload.get("results", [])
@@ -419,6 +524,9 @@ def ask_impl(question: str, top_k: int = 5, course: str = "", topic: str = "") -
             "contexts": [],
             "course": course or None,
             "topic": topic or None,
+            "confidence_tier": "low",
+            "top_match_score": float(top_score),
+            "semantic_ready": False,
         }
 
     answer = make_answer(question, results, max_sentences=5)
@@ -436,7 +544,22 @@ def ask_impl(question: str, top_k: int = 5, course: str = "", topic: str = "") -
             }
         )
 
-    return {"answer": answer, "contexts": contexts, "course": course or None, "topic": topic or None}
+    tier = confidence_tier_from_score(float(top_score)) if results else "low"
+    follow_ups = [
+        "What mechanism connects these reagents to the major product?",
+        "What is the key intermediate before the product forms?",
+    ]
+
+    return {
+        "answer": answer,
+        "contexts": contexts,
+        "course": course or None,
+        "topic": topic or None,
+        "confidence_tier": tier,
+        "top_match_score": float(top_score),
+        "semantic_ready": False,
+        "follow_up_suggestions": follow_ups,
+    }
 
 
 @app.get("/ask")
@@ -535,3 +658,83 @@ def get_practice_exam(request: Request, filename: str):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error reading file: {str(e)}")
+
+
+# --- PharmaSim demo API (educational / hackathon; see responses["disclaimer"]) ---
+
+
+class PharmaSimPredictRequest(BaseModel):
+    drug_id: str = Field(..., min_length=2, max_length=80)
+    weight_kg: float = Field(70.0, ge=40.0, le=120.0)
+
+
+class PharmaSimSimulateRequest(BaseModel):
+    drug_id: str = Field(..., min_length=2, max_length=80)
+    hours: float = Field(24.0, ge=1.0, le=72.0)
+    steps: int = Field(48, ge=8, le=200)
+    dose_mg: Optional[float] = Field(default=None, ge=1.0, le=5000.0)
+    weight_kg: float = Field(70.0, ge=40.0, le=120.0)
+
+
+class PharmaSimCompareRequest(BaseModel):
+    drug_id_a: str = Field(..., min_length=2, max_length=80)
+    drug_id_b: str = Field(..., min_length=2, max_length=80)
+    hours: float = Field(24.0, ge=1.0, le=72.0)
+    steps: int = Field(48, ge=8, le=200)
+    weight_kg: float = Field(70.0, ge=40.0, le=120.0)
+
+
+@app.get("/pharmasim/drugs")
+@limiter.limit("120/minute")
+def pharmasim_list_drugs(request: Request):
+    items = []
+    for did in psim.list_preset_ids():
+        p = psim.PRESETS[did]
+        items.append(
+            {
+                "drug_id": did,
+                "display_name": p["display_name"],
+                "generic": p["generic"],
+                "dose_demo_mg": p["dose_demo_mg"],
+            }
+        )
+    return {"count": len(items), "items": items, "disclaimer": psim.DISCLAIMER}
+
+
+@app.post("/predict")
+@limiter.limit("60/minute")
+def pharmasim_predict(request: Request, body: PharmaSimPredictRequest):
+    try:
+        return psim.predict(body.drug_id, weight_kg=body.weight_kg)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/simulate")
+@limiter.limit("60/minute")
+def pharmasim_simulate(request: Request, body: PharmaSimSimulateRequest):
+    try:
+        return psim.simulate(
+            body.drug_id,
+            hours=body.hours,
+            steps=body.steps,
+            dose_mg=body.dose_mg,
+            weight_kg=body.weight_kg,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/compare")
+@limiter.limit("60/minute")
+def pharmasim_compare(request: Request, body: PharmaSimCompareRequest):
+    try:
+        return psim.compare_drugs(
+            body.drug_id_a,
+            body.drug_id_b,
+            hours=body.hours,
+            steps=body.steps,
+            weight_kg=body.weight_kg,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
