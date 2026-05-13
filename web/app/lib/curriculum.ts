@@ -1,4 +1,15 @@
+import { applyOrgChem2Enrichment } from "./orgochem2TopicEnrichment";
+
 export type CourseId = "orgochem-1" | "orgochem-2";
+
+export type TopicImageSection = "summary" | "mechanism" | "spectra" | "practice";
+
+export type TopicCurriculumImage = {
+  src: string;
+  alt: string;
+  caption: string;
+  section: TopicImageSection;
+};
 
 export type TopicVideo = {
   topic: string;
@@ -12,6 +23,30 @@ export type TopicVideo = {
   length: string;
   bestTime: string;
   useType: string;
+};
+
+/** OrgoChem II: one checklist row with its own explainer video (11-char YouTube id). */
+export type TopicMustKnowItem = {
+  title: string;
+  description: string;
+  videoId: string;
+};
+
+export type TopicPracticeMcq = {
+  question: string;
+  options: [string, string, string, string];
+  answerIndex: 0 | 1 | 2 | 3;
+  explanation: string;
+};
+
+/** Data-driven hero reaction card (same visual slot as inline TopicIllustration). */
+export type TopicHeroDiagram = {
+  cardTitle: string;
+  cardSubtitle: string;
+  centerLine1: string;
+  centerLine2?: string;
+  reagentCaption: string;
+  reagentBold: string;
 };
 
 export type Topic = {
@@ -54,6 +89,27 @@ export type Topic = {
   };
   masteryGoal?: string;
   studyPlan?: string[];
+
+  /** CHM 222-style calendar week (1–17); gaps (e.g. 8, 13) match the syllabus. */
+  scheduleWeek?: number;
+  /** Optional label shown next to week (e.g. course subtitle). */
+  weekLabel?: string;
+  /** Deep link when a drill route exists (practice API, exams bank, spectra, etc.). */
+  practiceHref?: string;
+  /** Textbook chapter label (e.g. OpenStax chapter). */
+  chapter?: string;
+  /** Inline figures under `/public` (e.g. `/images/orgochem2/...`). */
+  images?: TopicCurriculumImage[];
+  /** Short exam-prep tips shown on the OrgoChem II topic page. */
+  tips?: string[];
+  /** OrgoChem II: structured must-know rows with per-concept YouTube clips. */
+  mustKnowItems?: TopicMustKnowItem[];
+  /** OrgoChem II: multiple-choice practice for the Practice section. */
+  practiceMcqs?: TopicPracticeMcq[];
+  /** OrgoChem II: replaces default hero SVG when set. */
+  heroDiagram?: TopicHeroDiagram;
+  /** OrgoChem II: primary tutorial embed in Overview (YouTube id). */
+  overviewVideoId?: string;
 };
 
 const ORGOCHEM_1: Topic[] = [
@@ -391,194 +447,504 @@ const ORGOCHEM_1: Topic[] = [
   },
 ];
 
-const ORGOCHEM_2: Topic[] = [
+const _orgochem2TopicsBase: Topic[] = [
   {
-    slug: "alcohols",
-    title: "Alcohols",
-    shortDesc: "Oxidation substitution protection and synthesis roles",
+    slug: "resonance-acid-base-review",
+    title: "Resonance and Acid-Base Review",
+    shortDesc: "Electron movement, pKa, and equilibrium direction",
+    scheduleWeek: 1,
+    chapter: "Chapter 2",
     summary:
-      "Alcohols are multipurpose. Learn oxidation levels and common transformations. Full reference is on the external link.",
-    externalUrl: "https://openstax.org/books/organic-chemistry/pages/10-introduction",
-    externalLabel: "OpenStax Organic Chemistry - Chapter 10: Alcohols",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/8/8d/Jones_oxidation.png",
-    imageAlt: "Jones oxidation overview",
+      "Reviews resonance and Brønsted-Lowry acid-base theory. Only pi bonds and lone pairs move in resonance — sigma bonds never move. Equilibrium favors the weaker acid (higher pKa). EWGs stabilize carboxylate anions and enhance acidity; EDGs destabilize anions and weaken acidity.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/2-4-resonance",
+    externalLabel: "OpenStax — Resonance (Chapter 2)",
     mustKnow: [
-      "Oxidation ladder primary to aldehyde to acid secondary to ketone",
-      "Reagents PCC vs Jones vs Swern vs DMP and what they stop at",
-      "Convert alcohol to leaving group tosylate mesylate then substitution elimination",
-      "Protection as silyl ether concept and when you need it",
-      "Acid catalyzed dehydration and rearrangements",
+      "Resonance rules: Only pi bonds and lone pairs move — sigma bonds are fixed. Atoms stay in place. Charge = valence electrons − bonds − nonbonding electrons.",
+      "pKa table: HCl <0, RCOOH ~5, PhOH ~10, H2O 15.7, ROH 16–18, RC≡CH ~25, NH3 ~35, alkenes ~45, alkanes ~50. Lower pKa = stronger acid.",
+      "Equilibrium direction: Reaction favors the weaker acid side (higher pKa). If left acid pKa < right acid pKa, products are favored. NaOH cannot deprotonate alkynes (pKa mismatch).",
+      "EWG vs EDG on acidity: EWGs pull electron density, stabilize the carboxylate anion, enhance acidity. EDGs donate electron density, destabilize anion, weaken acidity.",
     ],
     howToStudy: [
-      "Build oxidation table starting alcohol reagent product conditions",
-      "Do 20 transformations starting from alcohols and identify the key reagent",
-      "Practice protecting group logic on 10 multi step problems",
-      "Mix in 10 mechanism sketches for dehydration and tosylate formation",
+      "Draw resonance structures using only pi bond and lone pair movement",
+      "Use charge formula to assign + and − to atoms",
+      "Use pKa table to predict acid-base equilibrium direction",
+      "Predict how EWGs and EDGs affect carboxylic acid acidity",
+      "Tip — Lower pKa always wins — that side is the stronger acid",
+      "Tip — Sigma bonds NEVER move in resonance",
+    ],
+    commonMistakes: [
+      "Moving sigma bonds in resonance — this is never allowed",
+      "Forgetting equilibrium favors the weaker acid (higher pKa) as product",
+      "Assuming NaOH can deprotonate alkynes — it cannot",
+    ],
+    hasMechanism: false,
+    tips: [
+      "Lower pKa always wins — that side is the stronger acid",
+      "Sigma bonds NEVER move in resonance",
+    ],
+  },
+  {
+    slug: "substitution-elimination-nmr-review",
+    title: "Substitution, Elimination, and NMR Review",
+    shortDesc: "SN1, SN2, E1, E2, and spectroscopy fundamentals",
+    scheduleWeek: 2,
+    chapter: "Chapters 6–13",
+    summary:
+      "Reviews SN1, SN2, E1, E2 from Orgo I plus 1H NMR. SN2 favors primary substrates + strong nucleophiles; SN1 favors tertiary via carbocations. Tosylate esters (TsCl/pyridine) activate alcohols for substitution/elimination with basic nucleophiles. NMR: carboxylic acid O–H at 10–13 ppm (broad), C=O at 1710 cm⁻¹ in IR.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/11-1-the-sn1-reaction",
+    externalLabel: "OpenStax — SN1 and related chapters",
+    mustKnow: [
+      "SN2 requirements: Primary substrate, strong nucleophile, one step, inversion of configuration. Backside attack — sterically blocked at 3° substrates.",
+      "SN1 requirements: Tertiary substrate, weak nucleophile, two steps via carbocation intermediate, racemization. Benzylic and allylic positions also reactive.",
+      "Tosylate ester strategy: TsCl/pyridine converts –OH to –OTs without breaking C–O bond. Allows SN2/E2 with basic nucleophiles incompatible with HX conditions.",
+      "NMR key shifts: Carboxylic acid O–H: 10–13 ppm, very broad. Aldehyde C–H: 9–10 ppm. Carbonyl 13C: 160–210 ppm. IR C=O: 1710 cm⁻¹ (acid), O–H: 2500–3500 cm⁻¹ (broad).",
+    ],
+    howToStudy: [
+      "For each reaction identify substrate class, nucleophile strength, base strength → assign mechanism",
+      "Practice tosylate formation and subsequent SN2/elimination",
+      "Interpret NMR spectra using chemical shift table",
+      "Tip — Benzylic halides are 100× more reactive than primary halides in SN2",
+      "Tip — Sulfonation is reversible — unlike other EAS reactions",
+    ],
+    commonMistakes: [
+      "Attempting SN2 on tertiary substrates — steric hindrance prevents backside attack",
+      "Forgetting tosylation does NOT break the C–O bond — configuration at carbon is retained",
+      "Confusing aldehyde C–H (~9–10 ppm) with carboxylic acid O–H (~10–13 ppm)",
     ],
     hasMechanism: true,
+    practiceHref: "/spectra",
+    images: [
+      {
+        src: "/images/orgochem2/nmr-spectra-carboxylic-1.svg",
+        alt: "Schematic 1H NMR and IR bands for a carboxylic acid",
+        caption: "Reference: broad O–H (10–13 ppm, ¹H), C=O IR ~1710 cm⁻¹, broad H-bonded O–H IR 2500–3500 cm⁻¹.",
+        section: "spectra",
+      },
+    ],
+    tips: [
+      "Benzylic halides are 100× more reactive than primary halides in SN2",
+      "Sulfonation is reversible — unlike other EAS reactions",
+    ],
+  },
+  {
+    slug: "alkynes",
+    title: "Alkynes",
+    shortDesc: "Addition, hydration, reduction, and acetylide chemistry",
+    scheduleWeek: 3,
+    chapter: "Chapter 9",
+    summary:
+      "Alkynes have two pi bonds allowing electrophiles to add twice. HgSO4/H2SO4/H2O gives Markovnikov ketone via keto-enol tautomerization; Sia2BH/H2O2/NaOH gives anti-Markovnikov aldehyde. Lindlar's catalyst gives cis alkene; Na/NH3 gives trans alkene. Terminal alkynes (pKa ~25) are deprotonated by NaNH2 to form acetylide nucleophiles for SN2 alkylation.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/9-3-reactions-of-alkynes-addition-of-hx-and-x2",
+    externalLabel: "OpenStax — Reactions of alkynes",
+    mustKnow: [
+      "Double addition of electrophiles: X2 (1 equiv) → vinyl dihalide; X2 (2 equiv) → tetrahalide. HX adds twice Markovnikov each time.",
+      "Hydration (Markovnikov): HgSO4/H2SO4/H2O → enol → tautomerizes to ketone. Terminal alkyne gives methyl ketone.",
+      "Hydration (anti-Markovnikov): Sia2BH then H2O2/NaOH → aldehyde (anti-Markovnikov). Only one B–H bond so reaction stops at alkene stage.",
+      "Reduction to alkenes: Lindlar's catalyst (H2, Pd/BaSO4, quinoline) → cis alkene. Na/NH3 dissolving metal → trans alkene. H2/Pt goes all the way to alkane.",
+      "Acetylide alkylation: Terminal alkyne + NaNH2 → acetylide anion → SN2 on primary alkyl halide only. Cannot use on 2° or 3° — steric hindrance.",
+      "Oxidative cleavage: KMnO4 or O3 cleaves internal alkyne → 2 carboxylic acids. Terminal alkyne → RCOOH + CO2.",
+    ],
+    howToStudy: [
+      "Practice addition reactions tracking equivalents (1 vs 2)",
+      "Work through keto-enol tautomerization mechanism",
+      "Choose Lindlar's vs Na/NH3 based on desired alkene geometry",
+      "Practice retrosynthesis: given a product, work back to the alkyne and reagents",
+      "Tip — Lindlar's = cis. Sodium = trans. Pt = alkane. Memorize this trio.",
+      "Tip — Enol always tautomerizes — never write it as the final product",
+    ],
+    commonMistakes: [
+      "Using H2/Pt expecting to stop at alkene — it always goes to alkane",
+      "Forgetting tautomerization after hydration — enol is not the final product",
+      "Attempting acetylide SN2 on secondary or tertiary alkyl halide",
+    ],
+    hasMechanism: true,
+    images: [
+      {
+        src: "/images/orgochem2/alkynes-mechanism-1.svg",
+        alt: "First addition of HBr to an alkyne: pi attack on protonated intermediate",
+        caption: "Step 1 of HX addition: pi bond as nucleophile toward electrophilic H (Markovnikov pathway).",
+        section: "mechanism",
+      },
+    ],
+    tips: [
+      "Lindlar's = cis. Sodium = trans. Pt = alkane. Memorize this trio.",
+      "Enol always tautomerizes — never write it as the final product",
+    ],
+  },
+  {
+    slug: "grignard-reaction",
+    title: "Grignard Reaction",
+    shortDesc: "Nucleophilic carbon sources and organometallic additions",
+    scheduleWeek: 3,
+    chapter: "Chapter 10",
+    summary:
+      "Grignard reagents (RMgX) and organolithium reagents are nucleophilic C sources. The C–Mg bond is polarized C⁻–Mg⁺. Addition to aldehydes gives 2° alcohols, to ketones gives 3° alcohols, to formaldehyde gives 1° alcohols, to esters/acid chlorides gives 3° alcohols (reacts twice), to CO2 gives carboxylic acids. Incompatible with O–H, N–H, S–H, terminal alkynes, and electrophilic carbonyls on the substrate.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/10-6-reactions-of-alkyl-halides-grignard-reagents",
+    externalLabel: "OpenStax — Grignard reagents",
+    mustKnow: [
+      "Grignard formation: R–X + Mg, ether → R–MgX. Organolithium: R–X + 2 Li, hexane → R–Li. THF is another common solvent. Glassware must be bone dry.",
+      "Addition to carbonyls: Aldehyde → 2° alcohol. Ketone → 3° alcohol. Formaldehyde → 1° alcohol. CO2 → carboxylic acid after H3O+ workup. Ester or acid chloride → adds twice → 3° alcohol.",
+      "Incompatible groups: O–H, N–H, S–H, terminal alkynes all protonate and destroy the Grignard. Strongly electrophilic groups (C=N, S=O, NO) also react undesirably.",
+      "Gilman reagent: R2CuLi couples with alkyl halides (not fluorides) to form C–C bonds. Adds once to acid chlorides giving ketones (stops there, unlike Grignard).",
+      "Suzuki-Miyaura reaction: Aryl/vinyl boronic acid + aryl/vinyl halide, Pd catalyst, base → biaryl. Used widely in drug synthesis. Doesn't work with alkyl substrates.",
+    ],
+    howToStudy: [
+      "Practice choosing the correct carbonyl/Grignard pair to reach a target alcohol",
+      "Note 3° alcohols can be made 3 different ways — practice all three routes",
+      "Practice identifying incompatible functional groups before planning synthesis",
+      "Tip — Water destroys Grignard reagents — always dry glassware first",
+      "Tip — CO2 + Grignard is the cleanest route to a carboxylic acid",
+    ],
+    commonMistakes: [
+      "Putting O–H or N–H on the substrate — Grignard will just deprotonate it",
+      "Forgetting esters/acid chlorides react twice — product is always a 3° alcohol",
+      "Using Gilman reagent with C–F bonds — it does not react with fluorides",
+    ],
+    hasMechanism: true,
+    tips: [
+      "Water destroys Grignard reagents — always dry glassware first",
+      "CO2 + Grignard is the cleanest route to a carboxylic acid",
+    ],
+  },
+  {
+    slug: "organohalides-radical",
+    title: "Organohalides and Radical Reactions",
+    shortDesc: "Radical halogenation, NBS, and alkyl halide synthesis",
+    scheduleWeek: 4,
+    chapter: "Chapter 10",
+    summary:
+      "Alkyl halides are made from alcohols using HX, PBr3, SOCl2, or PCl5. SOCl2 gives retention of configuration. Radical halogenation (Cl2 or Br2/hν) proceeds via initiation, propagation, and termination. NBS selectively brominates the allylic position via radical mechanism. Radical stability: allylic/benzylic > 3° > 2° > 1°.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/10-2-preparing-alkyl-halides-from-alkanes-radical-halogenation",
+    externalLabel: "OpenStax — Radical halogenation",
+    mustKnow: [
+      "Alcohol → alkyl halide reagents: HX (best for 3°). PBr3 (best for 1° and 2° bromides). SOCl2 (chlorides, retention of config). PCl5 (also chlorides). 2P + 3I2 (iodides only).",
+      "Radical mechanism steps: Initiation (0→2 radicals, hν splits X2). Propagation (1→1 radical, chain continues). Termination (2→0 radicals, two radicals collide).",
+      "NBS allylic bromination: NBS + hν (or heat) in CCl4 → brominates carbon adjacent to double bond (allylic position). Radical mechanism. Does NOT add to the double bond.",
+      "Radical stability order: Allylic/benzylic (resonance stabilized) > 3° > 2° > 1° > methyl. More substituents = more stable = more likely to form.",
+    ],
+    howToStudy: [
+      "Label initiation, propagation, termination steps in any radical mechanism",
+      "Choose between HX, PBr3, SOCl2 based on substrate and stereochemistry needs",
+      "Rank radicals by stability using substituents and resonance",
+      "Tip — Br2 is more selective than Cl2 in radical halogenation (only hits 3° and benzylic/allylic)",
+      "Tip — The undesired termination step in methane chlorination is ethane formation — can't be converted to product",
+    ],
+    commonMistakes: [
+      "SOCl2 gives retention, not inversion — the C–O bond is not broken in the rate-limiting step",
+      "NBS does NOT add to the double bond — it only brominates the allylic position",
+      "Confusing HBr (Markovnikov ionic) with HBr/ROOR (anti-Markovnikov radical)",
+    ],
+    hasMechanism: true,
+    tips: [
+      "Br2 is more selective than Cl2 in radical halogenation (only hits 3° and benzylic/allylic)",
+      "The undesired termination step in methane chlorination is ethane formation — can't be converted to product",
+    ],
+  },
+  {
+    slug: "conjugated-compounds-diels-alder",
+    title: "Conjugated Compounds and Diels-Alder",
+    shortDesc: "1,2- vs 1,4-addition, kinetic vs thermodynamic control, cycloaddition",
+    scheduleWeek: 6,
+    chapter: "Chapter 14",
+    summary:
+      "Conjugated dienes have extra resonance stability and give both 1,2- and 1,4-addition products. Low temperature favors the kinetic (1,2) product; high temperature favors the thermodynamic (1,4) product. Diels-Alder [4+2] cycloaddition requires diene in s-cis conformation and EWG on dienophile. Concerted mechanism gives stereospecific cis addition.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/14-4-the-diels-alder-cycloaddition-reaction",
+    externalLabel: "OpenStax — Diels-Alder cycloaddition",
+    mustKnow: [
+      "Conjugated vs isolated vs cumulated: Conjugated = alternating double/single bonds (1,3-butadiene). Isolated = more than one single bond between double bonds. Cumulated = allene (two successive double bonds on same carbon).",
+      "1,2- vs 1,4-addition: 1,2-addition = kinetic product (low temp, −80°C, 80% yield). 1,4-addition = thermodynamic product (high temp, 40°C, 85% yield). 1,4 is more stable (more substituted double bond).",
+      "Diels-Alder requirements: Diene must be in s-cis conformation. Dienophile needs EWG (C=O, CN, NO2). Both react in a concerted [4+2] cycloaddition. If diene is locked s-trans, no reaction.",
+      "Diels-Alder stereochemistry: Cis dienophile substituents → cis product. Trans dienophile → trans product. The geometry is completely preserved in the ring.",
+    ],
+    howToStudy: [
+      "Label conjugated/isolated/cumulated for any given structure",
+      "Draw 1,2 and 1,4 addition products for HBr and Br2 with 1,3-butadiene",
+      "Practice Diels-Alder by drawing diene in s-cis and matching with dienophile",
+      "Predict Diels-Alder stereochemistry from dienophile geometry",
+      "Tip — EDGs on diene + EWGs on dienophile = fastest Diels-Alder reaction",
+      "Tip — Cyclopentadiene is always locked s-cis — extremely reactive in Diels-Alder",
+    ],
+    commonMistakes: [
+      "Forgetting diene must be s-cis — locked s-trans dienes do not react",
+      "Reversing kinetic and thermodynamic — kinetic = 1,2 (faster), thermodynamic = 1,4 (more stable)",
+      "Ignoring stereochemistry — cis/trans of dienophile transfers to product ring",
+    ],
+    hasMechanism: true,
+    images: [
+      {
+        src: "/images/orgochem2/diels-alder-mechanism-1.svg",
+        alt: "s-cis diene and dienophile oriented for [4+2] cycloaddition to cyclohexene framework",
+        caption: "Diels–Alder: overlap diene HOMO with dienophile LUMO in the s-cis conformation.",
+        section: "mechanism",
+      },
+    ],
+    tips: [
+      "EDGs on diene + EWGs on dienophile = fastest Diels-Alder reaction",
+      "Cyclopentadiene is always locked s-cis — extremely reactive in Diels-Alder",
+    ],
+  },
+  {
+    slug: "aromaticity",
+    title: "Aromaticity",
+    shortDesc: "Hückel's rule, aromatic ions, and heterocycles",
+    scheduleWeek: 7,
+    chapter: "Chapter 15",
+    summary:
+      "Aromatic compounds are cyclic, planar, fully conjugated, and have 4n+2 π electrons. Antiaromatic = 4n π electrons (meets criteria 1–3 but fails Hückel). Nonaromatic = fails at least one of criteria 1–3. Cyclopentadienyl anion is aromatic (6π); cation is antiaromatic (4π). Pyridine lone pair is NOT in the π system → strong base. Pyrrole lone pair IS in the π system → weak base.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/15-3-aromaticity-and-the-huckel-4n-2-rule",
+    externalLabel: "OpenStax — Hückel's rule and aromaticity",
+    mustKnow: [
+      "4 criteria for aromaticity: 1) Cyclic. 2) One p orbital on each ring atom. 3) Planar. 4) 4n+2 π electrons (n = 0,1,2...). All 4 must be met. Missing any one = nonaromatic (or antiaromatic if only criterion 4 fails).",
+      "Aromatic vs antiaromatic vs nonaromatic: Benzene 6π (n=1) aromatic. Cyclobutadiene 4π (n=1, antiaromatic). Cyclooctatetraene nonplanar = nonaromatic. Cyclopentadienyl anion 6π = aromatic. Cation 4π = antiaromatic.",
+      "Pyridine vs pyrrole basicity: Pyridine N lone pair is in sp2 orbital, NOT in π system → protonation retains aromaticity → strong base. Pyrrole N lone pair IS in π system → protonation destroys aromaticity → weak base.",
+      "Heterocycle π electron counting: If lone pair is in the π system (like pyrrole O in furan, S in thiophene), count it as 2 π electrons. If it's in an sp2 orbital (pyridine N), do not count it.",
+    ],
+    howToStudy: [
+      "Apply all 4 criteria in order to classify any ring system",
+      "Count π electrons carefully in charged and heterocyclic systems",
+      "Determine if N lone pair is in π system or not to classify base strength",
+      "Tip — Aromaticity drives reactions — if a product can be aromatic, the reaction will favor it",
+      "Tip — Cyclopentadiene is unusually acidic (pKa ~16) because the anion is aromatic",
+    ],
+    commonMistakes: [
+      "Counting lone pairs as π electrons when they are in sp3 or sp2 (non-π) orbitals",
+      "Calling cyclooctatetraene antiaromatic — it's nonplanar so it's nonaromatic",
+      "Assuming all N-heterocycles are strong bases — pyrrole N is weak base",
+    ],
+    hasMechanism: false,
+    tips: [
+      "Aromaticity drives reactions — if a product can be aromatic, the reaction will favor it",
+      "Cyclopentadiene is unusually acidic (pKa ~16) because the anion is aromatic",
+    ],
+  },
+  {
+    slug: "electrophilic-aromatic-substitution",
+    title: "Electrophilic Aromatic Substitution (EAS)",
+    shortDesc: "Halogenation, nitration, sulfonation, Friedel-Crafts, and directing effects",
+    scheduleWeek: 9,
+    chapter: "Chapter 16",
+    summary:
+      "Benzene undergoes EAS — Step 1 (slow, rate-determining): π bond attacks electrophile forming nonaromatic sigma complex (arenium ion). Step 2 (fast): base removes H to restore aromaticity. Five key reactions: halogenation, nitration, sulfonation (reversible), Friedel-Crafts alkylation (prone to rearrangement), Friedel-Crafts acylation (no rearrangement). Substituents direct ortho/para (activating donors + halogens) or meta (deactivating EWGs).",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/16-1-electrophilic-aromatic-substitution-reactions-bromination",
+    externalLabel: "OpenStax — Electrophilic aromatic substitution",
+    mustKnow: [
+      "EAS two steps: Step 1 (slow): π bond attacks E+, aromaticity lost, sigma complex (arenium ion) forms. Step 2 (fast): base removes H+, aromaticity restored. Step 1 is rate-determining.",
+      "5 EAS reactions: Halogenation (Br2/FeBr3 or Cl2/AlCl3). Nitration (HNO3/H2SO4 → NO2+). Sulfonation (SO3/H2SO4, reversible). Friedel-Crafts alkylation (RX/AlCl3, rearrangement risk). Friedel-Crafts acylation (RCOCl/AlCl3, no rearrangement → ketone).",
+      "Directing effects: Ortho/para directors (activating): –NH2, –OH, –OR, alkyl. Ortho/para directors (deactivating): halogens. Meta directors (deactivating): –NO2, –SO3H, –CHO, –COR, –COOH, –CN. Follow the more activating group when two substituents compete.",
+      "Friedel-Crafts acylation strategy: Use acylation (no rearrangement) then reduce ketone to alkyl with Zn/HCl(aq) or H2/Pd. This avoids the carbocation rearrangement problem of direct alkylation.",
+    ],
+    howToStudy: [
+      "Memorize the 5 EAS reactions and electrophile-generating reagent for each",
+      "Draw full EAS mechanisms including sigma complex resonance structures",
+      "Use sigma complex resonance to predict ortho/para vs meta",
+      "Practice multi-step aromatic synthesis using directing effects strategically",
+      "Tip — When two substituents on a ring conflict, always follow the more activating one",
+      "Tip — Acylation then reduction = no rearrangement. Alkylation directly = rearrangement risk.",
+    ],
+    commonMistakes: [
+      "Using Br2 alone without Lewis acid — not electrophilic enough for EAS",
+      "Friedel-Crafts alkylation with primary alkyl chloride expecting no rearrangement — always rearranges",
+      "Misidentifying halogens as activating — they are deactivating despite ortho/para direction",
+      "Forgetting sulfonation is reversible — sulfonic acid group is removed with dilute H2SO4/steam",
+    ],
+    hasMechanism: true,
+    images: [
+      {
+        src: "/images/orgochem2/eas-mechanism-1.svg",
+        alt: "Benzene attacks electrophile then deprotonates to restore aromaticity",
+        caption: "EAS sigma complex: ring loses aromaticity briefly, then base removes adjacent H.",
+        section: "mechanism",
+      },
+    ],
+    tips: [
+      "When two substituents on a ring conflict, always follow the more activating one",
+      "Acylation then reduction = no rearrangement. Alkylation directly = rearrangement risk.",
+    ],
+  },
+  {
+    slug: "nucleophilic-aromatic-substitution",
+    title: "Nucleophilic Aromatic Substitution and Side-Chain Reactions",
+    shortDesc: "NAS, benzyne, oxidation, and benzylic chemistry",
+    scheduleWeek: 10,
+    chapter: "Chapter 16",
+    summary:
+      "NAS requires a halogen leaving group plus EWGs ortho/para to stabilize the Meisenheimer complex (negatively charged intermediate). NAS advantage over EAS/reduction route: can install –NH2 alongside existing –NO2 on the ring. Benzyne (NaNH2) gives regioisomeric mixture. Side-chain: KMnO4 oxidizes any alkyl group to –COOH; Br2/hν selectively brominates benzylic position via radical mechanism.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/16-6-nucleophilic-aromatic-substitution",
+    externalLabel: "OpenStax — Nucleophilic aromatic substitution",
+    mustKnow: [
+      "NAS requirements: Must have halogen leaving group + EWGs (especially NO2) ortho/para for activation. Nucleophile attacks ipso carbon → negatively charged Meisenheimer complex → halide leaves.",
+      "NAS vs EAS route to ring amines: EAS route (HNO3/H2SO4 then Zn/HCl): reduces ALL nitro groups AND carbonyls. NAS route (2 NaOH or 2 NH3): can place –NH2 next to –NO2 on same ring. NAS is the only option when you need both.",
+      "Benzyne mechanism: Requires very strong base (NaNH2) + halogen on ring. NaNH2 deprotonates ring; elimination gives strained benzyne (triple bond in ring). Nucleophile adds to give mixture of two regioisomers.",
+      "Side-chain oxidation and halogenation: KMnO4 or Na2Cr2O7/H2SO4 oxidizes any alkyl side chain to –COOH regardless of chain length. Br2/hν or NBS gives radical halogenation at benzylic position only. Benzylic halides are 100× more reactive than primary in SN2.",
+    ],
+    howToStudy: [
+      "Practice NAS mechanism: nucleophile attacks ipso, Meisenheimer forms, halide leaves",
+      "Count EWGs and positions to predict if NAS will work",
+      "Practice side-chain oxidation: identify every alkyl group that becomes COOH",
+      "Distinguish ring halogenation (EAS) from benzylic halogenation (radical)",
+      "Tip — The Meisenheimer complex is anionic — remember it's the opposite charge from EAS",
+      "Tip — Benzyne always gives a mixture — use NAS when you need regioselectivity",
+    ],
+    commonMistakes: [
+      "Attempting NAS without EWGs on the ring — will not proceed",
+      "NAS gives negatively charged intermediate — opposite of EAS (positively charged arenium)",
+      "KMnO4 oxidizes ALL alkyl side chains to COOH — not selective for one position",
+    ],
+    hasMechanism: true,
+    tips: [
+      "The Meisenheimer complex is anionic — remember it's the opposite charge from EAS",
+      "Benzyne always gives a mixture — use NAS when you need regioselectivity",
+    ],
+  },
+  {
+    slug: "alcohols-phenols",
+    title: "Alcohols and Phenols",
+    shortDesc: "Synthesis, oxidation, and leaving group activation",
+    scheduleWeek: 11,
+    chapter: "Chapter 17",
+    summary:
+      "Alcohols are synthesized by carbonyl reduction (NaBH4 or LiAlH4) or Grignard addition. Primary alcohols oxidize to aldehydes (PCC or Dess-Martin) or carboxylic acids (chromic acid); secondary to ketones. Leaving group ability improved via protonation (HX) or tosylate (TsCl/pyridine). Phenol (pKa ~10) is more acidic than alcohols (pKa ~16–18) due to resonance delocalization into the ring.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/17-4-alcohols-from-carbonyl-compounds-reduction",
+    externalLabel: "OpenStax — Alcohols from carbonyl reduction",
+    mustKnow: [
+      "Reducing agents: NaBH4 reduces aldehydes and ketones only. LiAlH4 reduces all carbonyls including COOH and esters. LiAlH4 on esters adds twice — gives primary alcohol. NaBH4 cannot reduce COOH or esters.",
+      "Oxidation levels: PCC or Dess-Martin periodinane: 1° alcohol → aldehyde (stops); 2° alcohol → ketone. Chromic acid (Na2Cr2O7, CrO3/H2SO4): 1° alcohol → carboxylic acid all the way. 3° alcohols do not oxidize.",
+      "Tosylate ester strategy: TsCl/pyridine converts –OH to –OTs. C–O bond is NOT broken during tosylation. Tosylate is an excellent leaving group for SN2/E2 with basic nucleophiles.",
+      "Phenol acidity: Phenol pKa ~10 — far more acidic than alcohols (pKa ~16–18). Phenoxide anion is stabilized by resonance into the ring. NaOH deprotonates phenol but not regular alcohols.",
+    ],
+    howToStudy: [
+      "Practice choosing NaBH4 vs LiAlH4 based on the substrate",
+      "Practice choosing PCC/Dess-Martin vs chromic acid based on desired oxidation level",
+      "Work through tosylate formation and subsequent SN2/elimination with various nucleophiles",
+      "Tip — 3° alcohols do not oxidize — no H on the carbon bearing OH",
+      "Tip — PCC stops at aldehyde; chromic acid does not stop there",
+    ],
+    commonMistakes: [
+      "Using NaBH4 on carboxylic acids or esters — not strong enough",
+      "Using chromic acid when you want to stop at aldehyde — use PCC or Dess-Martin instead",
+      "Thinking tosylation inverts configuration — C–O bond is NOT broken during tosylation",
+    ],
+    hasMechanism: true,
+    tips: [
+      "3° alcohols do not oxidize — no H on the carbon bearing OH",
+      "PCC stops at aldehyde; chromic acid does not stop there",
+    ],
   },
   {
     slug: "ethers-epoxides",
-    title: "Ethers and Epoxides",
-    shortDesc: "Williamson ether synthesis and epoxide openings",
+    title: "Ethers, Epoxides, Thiols, and Sulfides",
+    shortDesc: "Williamson synthesis, ring opening, and acid vs base conditions",
+    scheduleWeek: 12,
+    chapter: "Chapter 18",
     summary:
-      "Master Williamson and epoxide regioselectivity under basic vs acidic conditions. Full reference is on the external link.",
-    externalUrl: "https://openstax.org/books/organic-chemistry/pages/11-introduction",
-    externalLabel: "OpenStax Organic Chemistry - Chapter 11: Ethers and Epoxides",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/6/66/Epoxide_opening.png",
-    imageAlt: "Epoxide ring opening diagram",
+      "Symmetrical ethers form by acid-catalyzed dehydration (1° alcohols only). Unsymmetrical ethers use Williamson synthesis: alkoxide (Na/K/NaH) + primary alkyl halide via SN2. Ethers cleave with HBr or HI (2 equiv). Epoxides (mCPBA + alkene) open under acid conditions at more substituted carbon (SN1-like) or base conditions at less substituted carbon (SN2-like).",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/18-2-preparing-ethers",
+    externalLabel: "OpenStax — Preparing ethers",
     mustKnow: [
-      "Williamson ether synthesis is SN2 so primary works best",
-      "Epoxide opening basic attacks less substituted acidic attacks more substituted",
-      "Anti opening stereochemistry and why it happens",
-      "Ether cleavage with strong acids and limits",
-      "Use ethers as protecting groups in synthesis planning",
+      "Williamson synthesis: Alkoxide + 1° RX → ether via SN2. Use Na, K, or NaH to deprotonate alcohol (not NaOH — equilibrium disfavors alkoxide). SN2 on benzene ring is impossible.",
+      "Ether cleavage: HBr or HI (2 equiv) cleaves ethers → 2 alkyl halides + H2O. HCl and HF are too weak (halide not nucleophilic enough). Mechanism is SN1 or SN2 depending on substitution.",
+      "Epoxide synthesis: Alkene + mCPBA (meta-chloroperoxybenzoic acid) → epoxide via butterfly mechanism (syn addition — both oxygens add from same face).",
+      "Epoxide ring opening: Acid-catalyzed: protonate O first, nucleophile attacks more substituted C (SN1-like). Base-catalyzed: nucleophile attacks less substituted C directly (SN2-like). Grignard reagents = base-catalyzed pathway.",
     ],
     howToStudy: [
-      "Do 15 Williamson problems and identify which side must be the alkyl halide",
-      "Do 20 epoxide opening problems split by acidic vs basic conditions",
-      "Add stereochemistry checks on 10 problems using wedges and dashes",
-      "Finish with 10 synthesis problems combining epoxide formation and opening",
+      "Choose Williamson reagents: which component is alkoxide vs alkyl halide (must be 1°)",
+      "Work through acid and base epoxide opening mechanisms with full curved arrows",
+      "Practice synthesis sequences: alkene → epoxide → ring-opened product",
+      "Tip — Acid opens at more substituted (carbocation logic). Base opens at less substituted (SN2 logic).",
+      "Tip — Epoxides are far more reactive than regular ethers because of ring strain",
+    ],
+    commonMistakes: [
+      "Williamson synthesis on secondary or tertiary alkyl halide — SN2 won't work, use the other component as electrophile",
+      "Using NaOH to deprotonate alcohols — equilibrium strongly disfavors this",
+      "Confusing acid vs base epoxide regiochemistry — acid → more substituted C; base → less substituted C",
     ],
     hasMechanism: true,
+    tips: [
+      "Acid opens at more substituted (carbocation logic). Base opens at less substituted (SN2 logic).",
+      "Epoxides are far more reactive than regular ethers because of ring strain",
+    ],
   },
   {
-    slug: "carbonyls-addition",
-    title: "Carbonyls Nucleophilic Addition",
-    shortDesc: "Aldehydes and ketones additions and selectivity",
+    slug: "aldehydes-ketones",
+    title: "Aldehydes and Ketones",
+    shortDesc: "Nucleophilic addition, imine/enamine formation, Wittig, and acetal protection",
+    scheduleWeek: 14,
+    chapter: "Chapter 19",
     summary:
-      "Decide carbonyl type and nucleophile type first then draw. Full reference is on the external link.",
-    externalUrl: "https://openstax.org/books/organic-chemistry/pages/17-introduction",
-    externalLabel: "OpenStax Organic Chemistry - Chapter 17: Aldehydes and Ketones",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/6/6d/Grignard_reaction.png",
-    imageAlt: "Grignard reaction overview",
+      "Aldehydes and ketones undergo nucleophilic addition at the electrophilic carbonyl carbon. Key reactions: cyanohydrin (HCN/base), alcohol formation (NaBH4/LiAlH4 or Grignard), imine (1° amine, pH ~4.5), enamine (2° amine), hydrazone/Wolff-Kishner (H2NNH2 then KOH/heat → removes carbonyl entirely), acetal (2 ROH, acid, reversible — used as protecting group), Wittig (ylide + carbonyl → alkene).",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/19-6-nucleophilic-addition-of-hcn-cyanohydrin-formation",
+    externalLabel: "OpenStax — Cyanohydrin formation",
     mustKnow: [
-      "Reactivity aldehydes more reactive than ketones",
-      "Key additions hydride Grignard organolithium cyanohydrin acetal formation",
-      "Imine and enamine formation basics and acid catalysis role",
-      "Acetal as carbonyl protection and deprotection",
-      "Use spectra concepts to confirm products",
+      "Cyanohydrin formation: Aldehyde/ketone + HCN, base catalyst → cyanohydrin RCH(OH)CN. Base generates CN⁻ nucleophile. CN can be reduced to CH2NH2 by LiAlH4, or hydrolyzed to COOH by H3O+.",
+      "Imine and enamine formation: Imine: 1° amine + carbonyl, H+, pH ~4.5 → C=NR + H2O. Below pH 4.5, amine is protonated and not nucleophilic. Enamine: 2° amine + carbonyl → C=C–N (deprotonation from alpha carbon, no N–H to lose).",
+      "Wolff-Kishner reduction: Step 1: H2NNH2, H+ → hydrazone (C=N–NH2). Step 2: KOH, heat → alkane. Completely removes the carbonyl, converts C=O to CH2. Clemmensen reduction (Zn/Hg, HCl) does same thing under acidic conditions.",
+      "Acetal formation and protection: Carbonyl + 2 ROH, H+ → acetal R2C(OR')2 + H2O. Reversible — add acid + H2O to deprotect. Aldehyde more reactive than ketone. Used as protecting group to block one carbonyl during multi-step synthesis.",
+      "Wittig reaction: Ylide (Ph3P=CR2) + aldehyde or ketone → alkene + Ph3P=O. Wittig salt formed first by SN2 (Ph3P + RX). Base (NaOCH3) deprotonates salt → ylide. Allows C=O → C=C conversion.",
     ],
     howToStudy: [
-      "Make a nucleophile list hydride carbon nucleophile nitrogen nucleophile and expected products",
-      "Do 25 product predictions across mixed carbonyl additions",
-      "Practice 10 protection deprotection sequences using acetals",
-      "Add 10 combined problems with structure confirmation checks",
+      "Practice nucleophilic addition mechanisms to aldehydes and ketones with curved arrows",
+      "Work through imine and enamine formation mechanisms",
+      "Practice Wolff-Kishner mechanism completely",
+      "Practice Wittig: identify the ylide + carbonyl pair needed for a target alkene",
+      "Tip — Aldehydes are more reactive than ketones toward nucleophilic addition (less steric hindrance)",
+      "Tip — Protect the more reactive aldehyde first when a substrate has both aldehyde and ketone",
+    ],
+    commonMistakes: [
+      "Running imine formation at pH <4.5 — amine is protonated and no longer nucleophilic",
+      "Confusing imine (1° amine, C=N–R) with enamine (2° amine, C=C–N) — enamines have no N–H",
+      "Forgetting Wolff-Kishner is two steps: hydrazone first, then KOH/heat",
+      "Mixing up acetal formation (acid + 2 ROH) vs hydrolysis (acid + H2O)",
     ],
     hasMechanism: true,
+    tips: [
+      "Aldehydes are more reactive than ketones toward nucleophilic addition (less steric hindrance)",
+      "Protect the more reactive aldehyde first when a substrate has both aldehyde and ketone",
+    ],
   },
   {
     slug: "carboxylic-acids-derivatives",
-    title: "Carboxylic Acids and Derivatives",
-    shortDesc: "Acyl substitution and derivative reactivity ladder",
+    title: "Carboxylic Acids and Their Derivatives",
+    shortDesc: "Acidity, nucleophilic acyl substitution, and interconversion",
+    scheduleWeek: 16,
+    chapter: "Chapters 20–21",
     summary:
-      "This is substitution not addition. Use leaving group logic. Full reference is on the external link.",
-    externalUrl: "https://openstax.org/books/organic-chemistry/pages/19-introduction",
-    externalLabel: "OpenStax Organic Chemistry - Chapter 19: Carboxylic Acids and Derivatives",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/6/60/Nucleophilic_acyl_substitution.png",
-    imageAlt: "Nucleophilic acyl substitution overview",
+      "Carboxylic acids (pKa ~5) are the most acidic organic class. Derivatives in decreasing reactivity: acid chloride > anhydride > ester > amide > carboxylate. All react via nucleophilic acyl substitution through a tetrahedral intermediate. Key reactions: Fischer esterification (RCOOH + ROH, H+, reversible, Le Chatelier driven), acid chloride synthesis (SOCl2 or oxalyl chloride), saponification (ester + NaOH). Lactones = cyclic esters; lactams = cyclic amides.",
+    externalUrl: "https://openstax.org/books/organic-chemistry/pages/21-2-nucleophilic-acyl-substitution-reactions",
+    externalLabel: "OpenStax — Nucleophilic acyl substitution",
     mustKnow: [
-      "Reactivity ladder acyl chloride anhydride ester acid amide",
-      "Acyl substitution mechanism and tetrahedral intermediate",
-      "Conversions acid to acid chloride acid chloride to ester amide transesterification idea",
-      "Decarboxylation situations and beta dicarbonyl acidity idea",
-      "Differentiate derivatives using key signals concept level",
+      "Reactivity order: Acid chloride > anhydride > ester > amide > carboxylate. More reactive derivatives convert to less reactive — never the reverse in a single step. Reactivity determined by leaving group basicity (weaker base = better leaving group).",
+      "Nucleophilic acyl substitution mechanism: Nucleophile attacks carbonyl carbon → tetrahedral intermediate (4 bonds to carbon, negative oxygen) → leaving group departs → product. Four curved arrows total.",
+      "Fischer esterification: RCOOH + ROH, H+ → ester + H2O. Reversible. Drive to ester: remove water, remove ester, or excess alcohol (Le Chatelier). Drive to acid + alcohol: excess water, remove products.",
+      "Acid chloride synthesis: RCOOH + SOCl2 → RCOCl + SO2 + HCl. Or use oxalyl chloride (ClCO)2. Acid chlorides are the most reactive derivatives — convert to anything else.",
+      "Spectroscopy of carboxylic acids: IR C=O at 1710 cm⁻¹. O–H stretch at 2500–3500 cm⁻¹ (very broad). 1H NMR: O–H at 10–13 ppm (broad). 13C NMR: carbonyl C at 160–210 ppm. Alpha C–H at ~2.1 ppm.",
     ],
     howToStudy: [
-      "Memorize the ladder and do 20 conversion direction questions",
-      "Do 20 product predictions for acyl substitutions with different nucleophiles",
-      "Do 10 identification drills for derivatives",
-      "Do 10 multi step synthesis problems moving down the reactivity ladder",
+      "Memorize reactivity order and justify using leaving group basicity",
+      "Practice nucleophilic acyl substitution mechanisms for each derivative class",
+      "Practice Fischer esterification and identify conditions to shift equilibrium",
+      "Practice multi-step interconversions using the reactivity flow chart",
+      "Tip — Memorize the reactivity order: acid chloride > anhydride > ester > amide > carboxylate",
+      "Tip — Grignard + CO2 → carboxylic acid is cleaner than nitrile hydrolysis in most cases",
+    ],
+    commonMistakes: [
+      "Trying to convert less reactive to more reactive in one step — impossible without special reagents",
+      "Forgetting Fischer esterification is reversible — must use Le Chatelier to drive it",
+      "Confusing lactone (cyclic ester) with lactam (cyclic amide)",
+      "Forgetting SOCl2 converts –COOH all the way to –COCl",
     ],
     hasMechanism: true,
-  },
-  {
-    slug: "enolates-aldol-claisen",
-    title: "Enolates Aldol and Claisen",
-    shortDesc: "Alpha chemistry carbon carbon bond building",
-    summary:
-      "Identify alpha position choose base and conditions then build CC bonds. Full reference is on the external link.",
-    externalUrl: "https://openstax.org/books/organic-chemistry/pages/22-introduction",
-    externalLabel: "OpenStax Organic Chemistry - Chapter 22: Alpha Substitution and Condensation",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/2/2d/Aldol_reaction.png",
-    imageAlt: "Aldol reaction overview",
-    mustKnow: [
-      "Alpha hydrogen acidity and why enolates form",
-      "Kinetic vs thermodynamic enolate concept level",
-      "Aldol addition vs aldol condensation and dehydration idea",
-      "Claisen requirements at least one alpha H and matching alkoxide base",
-      "Michael addition and conjugate addition intuition",
+    tips: [
+      "Memorize the reactivity order: acid chloride > anhydride > ester > amide > carboxylate",
+      "Grignard + CO2 → carboxylic acid is cleaner than nitrile hydrolysis in most cases",
     ],
-    howToStudy: [
-      "For each problem mark alpha positions and decide which carbon becomes nucleophile",
-      "Do 15 aldol problems and label beta hydroxy vs enone products",
-      "Do 15 Claisen problems and check base alkoxide match",
-      "Add 10 mixed enolate planning problems for synthesis style questions",
-    ],
-    hasMechanism: true,
-  },
-  {
-    slug: "aromatic-chemistry",
-    title: "Aromatic Chemistry",
-    shortDesc: "EAS directing effects and synthesis order",
-    summary:
-      "Pick directing group then choose order of steps to control substitution. Full reference is on the external link.",
-    externalUrl: "https://openstax.org/books/organic-chemistry/pages/15-introduction",
-    externalLabel: "OpenStax Organic Chemistry - Chapter 15: Aromaticity and EAS",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/3/36/EAS_mechanism.png",
-    imageAlt: "Electrophilic aromatic substitution mechanism overview",
-    mustKnow: [
-      "Aromaticity requirements and resonance stabilization idea",
-      "EAS mechanism sigma complex and regeneration of aromaticity",
-      "Activating vs deactivating and ortho para vs meta directors",
-      "Common reactions nitration sulfonation halogenation Friedel Crafts alkylation acylation",
-      "Synthesis order to avoid wrong directing or rearrangements",
-    ],
-    howToStudy: [
-      "Memorize a director table and drill 20 predict major product problems",
-      "Do 15 synthesis order problems with two substitutions",
-      "Sketch sigma complex once per reaction type to see why directing happens",
-      "Add 10 practice problems mixing EAS with carbonyl chemistry",
-    ],
-    hasMechanism: true,
-  },
-  {
-    slug: "amines",
-    title: "Amines",
-    shortDesc: "Basicity synthesis and key reactions with carbonyls",
-    summary:
-      "Learn basicity trends and common formation pathways. Full reference is on the external link.",
-    externalUrl: "https://openstax.org/books/organic-chemistry/pages/21-introduction",
-    externalLabel: "OpenStax Organic Chemistry - Chapter 21: Amines",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/8/8a/Reductive_amination.png",
-    imageAlt: "Reductive amination overview",
-    mustKnow: [
-      "Amine classes primary secondary tertiary and ammonium salts",
-      "Basicity trends resonance decreases basicity inductive effects aniline case",
-      "Reductive amination concept and imine intermediate",
-      "Amide formation and why amides are weak bases",
-      "Structure confirmation cues concept level",
-    ],
-    howToStudy: [
-      "Drill 15 basicity ranking questions with one sentence explanation",
-      "Do 15 synthesis problems including reductive amination",
-      "Do 10 carbonyl to imine enamine transformation problems",
-      "Confirm products using structure checks on 10 mixed problems",
-    ],
-    hasMechanism: true,
   },
 ];
 
+export const orgochem2Topics: Topic[] = applyOrgChem2Enrichment(_orgochem2TopicsBase);
+
 export function getCourseTopics(course: CourseId): Topic[] {
   if (course === "orgochem-1") return ORGOCHEM_1;
-  return ORGOCHEM_2;
+  return orgochem2Topics;
 }
 
 export function findTopic(course: CourseId, slug: string): Topic | undefined {

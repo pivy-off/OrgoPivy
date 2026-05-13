@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import SpectraReferencePanels from "./SpectraReferencePanels";
 
 type NMRType = "1H" | "13C" | null;
 type AnalysisResult = {
@@ -122,6 +123,8 @@ export default function NMRStudio() {
           determine multiplicity, and solve structure determination problems.
         </p>
       </div>
+
+      <SpectraReferencePanels />
 
       {/* NMR Type Selection */}
       <div style={{

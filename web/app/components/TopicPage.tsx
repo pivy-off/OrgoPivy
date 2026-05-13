@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import TopicToolsClient from "./TopicToolsClient";
 import TopicChecklistClient from "./TopicChecklistClient";
 import type { Topic } from "../lib/curriculum";
+import TopicCurriculumImages from "./TopicCurriculumImages";
+import { ChemFormattedLine } from "../lib/chemTypography";
 
 function Section({
   title,
@@ -48,6 +50,7 @@ export default function TopicPage({
   illustration,
   commonMistakes,
   practiceHref,
+  chemPolish,
 }: {
   courseLabel: string;
   backHref: string;
@@ -55,6 +58,8 @@ export default function TopicPage({
   illustration: React.ReactNode;
   commonMistakes?: string[];
   practiceHref?: string;
+  /** When true, apply formula typography and ⚠️ on mistakes (e.g. OrgoChem II). */
+  chemPolish?: boolean;
 }) {
   const mechTag = guessMechanismTag(topic.slug);
 
@@ -89,12 +94,15 @@ export default function TopicPage({
                 </a>
               }
             >
-              <div className="topicSummaryText">{topic.summary}</div>
+              <div className="topicSummaryText">
+                {chemPolish ? <ChemFormattedLine text={topic.summary} /> : topic.summary}
+              </div>
+              {topic.images?.length ? <TopicCurriculumImages images={topic.images} section="summary" /> : null}
             </Section>
 
             <div className="topicTwoCol">
               <Section title="Must know checklist">
-                <TopicChecklistClient items={topic.mustKnow} />
+                <TopicChecklistClient items={topic.mustKnow} chemPolish={chemPolish} />
               </Section>
 
               <Section title="Common mistakes">
@@ -102,7 +110,14 @@ export default function TopicPage({
                   {(commonMistakes && commonMistakes.length ? commonMistakes : ["Write the one clue you ignored then redo the problem immediately"]).map(
                     (t, i) => (
                       <div key={`${i}-${t}`} className="topicMistakeItem">
-                        {t}
+                        {chemPolish ? (
+                          <>
+                            <span aria-hidden="true">⚠️ </span>
+                            <ChemFormattedLine text={t} />
+                          </>
+                        ) : (
+                          t
+                        )}
                       </div>
                     )
                   )}
@@ -111,7 +126,7 @@ export default function TopicPage({
             </div>
 
             <Section title="Study steps">
-              <TopicChecklistClient items={topic.howToStudy} />
+              <TopicChecklistClient items={topic.howToStudy} chemPolish={chemPolish} />
             </Section>
 
             <Section title="Tools">
@@ -134,6 +149,7 @@ export default function TopicPage({
             </Section>
 
             <Section title="Practice">
+              {topic.images?.length ? <TopicCurriculumImages images={topic.images} section="practice" /> : null}
               {practiceHref ? (
                 <div className="topicPracticeRow">
                   <div className="topicPracticeText">This topic has an interactive drill</div>

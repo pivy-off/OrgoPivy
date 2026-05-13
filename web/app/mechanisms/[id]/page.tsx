@@ -74,7 +74,7 @@ function SvgStage({ children }: { children: React.ReactNode }) {
           animation: fadeIn 0.4s ease-out;
         }
       `}</style>
-      <div className="mechanism-svg" style={{ width: "100%", height: "100%" }}>
+      <div className="mechanism-svg" style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", gap: 16, alignItems: "stretch" }}>
         {children}
       </div>
     </div>
@@ -180,7 +180,16 @@ export default function MechanismPage() {
       {/* Main Mechanism Visualization */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px", overflow: "auto" }}>
         <div style={{ width: "100%", maxWidth: 1600, height: "100%" }}>
-          <SvgStage>{step.svg(conditions)}</SvgStage>
+          <SvgStage>
+            {step.svg(conditions)}
+            {step.svgContent ? (
+              <div
+                className="mechanismSupplementalSvg"
+                // eslint-disable-next-line react/no-danger -- trusted curriculum SVG only
+                dangerouslySetInnerHTML={{ __html: step.svgContent }}
+              />
+            ) : null}
+          </SvgStage>
         </div>
       </div>
     </main>

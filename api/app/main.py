@@ -9,7 +9,7 @@ import re
 import os
 
 from app.ingest import chunk_text, score, make_answer
-from app import pharmasim as psim
+from app import admet_ai_service as admet_svc
 from app.security import (
     limiter,
     SecurityHeadersMiddleware,
@@ -660,81 +660,49 @@ def get_practice_exam(request: Request, filename: str):
         raise HTTPException(status_code=500, detail=f"Error reading file: {str(e)}")
 
 
-# --- PharmaSim demo API (educational / hackathon; see responses["disclaimer"]) ---
+# --- ADMET-AI (SMILES → TDC-style ADMET/physchem; first call loads models — can take a minute) ---
 
 
-class PharmaSimPredictRequest(BaseModel):
-    drug_id: str = Field(..., min_length=2, max_length=80)
-    weight_kg: float = Field(70.0, ge=40.0, le=120.0)
+class AdmetPredictRequest(BaseModel):
+    smiles: str = Field(..., min_length=1, max_length=2000)
 
 
-class PharmaSimSimulateRequest(BaseModel):
-    drug_id: str = Field(..., min_length=2, max_length=80)
-    hours: float = Field(24.0, ge=1.0, le=72.0)
-    steps: int = Field(48, ge=8, le=200)
-    dose_mg: Optional[float] = Field(default=None, ge=1.0, le=5000.0)
-    weight_kg: float = Field(70.0, ge=40.0, le=120.0)
+class AdmetCompareRequest(BaseModel):
+    smiles_a: str = Field(..., min_length=1, max_length=2000)
+    smiles_b: str = Field(..., min_length=1, max_length=2000)
 
 
-class PharmaSimCompareRequest(BaseModel):
-    drug_id_a: str = Field(..., min_length=2, max_length=80)
-    drug_id_b: str = Field(..., min_length=2, max_length=80)
-    hours: float = Field(24.0, ge=1.0, le=72.0)
-    steps: int = Field(48, ge=8, le=200)
-    weight_kg: float = Field(70.0, ge=40.0, le=120.0)
-
-
-@app.get("/pharmasim/drugs")
-@limiter.limit("120/minute")
-def pharmasim_list_drugs(request: Request):
-    items = []
-    for did in psim.list_preset_ids():
-        p = psim.PRESETS[did]
-        items.append(
-            {
-                "drug_id": did,
-                "display_name": p["display_name"],
-                "generic": p["generic"],
-                "dose_demo_mg": p["dose_demo_mg"],
-            }
-        )
-    return {"count": len(items), "items": items, "disclaimer": psim.DISCLAIMER}
-
-
-@app.post("/predict")
-@limiter.limit("60/minute")
-def pharmasim_predict(request: Request, body: PharmaSimPredictRequest):
+@app.post("/admet/predict")
+@limiter.limit("30/minute")
+def admet_predict(request: Request, body: AdmetPredictRequest):
     try:
-        return psim.predict(body.drug_id, weight_kg=body.weight_kg)
+        preds = admet_svc.predict_smiles(body.smiles)
+        return {
+            "smiles": body.smiles.strip(),
+            "model": "admet_ai",
+            "disclaimer": admet_svc.DISCLAIMER,
+            "properties": preds,
+            "property_count": len(preds),
+        }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ADMET-AI prediction failed: {e!s}")
 
 
-@app.post("/simulate")
-@limiter.limit("60/minute")
-def pharmasim_simulate(request: Request, body: PharmaSimSimulateRequest):
+@app.post("/admet/compare")
+@limiter.limit("20/minute")
+def admet_compare(request: Request, body: AdmetCompareRequest):
     try:
-        return psim.simulate(
-            body.drug_id,
-            hours=body.hours,
-            steps=body.steps,
-            dose_mg=body.dose_mg,
-            weight_kg=body.weight_kg,
-        )
+        a = admet_svc.predict_smiles(body.smiles_a)
+        b = admet_svc.predict_smiles(body.smiles_b)
+        return {
+            "disclaimer": admet_svc.DISCLAIMER,
+            "model": "admet_ai",
+            "A": {"smiles": body.smiles_a.strip(), "properties": a},
+            "B": {"smiles": body.smiles_b.strip(), "properties": b},
+        }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.post("/compare")
-@limiter.limit("60/minute")
-def pharmasim_compare(request: Request, body: PharmaSimCompareRequest):
-    try:
-        return psim.compare_drugs(
-            body.drug_id_a,
-            body.drug_id_b,
-            hours=body.hours,
-            steps=body.steps,
-            weight_kg=body.weight_kg,
-        )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ADMET-AI prediction failed: {e!s}")

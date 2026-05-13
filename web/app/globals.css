@@ -1,7 +1,9 @@
 :root {
-  --bg: #f5f5f7;
+  --bg: #f2f2f7;
   --panel: #ffffff;
   --panel-2: #fafafa;
+
+  --home-accent: #4f6ef7;
 
   --text: #1d1d1f;
   --muted: rgba(29, 29, 31, 0.6);
@@ -40,6 +42,7 @@
 
 [data-theme="dark"] {
   --bg: #000000;
+  --home-accent: #6b8cff;
   --panel: #1c1c1e;
   --panel-2: #2c2c2e;
 
@@ -93,15 +96,107 @@ a {
 
 .shell {
   display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: var(--space-4);
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 20px;
   align-items: start;
+}
+
+.shellMain {
+  min-width: 0;
 }
 
 @media (max-width: 980px) {
   .shell {
     grid-template-columns: 1fr;
   }
+}
+
+/* Workspace sidebar (reference layout) */
+.workspaceSidebar {
+  position: relative;
+}
+
+.workspaceSidebarCard {
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.workspaceSidebarInner {
+  padding: 16px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.workspaceSidebarHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.workspaceSidebarTitle {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  color: var(--text);
+}
+
+.workspaceSidebarSubtitle {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.workspaceNav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.workspaceNavPill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.workspaceNavPill:hover {
+  background: var(--panel-2);
+}
+
+.workspaceNavPill:active {
+  transform: scale(0.99);
+}
+
+.workspaceNavPill:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.workspaceNavPillActive {
+  border: 2px solid var(--text);
+  background: var(--panel);
+}
+
+.workspaceNavLabel {
+  font-weight: 800;
+}
+
+.workspaceNavTag {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  flex-shrink: 0;
 }
 
 .card {
@@ -331,6 +426,15 @@ a {
   letter-spacing: 0.2px;
 }
 
+.brandMark {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--home-accent) 0%, #5856d6 100%);
+  display: inline-block;
+}
+
 .brandDot {
   width: 10px;
   height: 10px;
@@ -372,6 +476,23 @@ a.pill {
 .pillActive {
   border-color: rgba(37, 99, 235, 0.35);
   box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
+}
+
+.topNav .pill:not(.pillActive) {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.topNav .pill:not(.pillActive):hover {
+  background: var(--panel-2);
+  border-color: var(--border-2);
+}
+
+.topNav .pillActive {
+  border: 2px solid var(--text);
+  background: var(--panel);
+  box-shadow: none;
 }
 
 .pill:focus-visible {
@@ -727,10 +848,6 @@ button.pill:active {
   width: 100%;
 }
 
-.brand {
-  align-items: center;
-}
-
 .topbarQuick {
   display: flex;
   align-items: center;
@@ -949,7 +1066,7 @@ a.homeCourseCard.homeCardMotion {
 }
 
 .homeSearchInput:focus {
-  border-color: rgba(0, 122, 255, 0.45);
+  border-color: color-mix(in srgb, var(--home-accent) 55%, var(--border));
   box-shadow: 0 0 0 4px var(--focus);
 }
 
@@ -958,9 +1075,16 @@ a.homeCourseCard.homeCardMotion {
   right: 18px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 18px;
-  opacity: 0.55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  opacity: 0.75;
   pointer-events: none;
+}
+
+.homeSearchIcon svg {
+  display: block;
 }
 
 .homeCourseGrid {
@@ -997,10 +1121,10 @@ a.homeCourseCard.homeCardMotion {
 }
 
 .homeCourseTitle {
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 800;
-  margin: 0 0 8px;
-  letter-spacing: -0.3px;
+  margin: 0 0 10px;
+  letter-spacing: -0.4px;
 }
 
 .homeCourseDesc {
@@ -1014,7 +1138,7 @@ a.homeCourseCard.homeCardMotion {
   gap: 6px;
   font-size: 15px;
   font-weight: 600;
-  color: var(--blue);
+  color: var(--home-accent);
   text-decoration: none;
   transition: opacity 0.15s ease, transform 0.12s ease;
 }
@@ -1062,6 +1186,35 @@ a.homeCourseCard.homeCardMotion {
 .homeMetricInner {
   text-align: center;
   padding: 16px 14px;
+}
+
+.homeMetricSplit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.12em;
+  row-gap: 0;
+}
+
+.homeMetricPrefix {
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.homeMetricSlash {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.homeMetricTail {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
 }
 
 .homeMetricValue {
@@ -1127,7 +1280,7 @@ a.homeCourseCard.homeCardMotion {
 .homeStreakBig {
   font-size: 36px;
   font-weight: 850;
-  color: var(--blue);
+  color: var(--home-accent);
   line-height: 1.1;
   letter-spacing: -1px;
 }
@@ -1200,8 +1353,12 @@ a.homeCourseCard.homeCardMotion {
 .homeProgressFill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--blue), var(--purple));
+  background: linear-gradient(90deg, var(--home-accent), var(--purple));
   transition: width 0.25s ease;
+}
+
+.homeProgressFillAccent {
+  background: linear-gradient(90deg, var(--home-accent), color-mix(in srgb, var(--home-accent) 55%, var(--purple)));
 }
 
 .homeStreakFoot {
@@ -1340,7 +1497,7 @@ a.homeCourseCard.homeCardMotion {
   text-align: center;
   font-size: 32px;
   font-weight: 850;
-  color: var(--blue);
+  color: var(--home-accent);
   letter-spacing: -1px;
   margin: 4px 0 8px;
 }
@@ -1423,8 +1580,17 @@ a.homeCourseCard.homeCardMotion {
   flex-shrink: 0;
   font-size: 20px;
   font-weight: 700;
-  color: var(--blue);
+  color: var(--home-accent);
   opacity: 0.85;
+}
+
+.homeMain .btnPrimary.homeAccentBtn {
+  background: linear-gradient(135deg, var(--home-accent), #5856d6);
+  box-shadow: 0 4px 14px rgba(79, 110, 247, 0.28);
+}
+
+.homeMain .btnPrimary.homeAccentBtn:hover {
+  box-shadow: 0 6px 20px rgba(79, 110, 247, 0.38);
 }
 
 /* —— Study OS / shared tool surfaces —— */
@@ -1832,4 +1998,235 @@ a.homeCourseCard.homeCardMotion {
 
 .opRecBanner strong {
   font-weight: 850;
+}
+
+/* —— OrgoChem II topic visuals —— */
+.orgochem2-topic .chem-mono-inline,
+.orgochem2-topic .chem-line {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 0.96em;
+}
+
+.orgochem2-topic .chem-reagent-strong {
+  font-weight: 800;
+  color: var(--text);
+}
+
+.orgochem2MechanismSupplemental {
+  margin-top: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  padding: 12px;
+  overflow: auto;
+}
+
+.orgochem2MechanismSupplemental svg {
+  display: block;
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.mechanismSupplementalSvg {
+  margin-top: 16px;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+  padding: 12px;
+  background: var(--panel-2);
+}
+
+.mechanismSupplementalSvg svg {
+  display: block;
+  width: 100%;
+  max-height: 200px;
+  margin: 0 auto;
+}
+
+.orgochem2ReactionTableWrap {
+  padding: 4px 0 8px;
+}
+
+.orgochem2ReactionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.orgochem2ReactionCard {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+  background: var(--panel-2);
+  display: grid;
+  gap: 8px;
+}
+
+.orgochem2ReactionCardReagents {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.orgochem2ReactionCardArrow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.orgochem2ReactionCardNotes {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.rt-halogenation {
+  border-left: 4px solid #007aff;
+}
+.rt-nitration {
+  border-left: 4px solid #ff3b30;
+}
+.rt-sulfonation {
+  border-left: 4px solid #ff9500;
+}
+.rt-fc-alkyl {
+  border-left: 4px solid #34c759;
+}
+.rt-fc-acyl {
+  border-left: 4px solid #5856d6;
+}
+
+.rt-acyl-1 {
+  border-left: 4px solid #ff3b30;
+}
+.rt-acyl-2 {
+  border-left: 4px solid #ff9500;
+}
+.rt-acyl-3 {
+  border-left: 4px solid #ffcc00;
+}
+.rt-acyl-4 {
+  border-left: 4px solid #34c759;
+}
+.rt-acyl-5 {
+  border-left: 4px solid #007aff;
+}
+
+.rt-add-1 {
+  border-left: 4px solid #5856d6;
+}
+.rt-add-2 {
+  border-left: 4px solid #007aff;
+}
+.rt-add-3 {
+  border-left: 4px solid #34c759;
+}
+.rt-add-4 {
+  border-left: 4px solid #ff9500;
+}
+.rt-add-5 {
+  border-left: 4px solid #ff3b30;
+}
+.rt-add-6 {
+  border-left: 4px solid #af52de;
+}
+
+.rt-ep-a {
+  border-left: 4px solid #ff3b30;
+}
+.rt-ep-b {
+  border-left: 4px solid #007aff;
+}
+.rt-ep-c {
+  border-left: 4px solid #34c759;
+}
+
+.rt-ox-1 {
+  border-left: 4px solid #8e8e93;
+}
+.rt-ox-2 {
+  border-left: 4px solid #34c759;
+}
+.rt-ox-3 {
+  border-left: 4px solid #ff9500;
+}
+.rt-ox-4 {
+  border-left: 4px solid #007aff;
+}
+.rt-ox-5 {
+  border-left: 4px solid #ff3b30;
+}
+
+.spectraRefSection {
+  padding: 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.spectraRefHeading {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.spectraRefLead {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.spectraRefGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.spectraRefCard {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  padding: 12px;
+}
+
+.spectraRefTitle {
+  font-weight: 800;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.spectraRefIrAxis,
+.spectraRefHAxis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--muted-2);
+  margin-bottom: 4px;
+}
+
+.spectraRefIrPlot,
+.spectraRefHPlot {
+  background: var(--panel);
+  border-radius: 8px;
+  border: 1px solid var(--border-2);
+}
+
+.spectraRefIrSvg,
+.spectraRefHSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.spectraRefNote {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
 }

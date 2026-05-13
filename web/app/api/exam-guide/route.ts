@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { findTopic, getCourseTopics, type CourseId } from "../../lib/curriculum";
+import { findTopic, getCourseTopics, type CourseId, type TopicPracticeMcq } from "../../lib/curriculum";
 import { Document, ExternalHyperlink, Packer, Paragraph, TextRun, HeadingLevel } from "docx";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
@@ -222,7 +222,29 @@ function generateWordDoc(topic: any, course: CourseId, uploadedContent: string[]
     new Paragraph({ text: "" }),
   ];
 
-  // Add uploaded content if available
+  if (topic.practiceMcqs && topic.practiceMcqs.length > 0) {
+    const labels = ["A", "B", "C", "D"] as const;
+    const mcqParas: Paragraph[] = [
+      new Paragraph({
+        text: "PRACTICE MCQs (multiple choice)",
+        heading: HeadingLevel.HEADING_2,
+      }),
+      new Paragraph({
+        text: "-".repeat(60),
+      }),
+    ];
+    topic.practiceMcqs.forEach((mcq: TopicPracticeMcq, i: number) => {
+      mcqParas.push(new Paragraph({ text: `Q${i + 1}. ${mcq.question}` }));
+      mcq.options.forEach((opt: string, j: number) => {
+        mcqParas.push(new Paragraph({ text: `  ${labels[j]}. ${opt}` }));
+      });
+      mcqParas.push(new Paragraph({ text: `Answer: ${labels[mcq.answerIndex]}` }));
+      mcqParas.push(new Paragraph({ text: mcq.explanation }));
+      mcqParas.push(new Paragraph({ text: "" }));
+    });
+    children.push(...mcqParas);
+  }
+
   if (uploadedContent.length > 0) {
     children.push(
       new Paragraph({

@@ -48,7 +48,8 @@ function SearchContent() {
   const engineNote = useMemo(
     () =>
       data?.engine === "lexical"
-        ? "Lexical keyword search. Semantic ranking can plug into the same UI when the API adds an `engine` field.",
+        ? "Lexical keyword search. Semantic ranking can plug into the same UI when the API adds an engine field."
+        : "",
     [data?.engine]
   );
 

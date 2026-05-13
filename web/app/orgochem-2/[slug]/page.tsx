@@ -1,8 +1,16 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { findTopic } from "../../lib/curriculum";
 import MustKnowChecklist from "../../components/MustKnowChecklist";
 import StudyStepsChecklist from "../../components/StudyStepsChecklist";
+import TopicCurriculumImages from "../../components/TopicCurriculumImages";
+import OrgChem2MechanismStepCards from "../../components/OrgChem2MechanismStepCards";
+import OrgChem2ReactionTables from "../../components/OrgChem2ReactionTables";
+import { ChemFormattedLine } from "../../lib/chemTypography";
+import { getOrgChem2MechanismSupplementalSvg } from "../../lib/orgochem2MechanismSupplementalSvg";
+import TopicHeroDiagram from "../../components/TopicHeroDiagram";
+import TopicPracticeMcqs from "../../components/TopicPracticeMcqs";
 
 function TopicIllustration({ slug, title }: { slug: string; title: string }) {
   const common = {
@@ -22,7 +30,55 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
     </defs>
   );
 
-  if (slug === "alcohols") {
+  if (slug === "resonance-acid-base-review") {
+    return (
+      <svg {...common}>
+        {bg}
+        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
+          Acid-base equilibrium
+        </text>
+        <text x="28" y="82" fontSize="13" fill="var(--muted)">
+          pKa comparison — weaker acid (higher pKa) on the product side
+        </text>
+        <text x="200" y="150" fontSize="15" fill="var(--text)" fontWeight="700">
+          H–A + B: → A:⁻ + H–B⁺
+        </text>
+        <text x="600" y="132" fontSize="14" fill="var(--muted)">
+          Compare
+        </text>
+        <text x="600" y="158" fontSize="14" fill="var(--text)" fontWeight="900">
+          pKa table
+        </text>
+      </svg>
+    );
+  }
+
+  if (slug === "substitution-elimination-nmr-review") {
+    return (
+      <svg {...common}>
+        {bg}
+        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
+          SN2 reaction
+        </text>
+        <text x="28" y="82" fontSize="13" fill="var(--muted)">
+          Primary substrate · δ (ppm) · integration
+        </text>
+        <text x="160" y="150" fontSize="14" fill="var(--text)" fontWeight="700">
+          Nu:⁻ + R–X → Nu–R + X:⁻
+        </text>
+        <text x="600" y="132" fontSize="14" fill="var(--muted)">
+          Reagent
+        </text>
+        <text x="600" y="158" fontSize="14" fill="var(--text)" fontWeight="900">
+          1° RX + strong Nu
+        </text>
+      </svg>
+    );
+  }
+
+  if (slug === "alcohols-phenols") {
     return (
       <svg {...common}>
         {bg}
@@ -31,7 +87,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
           Alcohol oxidation
         </text>
         <text x="28" y="82" fontSize="13" fill="var(--muted)">
-          Primary → Aldehyde → Acid | Secondary → Ketone
+          R–CH₂–OH → R–CHO → R–COOH · choose oxidant
         </text>
 
         <line x1="280" y1="150" x2="380" y2="150" stroke="var(--text)" strokeOpacity="0.6" strokeWidth="4" />
@@ -41,7 +97,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
         <text x="520" y="150" fontSize="14" fill="var(--text)" fontWeight="700">O</text>
 
         <text x="600" y="140" fontSize="14" fill="var(--muted)">Reagent</text>
-        <text x="600" y="160" fontSize="14" fill="var(--text)" fontWeight="900">PCC, Jones, Swern</text>
+        <text x="600" y="160" fontSize="14" fill="var(--text)" fontWeight="900">PCC or CrO₃</text>
       </svg>
     );
   }
@@ -55,7 +111,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
           Epoxide opening
         </text>
         <text x="28" y="82" fontSize="13" fill="var(--muted)">
-          Basic: less substituted | Acidic: more substituted
+          epoxide + Nu → trans diol · acid or base conditions
         </text>
 
         <polygon points="300,150 350,120 400,150 350,180" fill="none" stroke="var(--text)" strokeOpacity="0.6" strokeWidth="4" />
@@ -64,13 +120,65 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
         <path d="M 450 150 L 550 130" fill="none" stroke="var(--text)" strokeOpacity="0.4" strokeWidth="3" />
         <text x="570" y="135" fontSize="14" fill="var(--text)" fontWeight="700">OH</text>
 
-        <text x="650" y="140" fontSize="14" fill="var(--muted)">Regioselectivity</text>
-        <text x="650" y="160" fontSize="14" fill="var(--text)" fontWeight="900">Depends on conditions</text>
+        <text x="650" y="140" fontSize="14" fill="var(--muted)">Conditions</text>
+        <text x="650" y="160" fontSize="14" fill="var(--text)" fontWeight="900">Acid or base</text>
       </svg>
     );
   }
 
-  if (slug.includes("carbonyl")) {
+  if (slug === "grignard-reaction") {
+    return (
+      <svg {...common}>
+        {bg}
+        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
+          Grignard addition
+        </text>
+        <text x="28" y="82" fontSize="13" fill="var(--muted)">
+          R–MgBr + C=O → after workup → C–OH
+        </text>
+        <text x="220" y="150" fontSize="14" fill="var(--text)" fontWeight="700">
+          R–MgBr + C=O → R–C–OH
+        </text>
+        <text x="600" y="132" fontSize="14" fill="var(--muted)">
+          Reagent
+        </text>
+        <text x="600" y="158" fontSize="14" fill="var(--text)" fontWeight="900">
+          Ether solvent
+        </text>
+      </svg>
+    );
+  }
+
+  if (slug === "aldehydes-ketones") {
+    return (
+      <svg {...common}>
+        {bg}
+        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
+          Nucleophilic addition
+        </text>
+        <text x="28" y="82" fontSize="13" fill="var(--muted)">
+          C=O + Nu:⁻ → tetrahedral alkoxide
+        </text>
+        <text x="200" y="150" fontSize="14" fill="var(--text)" fontWeight="700">
+          C=O + Nu:⁻ → C(–O⁻)(–Nu)
+        </text>
+        <text x="600" y="132" fontSize="14" fill="var(--muted)">
+          Selectivity
+        </text>
+        <text x="600" y="158" fontSize="14" fill="var(--text)" fontWeight="900">
+          Aldehyde &gt; ketone
+        </text>
+      </svg>
+    );
+  }
+
+  if (
+    slug.includes("carbonyl") ||
+    slug === "grignard-reaction-lab" ||
+    slug === "organometallic-reactions"
+  ) {
     return (
       <svg {...common}>
         {bg}
@@ -98,7 +206,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
     );
   }
 
-  if (slug === "carboxylic-acids-derivatives") {
+  if (slug.includes("carboxylic-acids")) {
     return (
       <svg {...common}>
         {bg}
@@ -117,13 +225,13 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
         <path d="M 400 150 L 500 130 L 500 170 Z" fill="none" stroke="var(--text)" strokeOpacity="0.4" strokeWidth="3" />
         <text x="520" y="150" fontSize="14" fill="var(--text)" fontWeight="700">Nu</text>
 
-        <text x="600" y="140" fontSize="14" fill="var(--muted)">Leaving group</text>
-        <text x="600" y="160" fontSize="14" fill="var(--text)" fontWeight="900">Better LG = faster</text>
+        <text x="600" y="140" fontSize="14" fill="var(--muted)">Intermediate</text>
+        <text x="600" y="160" fontSize="14" fill="var(--text)" fontWeight="900">Tetrahedral adduct</text>
       </svg>
     );
   }
 
-  if (slug === "enolates-aldol-claisen") {
+  if (slug === "aldehydes-ketones-part-b") {
     return (
       <svg {...common}>
         {bg}
@@ -149,51 +257,185 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
     );
   }
 
-  if (slug === "aromatic-chemistry") {
+  if (slug === "electrophilic-aromatic-substitution" || slug === "eas-substituent-directing-effects") {
     return (
       <svg {...common}>
         {bg}
         <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
-          EAS directing
+          EAS mechanism
         </text>
         <text x="28" y="82" fontSize="13" fill="var(--muted)">
-          Activating: ortho/para | Deactivating: meta
+          Ar–H + E⁺ → Ar–E + H⁺
         </text>
 
         <polygon points="300,120 320,100 360,100 380,120 360,140 320,140" fill="none" stroke="var(--text)" strokeOpacity="0.6" strokeWidth="4" />
-        <text x="340" y="130" fontSize="12" fill="var(--text)" fontWeight="700">R</text>
+        <text x="340" y="130" fontSize="12" fill="var(--text)" fontWeight="700">
+          Ar
+        </text>
 
         <path d="M 400 130 L 500 110 L 500 150 Z" fill="none" stroke="var(--text)" strokeOpacity="0.4" strokeWidth="3" />
-        <text x="520" y="130" fontSize="14" fill="var(--text)" fontWeight="700">E+</text>
+        <text x="520" y="130" fontSize="14" fill="var(--text)" fontWeight="700">
+          E⁺
+        </text>
 
-        <text x="600" y="120" fontSize="14" fill="var(--muted)">Directing</text>
-        <text x="600" y="140" fontSize="14" fill="var(--text)" fontWeight="900">ortho/para/meta</text>
+        <text x="600" y="120" fontSize="14" fill="var(--muted)">
+          Catalyst
+        </text>
+        <text x="600" y="140" fontSize="14" fill="var(--text)" fontWeight="900">
+          Lewis acid
+        </text>
       </svg>
     );
   }
 
-  if (slug === "amines") {
+  if (slug === "nucleophilic-aromatic-substitution" || slug === "aromatic-side-chain-reactions") {
     return (
       <svg {...common}>
         {bg}
         <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
         <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
-          Amine basicity
+          NAS mechanism
         </text>
         <text x="28" y="82" fontSize="13" fill="var(--muted)">
-          Resonance decreases basicity | Inductive effects matter
+          Ar–X + Nu:⁻ → Ar–Nu + X:⁻
         </text>
 
-        <line x1="280" y1="150" x2="380" y2="150" stroke="var(--text)" strokeOpacity="0.6" strokeWidth="4" />
-        <text x="330" y="145" fontSize="14" fill="var(--text)" fontWeight="700">N</text>
-        <circle cx="330" cy="150" r="12" fill="var(--text)" fillOpacity="0.3" />
+        <polygon points="300,120 320,100 360,100 380,120 360,140 320,140" fill="none" stroke="var(--text)" strokeOpacity="0.6" strokeWidth="4" />
+        <text x="340" y="130" fontSize="12" fill="var(--text)" fontWeight="700">
+          Ar–X
+        </text>
 
-        <path d="M 400 150 L 500 130 L 500 170 Z" fill="none" stroke="var(--text)" strokeOpacity="0.4" strokeWidth="3" />
-        <text x="520" y="150" fontSize="14" fill="var(--text)" fontWeight="700">H+</text>
+        <path d="M 400 130 L 500 110 L 500 150 Z" fill="none" stroke="var(--text)" strokeOpacity="0.4" strokeWidth="3" />
+        <text x="520" y="130" fontSize="14" fill="var(--text)" fontWeight="700">
+          Nu:⁻
+        </text>
 
-        <text x="600" y="140" fontSize="14" fill="var(--muted)">Basicity</text>
-        <text x="600" y="160" fontSize="14" fill="var(--text)" fontWeight="900">Rank by pKa</text>
+        <text x="600" y="120" fontSize="14" fill="var(--muted)">
+          Activation
+        </text>
+        <text x="600" y="140" fontSize="14" fill="var(--text)" fontWeight="900">
+          EWG required
+        </text>
+      </svg>
+    );
+  }
+
+  if (slug === "diels-alder-reaction" || slug === "conjugated-systems" || slug === "conjugated-compounds-diels-alder") {
+    return (
+      <svg {...common}>
+        {bg}
+        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
+          Diels-Alder
+        </text>
+        <text x="28" y="82" fontSize="13" fill="var(--muted)">
+          diene + dienophile → cyclohexene · concerted [4+2]
+        </text>
+        <path d="M 260 150 L 320 120 L 380 150 L 320 180 Z" fill="none" stroke="var(--text)" strokeOpacity="0.55" strokeWidth="3" />
+        <path d="M 420 150 L 520 150" stroke="var(--text)" strokeOpacity="0.35" strokeWidth="4" />
+        <rect x="560" y="115" width="200" height="70" rx="12" fill="var(--panel)" stroke="var(--border)" />
+        <text x="575" y="145" fontSize="13" fill="var(--text)" fontWeight="800">
+          Heat · [4+2]
+        </text>
+        <text x="575" y="165" fontSize="12" fill="var(--muted)">
+          s-cis diene required
+        </text>
+      </svg>
+    );
+  }
+
+  if (slug === "organohalides-radical") {
+    return (
+      <svg {...common}>
+        {bg}
+        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
+          Allylic bromination
+        </text>
+        <text x="28" y="82" fontSize="13" fill="var(--muted)">
+          [alkene] + NBS → [allylic bromide] · radical chain
+        </text>
+        <circle cx="320" cy="150" r="10" fill="var(--text)" fillOpacity="0.75" />
+        <text x="340" y="155" fontSize="14" fill="var(--text)" fontWeight="800">
+          X·
+        </text>
+        <path d="M 380 150 L 468 150" stroke="var(--text)" strokeOpacity="0.4" strokeWidth="4" />
+        <path d="M 462 146 L 478 150 L 462 154 Z" fill="var(--text)" fillOpacity="0.55" />
+        <text x="520" y="132" fontSize="14" fill="var(--muted)">
+          Reagent
+        </text>
+        <text x="520" y="158" fontSize="14" fill="var(--text)" fontWeight="900">
+          NBS, hν
+        </text>
+      </svg>
+    );
+  }
+
+  if (slug === "alkynes") {
+    return (
+      <svg {...common}>
+        {bg}
+        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
+          Alkyne hydration
+        </text>
+        <text x="28" y="82" fontSize="13" fill="var(--muted)">
+          RC≡CH + H₂O → RC(=O)CH₃ (after tautomerization)
+        </text>
+        <line x1="280" y1="150" x2="400" y2="150" stroke="var(--text)" strokeOpacity="0.65" strokeWidth="5" />
+        <line x1="280" y1="142" x2="400" y2="142" stroke="var(--text)" strokeOpacity="0.65" strokeWidth="5" />
+        <text x="420" y="155" fontSize="14" fill="var(--text)" fontWeight="900">
+          C≡C
+        </text>
+        <text x="560" y="132" fontSize="14" fill="var(--muted)">
+          Reagent
+        </text>
+        <text x="560" y="158" fontSize="14" fill="var(--text)" fontWeight="850">
+          HgSO₄, H₂SO₄
+        </text>
+      </svg>
+    );
+  }
+
+  if (slug === "aromaticity") {
+    return (
+      <svg {...common}>
+        {bg}
+        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
+          {`Hückel's rule`}
+        </text>
+        <text x="28" y="82" fontSize="13" fill="var(--muted)">
+          4n+2 π electrons → aromatic · cyclic + planar + conjugated
+        </text>
+        <polygon points="300,120 320,100 360,100 380,120 360,140 320,140" fill="none" stroke="var(--text)" strokeOpacity="0.65" strokeWidth="4" />
+        <circle cx="340" cy="120" r="22" fill="none" stroke="var(--primary)" strokeOpacity="0.35" strokeWidth="3" />
+        <text x="520" y="140" fontSize="14" fill="var(--text)" fontWeight="900">
+          6 π electrons (n=1)
+        </text>
+      </svg>
+    );
+  }
+
+  if (slug === "proton-nmr-review" || slug === "nmr-spectroscopy-review") {
+    return (
+      <svg {...common}>
+        {bg}
+        <rect x="0" y="0" width="900" height="240" rx="18" fill="url(#g0)" />
+        <text x="28" y="54" fontSize="20" fontWeight="950" fill="var(--text)">
+          ¹H NMR review
+        </text>
+        <text x="28" y="82" fontSize="13" fill="var(--muted)">
+          δ · integration · splitting (n+1) · coupling
+        </text>
+        <rect x="260" y="120" width="360" height="60" rx="12" fill="var(--panel)" stroke="var(--border)" />
+        <text x="280" y="148" fontSize="13" fill="var(--text)" fontWeight="800">
+          Triplet · Quartet · Multiplet
+        </text>
+        <text x="280" y="168" fontSize="12" fill="var(--muted)">
+          Predict spectrum from structure before peak hunting
+        </text>
       </svg>
     );
   }
@@ -206,7 +448,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
         {title}
       </text>
       <text x="28" y="82" fontSize="13" fill="var(--muted)">
-        Visual guide
+        CHM 222 topic visual
       </text>
     </svg>
   );
@@ -218,8 +460,8 @@ function Section({
   children,
 }: {
   title: string;
-  right?: React.ReactNode;
-  children: React.ReactNode;
+  right?: ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="card topicSection" style={{ boxShadow: "none" }}>
@@ -234,33 +476,13 @@ function Section({
   );
 }
 
-function Checklist({ items }: { items: string[] }) {
-  return (
-    <div className="topicChecklist">
-      {items.map((raw, i) => {
-        const parts = raw.split(":");
-        const head = (parts[0] || "").trim();
-        const tail = parts.slice(1).join(":").trim();
-        return (
-          <div key={`${i}-${raw}`} className="topicCheckItem">
-            <div className="topicCheckBox" aria-hidden="true" />
-            <div className="topicCheckText">
-              <div className="topicCheckHead">{head}</div>
-              {tail ? <div className="topicCheckTail">{tail}</div> : null}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 function Mistakes({ items }: { items: string[] }) {
   return (
     <div className="topicMistakes">
       {items.map((t, i) => (
         <div key={`${i}-${t}`} className="topicMistakeItem">
-          {t}
+          <span aria-hidden="true">⚠️ </span>
+          <ChemFormattedLine text={t} />
         </div>
       ))}
     </div>
@@ -268,14 +490,30 @@ function Mistakes({ items }: { items: string[] }) {
 }
 
 function guessMechanismTag(slug: string) {
-  if (slug.includes("alcohol")) return "alcohol";
-  if (slug.includes("ether")) return "ether";
-  if (slug.includes("epoxide")) return "epoxide";
-  if (slug.includes("carbonyl")) return "carbonyl";
+  if (slug === "substitution-elimination-nmr-review" || slug === "substitution-elimination-review" || slug === "organohalides-radical") return "substitution";
+  if (slug === "alcohols-phenols" || slug.includes("alcohol")) return "alcohol";
+  if (slug === "ethers-epoxides" || slug.includes("ether") || slug.includes("epoxide") || slug.includes("thiols")) return "ether";
+  if (slug === "aldehydes-ketones" || slug === "grignard-reaction" || slug.includes("organometallic")) return "carbonyl";
   if (slug.includes("carboxylic")) return "carboxylic";
-  if (slug.includes("enolate")) return "enolate";
-  if (slug.includes("aromatic")) return "aromatic";
+  if (slug.includes("enolate") || slug.includes("aldol")) return "enolate";
+  if (
+    slug === "electrophilic-aromatic-substitution" ||
+    slug === "nucleophilic-aromatic-substitution" ||
+    slug.includes("eas-substituent") ||
+    slug.includes("aromatic-side")
+  ) {
+    return "aromatic";
+  }
   if (slug.includes("amine")) return "amine";
+  if (slug === "alkynes" || slug === "conjugated-compounds-diels-alder" || slug === "radical-reactions" || slug === "conjugated-systems" || slug === "diels-alder-reaction") {
+    return "alkene";
+  }
+  if (
+    slug === "nmr-spectroscopy-review" ||
+    slug === "proton-nmr-review" ||
+    slug === "substitution-elimination-nmr-review"
+  )
+    return "spectroscopy";
   return slug;
 }
 
@@ -289,15 +527,17 @@ export default async function OrgoChem2TopicPage({
   if (!topic) return notFound();
 
   const mechTag = guessMechanismTag(topic.slug);
+  const supplementalSvg = topic.hasMechanism ? getOrgChem2MechanismSupplementalSvg(topic.slug) : undefined;
+  const hasSpectraImages = topic.images?.some((im) => im.section === "spectra") ?? false;
 
   return (
-    <main className="stack">
+    <main className="stack orgochem2-topic">
       <div className="card">
         <div className="cardInner">
           <div className="stack">
             <div className="topicTopRow">
               <div className="topicTopLeft">
-                <div className="subtle">OrgoChem II</div>
+                <div className="subtle">OrgoChem II · CHM 222 (Dr. Garrett, Spring 2026)</div>
                 <h1 className="h1">{topic.title}</h1>
                 <div className="subtle">{topic.shortDesc}</div>
               </div>
@@ -310,7 +550,11 @@ export default async function OrgoChem2TopicPage({
             </div>
 
             <div className="topicHero">
-              <TopicIllustration slug={topic.slug} title={topic.title} />
+              {topic.heroDiagram ? (
+                <TopicHeroDiagram diagram={topic.heroDiagram} />
+              ) : (
+                <TopicIllustration slug={topic.slug} title={topic.title} />
+              )}
             </div>
 
             <div className="divider" />
@@ -324,39 +568,100 @@ export default async function OrgoChem2TopicPage({
               }
             >
               <div className="topicSummaryText">
-                <div style={{ marginBottom: 16, fontSize: 16, lineHeight: 1.7, fontWeight: 500 }}>
-                  {topic.summary}
+                <div className="orgochem2SummaryBody" style={{ marginBottom: 16, fontSize: 16, lineHeight: 1.7, fontWeight: 500 }}>
+                  <ChemFormattedLine text={topic.summary} />
                 </div>
+                <TopicCurriculumImages images={topic.images} section="summary" />
+                {topic.overviewVideoId ? (
+                  <div style={{ marginTop: 16, maxWidth: 720 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#007AFF" }}>Video tutorial</div>
+                    <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%", height: 0, borderRadius: 12, overflow: "hidden", border: "1px solid rgba(0,0,0,0.08)" }}>
+                      <iframe
+                        title={`${topic.title} tutorial`}
+                        src={`https://www.youtube.com/embed/${topic.overviewVideoId}`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
+                      />
+                    </div>
+                  </div>
+                ) : null}
                 <div style={{ marginTop: 16, padding: 16, background: "rgba(0, 122, 255, 0.04)", borderRadius: 12, border: "1px solid rgba(0, 122, 255, 0.1)" }}>
                   <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: "#007AFF" }}>
                     What you need to know:
                   </div>
                   <div style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.8)" }}>
-                    This topic covers {topic.title.toLowerCase()}. Focus on mastering the key concepts in the "Must know checklist" above. 
-                    Follow the study steps systematically, and use practice problems to reinforce your understanding. 
-                    The external reference provides comprehensive coverage of all concepts.
+                    This topic covers {topic.title.toLowerCase()}. Focus on the must-know checklist and study steps below. Use the mechanism and spectra panels when present, then open the full reference for depth.
                   </div>
                 </div>
               </div>
             </Section>
 
+            <OrgChem2ReactionTables slug={topic.slug} />
+
+            {topic.hasMechanism ? (
+              <Section title="Mechanism steps">
+                <OrgChem2MechanismStepCards slug={topic.slug} />
+              </Section>
+            ) : null}
+
+            {topic.hasMechanism ? (
+              <Section
+                title="Mechanism visuals"
+                right={
+                  <Link className="btn btnPrimary" href={`/mechanisms?topic=${encodeURIComponent(mechTag)}`}>
+                    Open mechanism viewer
+                  </Link>
+                }
+              >
+                <p className="subtle" style={{ marginBottom: 12, lineHeight: 1.55 }}>
+                  Labels: <strong>Nu</strong> = nucleophile (lone pair or π bond), <strong>E⁺</strong> = electrophile, <strong>LG</strong> = leaving group. The interactive viewer uses step-by-step diagrams; supplemental SVG below sketches electron flow for this topic.
+                </p>
+                <TopicCurriculumImages images={topic.images} section="mechanism" />
+                {supplementalSvg ? (
+                  <div
+                    className="orgochem2MechanismSupplemental"
+                    // eslint-disable-next-line react/no-danger -- static curriculum SVG only
+                    dangerouslySetInnerHTML={{ __html: supplementalSvg }}
+                  />
+                ) : null}
+              </Section>
+            ) : null}
+
+            {hasSpectraImages ? (
+              <Section title="Spectra" right={topic.practiceHref === "/spectra" ? <Link className="btn" href="/spectra">NMR Studio</Link> : null}>
+                <TopicCurriculumImages images={topic.images} section="spectra" />
+              </Section>
+            ) : null}
+
             <div className="topicTwoCol">
               <Section title="Must know checklist">
-                <MustKnowChecklist items={topic.mustKnow} course="orgochem-2" topic={topic.slug} />
+                <MustKnowChecklist
+                  chemPolish
+                  items={topic.mustKnow}
+                  structuredItems={topic.mustKnowItems}
+                  course="orgochem-2"
+                  topic={topic.slug}
+                />
               </Section>
 
               <Section title="Common mistakes">
-                <Mistakes items={[
-                  "Not deciding addition vs substitution first for carbonyls",
-                  "Forgetting to check alpha positions before enolate formation",
-                  "Ignoring directing effects when planning EAS synthesis order",
-                  "Mixing up kinetic vs thermodynamic enolate conditions",
-                ]} />
+                <Mistakes
+                  items={
+                    topic.commonMistakes && topic.commonMistakes.length > 0
+                      ? topic.commonMistakes
+                      : [
+                          "Skipping resonance or acid–base reasoning before drawing a mechanism",
+                          "Treating every carbonyl problem as addition without checking for acyl substitution",
+                          "Misordering EAS steps on disubstituted benzenes",
+                        ]
+                  }
+                />
               </Section>
             </div>
 
             <Section title="Study steps">
-              <StudyStepsChecklist items={topic.howToStudy} course="orgochem-2" topic={topic.slug} />
+              <StudyStepsChecklist chemPolish items={topic.howToStudy} course="orgochem-2" topic={topic.slug} />
             </Section>
 
             <Section title="Tools">
@@ -366,7 +671,14 @@ export default async function OrgoChem2TopicPage({
                     Mechanism tool
                   </Link>
                 ) : null}
-                {!topic.hasMechanism ? (
+                {topic.slug === "nmr-spectroscopy-review" || topic.slug === "substitution-elimination-nmr-review" ? (
+                  <Link className="btn" href="/spectra">
+                    NMR Studio (reference spectra)
+                  </Link>
+                ) : null}
+                {!topic.hasMechanism &&
+                topic.slug !== "nmr-spectroscopy-review" &&
+                topic.slug !== "substitution-elimination-nmr-review" ? (
                   <div className="subtle">No specialized tools needed for this topic</div>
                 ) : null}
               </div>
@@ -382,13 +694,35 @@ export default async function OrgoChem2TopicPage({
             </Section>
 
             <Section title="Practice">
-              <div className="topicPracticeRow">
-                <div className="topicPracticeText">
-                  Practice problems for this topic. Get instant feedback and track your progress.
+              <TopicCurriculumImages images={topic.images} section="practice" />
+              {topic.practiceMcqs && topic.practiceMcqs.length > 0 ? (
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ fontWeight: 800, marginBottom: 8 }}>Multiple choice (exam-style)</div>
+                  <TopicPracticeMcqs questions={topic.practiceMcqs} />
                 </div>
-                <Link className="btn btnPrimary" href={`/orgochem-2/exams?topic=${encodeURIComponent(topic.slug)}`}>
-                  Open practice
-                </Link>
+              ) : null}
+              <div className="topicPracticeRow" style={{ flexWrap: "wrap", gap: 12 }}>
+                <div className="topicPracticeText">
+                  {topic.practiceHref
+                    ? "Open the linked drill (interactive practice, NMR studio, quiz, or exam bank)."
+                    : "Use exam mode for uploaded materials and mixed review; topic-specific MCQs are listed above when available."}
+                </div>
+                <div className="topicToolRow" style={{ flexWrap: "wrap" }}>
+                  {topic.practiceHref ? (
+                    <Link className="btn btnPrimary" href={topic.practiceHref}>
+                      Open linked drill
+                    </Link>
+                  ) : null}
+                  <Link
+                    className={topic.practiceHref ? "btn" : "btn btnPrimary"}
+                    href={`/orgochem-2/exams?topic=${encodeURIComponent(topic.slug)}`}
+                  >
+                    Exam practice (this topic)
+                  </Link>
+                  <Link className="btn" href="/orgochem-2/exams">
+                    Exam hub
+                  </Link>
+                </div>
               </div>
             </Section>
 
@@ -418,13 +752,16 @@ export default async function OrgoChem2TopicPage({
 
             <Section title="Tips">
               <div className="topicTips">
-                {[
-                  "Carbonyls decide addition vs substitution first",
-                  "Enolates mark alpha positions before choosing base",
-                  "Aromatics plan order of steps to control directing",
-                ].map((t, i) => (
+                {(topic.tips && topic.tips.length > 0
+                  ? topic.tips
+                  : [
+                      "Keep Week 1–2 skills warm: resonance and acid–base arguments belong in every later mechanism",
+                      "For aromatics, decide EAS vs NAS vs side-chain chemistry before drawing arrows",
+                      "For carbonyls and derivatives, label addition vs acyl substitution before predicting products",
+                    ]
+                ).map((t, i) => (
                   <div key={i} className="topicTipItem">
-                    {t}
+                    <ChemFormattedLine text={t} />
                   </div>
                 ))}
               </div>

@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import HomePressable from "./components/HomePressable";
-import HomeStudyOsSection from "./components/dashboard/HomeStudyOsSection";
 import { getCourseTopics, type CourseId, type Topic } from "./lib/curriculum";
 
 type ProgressMap = Record<string, boolean>;
 
 const GOAL_STORAGE = "orgopivy-daily-goal-minutes";
+const TOTAL_STUDY_MIN_KEY = "orgopivy-total-study-minutes";
+const BOOKMARKS_KEY = "orgopivy-bookmarks";
+const STREAK_DAYS_KEY = "orgopivy-streak-days";
+const ACHIEVEMENTS_KEY = "orgopivy-achievements-count";
 const DEFAULT_GOAL_MIN = 30;
 
 function storageKey(course: CourseId) {
@@ -24,6 +27,36 @@ function safeParse(raw: string | null): ProgressMap {
     // ignore
   }
   return {};
+}
+
+function readBookmarksCount(): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    const raw = localStorage.getItem(BOOKMARKS_KEY);
+    if (!raw) return 0;
+    const v = JSON.parse(raw);
+    if (Array.isArray(v)) return v.length;
+    if (v && typeof v === "object" && Array.isArray((v as { items?: unknown }).items)) {
+      return (v as { items: unknown[] }).items.length;
+    }
+  } catch {
+    // ignore
+  }
+  return 0;
+}
+
+function readNumber(key: string): number {
+  if (typeof window === "undefined") return 0;
+  const raw = localStorage.getItem(key);
+  const n = raw ? Number(raw) : 0;
+  return !Number.isNaN(n) && n >= 0 ? n : 0;
+}
+
+function formatStudyHM(totalMinutes: number): string {
+  const m = Math.max(0, Math.floor(totalMinutes));
+  const h = Math.floor(m / 60);
+  const min = m % 60;
+  return `${h}h ${min}m`;
 }
 
 function randomTopic(): { course: CourseId; topic: Topic } {
@@ -46,8 +79,12 @@ export default function HomePage() {
   const [dailyGoalMin, setDailyGoalMin] = useState(DEFAULT_GOAL_MIN);
   const [searchQuery, setSearchQuery] = useState("");
   const [dicePulse, setDicePulse] = useState(false);
+  const [totalStudyMinutes, setTotalStudyMinutes] = useState(0);
+  const [bookmarksCount, setBookmarksCount] = useState(0);
+  const [streakDays, setStreakDays] = useState(0);
+  const [achievementsCount, setAchievementsCount] = useState(0);
 
-  useEffect(() => {
+  const refreshFromStorage = useCallback(() => {
     const all = [...getCourseTopics("orgochem-1"), ...getCourseTopics("orgochem-2")];
     setTotalTopics(all.length);
 
@@ -65,10 +102,43 @@ export default function HomePage() {
       const goalRaw = localStorage.getItem(GOAL_STORAGE);
       const g = goalRaw ? Number(goalRaw) : NaN;
       if (!Number.isNaN(g) && g >= 5 && g <= 240) setDailyGoalMin(g);
+
+      setTotalStudyMinutes(readNumber(TOTAL_STUDY_MIN_KEY));
+      setBookmarksCount(readBookmarksCount());
+      setStreakDays(readNumber(STREAK_DAYS_KEY));
+      setAchievementsCount(readNumber(ACHIEVEMENTS_KEY));
     }
     setCompletedCount(done);
-    setReview(randomTopic());
   }, []);
+
+  useEffect(() => {
+    setReview(randomTopic());
+    refreshFromStorage();
+  }, [refreshFromStorage]);
+
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (!e.key) return;
+      if (
+        e.key.startsWith("orgopivy-progress-") ||
+        e.key === "orgopivy-study-minutes-today" ||
+        e.key === GOAL_STORAGE ||
+        e.key === TOTAL_STUDY_MIN_KEY ||
+        e.key === BOOKMARKS_KEY ||
+        e.key === STREAK_DAYS_KEY ||
+        e.key === ACHIEVEMENTS_KEY
+      ) {
+        refreshFromStorage();
+      }
+    };
+    const onFocus = () => refreshFromStorage();
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [refreshFromStorage]);
 
   const pct = useMemo(() => {
     if (!totalTopics) return 0;
@@ -78,6 +148,9 @@ export default function HomePage() {
   const dailyLeft = Math.max(0, dailyGoalMin - studyMinutesToday);
   const dailyPct =
     dailyGoalMin > 0 ? Math.min(100, Math.round((studyMinutesToday / dailyGoalMin) * 100)) : 0;
+
+  const studyTimeLabel = formatStudyHM(totalStudyMinutes);
+  const totalStudyH = Math.floor(totalStudyMinutes / 60);
 
   const searchResults = useMemo(() => {
     const needle = searchQuery.trim().toLowerCase();
@@ -123,16 +196,8 @@ export default function HomePage() {
     window.setTimeout(() => setDicePulse(false), 280);
   }
 
-  const studyTimeLabel = "0h 0m";
-  const streakDays = 0;
-  const bookmarks = 0;
-  const achievements = 0;
-  const totalStudyH = 0;
-
   return (
     <main className="homeMain">
-      <HomeStudyOsSection completedTopics={completedCount} totalTopics={totalTopics} />
-
       <form
         className="homeSearchWrap"
         role="search"
@@ -152,7 +217,10 @@ export default function HomePage() {
           autoComplete="off"
         />
         <span className="homeSearchIcon" aria-hidden>
-          🔍
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-4.2-4.2" />
+          </svg>
         </span>
         {searchQuery.trim().length >= 2 ? (
           <div className="homeSearchResults card">
@@ -212,34 +280,32 @@ export default function HomePage() {
         </Link>
       </div>
 
-      {/* Section 1 (above the fold): first three metrics */}
       <div className="homeMetricsRow homeMetricsRow3">
         <HomePressable className="card homeMetricCard homeCardMotion">
           <div className="cardInner homeMetricInner">
-            <div className="homeMetricValue">{completedCount}</div>
-            <div className="homeMetricLabel">Topics Completed</div>
+            <div className="homeMetricSplit">
+              <span className="homeMetricPrefix">{completedCount}</span>
+              <span className="homeMetricSlash"> / </span>
+              <span className="homeMetricTail">Topics Completed</span>
+            </div>
           </div>
         </HomePressable>
         <HomePressable className="card homeMetricCard homeCardMotion">
           <div className="cardInner homeMetricInner">
-            <div className="homeMetricValue">{studyTimeLabel}</div>
-            <div className="homeMetricLabel">Study Time</div>
+            <div className="homeMetricSplit">
+              <span className="homeMetricPrefix">{studyTimeLabel}</span>
+              <span className="homeMetricSlash"> / </span>
+              <span className="homeMetricTail">Study Time</span>
+            </div>
           </div>
         </HomePressable>
         <HomePressable className="card homeMetricCard homeCardMotion">
           <div className="cardInner homeMetricInner">
-            <div className="homeMetricValue">{bookmarks}</div>
-            <div className="homeMetricLabel">Bookmarks</div>
-          </div>
-        </HomePressable>
-      </div>
-
-      {/* Section 2 (scroll): achievements + streak + quick review */}
-      <div className="homeMetricsRow homeMetricsAchievements">
-        <HomePressable className="card homeMetricCard homeCardMotion">
-          <div className="cardInner homeMetricInner">
-            <div className="homeMetricValue">{achievements}</div>
-            <div className="homeMetricLabel">Achievements</div>
+            <div className="homeMetricSplit">
+              <span className="homeMetricPrefix">{bookmarksCount}</span>
+              <span className="homeMetricSlash"> / </span>
+              <span className="homeMetricTail">Bookmarks</span>
+            </div>
           </div>
         </HomePressable>
       </div>
@@ -271,7 +337,7 @@ export default function HomePage() {
                 <span className="subtle">{dailyLeft} min left</span>
               </div>
               <div className="homeProgressTrack" role="presentation">
-                <div className="homeProgressFill" style={{ width: `${dailyPct}%` }} />
+                <div className="homeProgressFill homeProgressFillAccent" style={{ width: `${dailyPct}%` }} />
               </div>
             </div>
 
@@ -302,7 +368,7 @@ export default function HomePage() {
                 <div className="subtle homeQuickTopicDesc">{review.topic.shortDesc}</div>
                 <Link
                   href={`/${review.course}/${review.topic.slug}`}
-                  className="btn btnPrimary homeReviewCta homeBtnMotion"
+                  className="btn btnPrimary homeReviewCta homeBtnMotion homeAccentBtn"
                 >
                   Review Topic
                 </Link>
@@ -314,13 +380,15 @@ export default function HomePage() {
               className={`homeDiceBtn homeBtnMotion${dicePulse ? " homeDiceBtnPulse" : ""}`}
               onClick={pickAnotherTopic}
             >
+              <span className="homeDiceEmoji" aria-hidden>
+                🎲
+              </span>{" "}
               Get Another Topic
             </button>
           </div>
         </HomePressable>
       </div>
 
-      {/* Section 3 (scroll): progress + professor bar */}
       <HomePressable className="card homeProgressCard homeCardMotion">
         <div className="cardInner homeProgressInner">
           <div className="homePanelHead">
@@ -335,13 +403,13 @@ export default function HomePage() {
             </span>
           </div>
           <div className="homeProgressTrack homeProgressTrackLg" role="presentation">
-            <div className="homeProgressFill" style={{ width: `${pct}%` }} />
+            <div className="homeProgressFill homeProgressFillAccent" style={{ width: `${pct}%` }} />
           </div>
           <div className="homeProgressPct">{pct}%</div>
 
           <div className="homeProgressGrid">
             <div className="homeProgressStat">
-              <div className="homeProgressStatVal">{totalStudyH}h</div>
+              <div className="homeProgressStatVal">{studyTimeLabel}</div>
               <div className="subtle homeProgressStatLbl">Total Study Time</div>
             </div>
             <div className="homeProgressStat">
@@ -349,11 +417,11 @@ export default function HomePage() {
               <div className="subtle homeProgressStatLbl">Day Streak</div>
             </div>
             <div className="homeProgressStat">
-              <div className="homeProgressStatVal">{bookmarks}</div>
+              <div className="homeProgressStatVal">{bookmarksCount}</div>
               <div className="subtle homeProgressStatLbl">Bookmarks</div>
             </div>
             <div className="homeProgressStat">
-              <div className="homeProgressStatVal">{achievements}</div>
+              <div className="homeProgressStatVal">{achievementsCount}</div>
               <div className="subtle homeProgressStatLbl">Achievements</div>
             </div>
           </div>

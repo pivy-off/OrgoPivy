@@ -14,6 +14,8 @@ export type MechanismStep = {
   title: string;
   explanation: string;
   svg: (conditions: ConditionState) => React.ReactElement;
+  /** Optional raw SVG markup (trusted) rendered below the interactive step diagram. */
+  svgContent?: string;
   example?: {
     reactant: string;
     product: string;
@@ -1606,6 +1608,20 @@ export function getAllMechanisms(): Mechanism[] {
           title: "Step 2: Electrophilic Attack - Sigma Complex",
           explanation: "NO₂⁺ attacks the aromatic ring, forming a sigma complex (arenium ion). The aromaticity is temporarily lost. This is the rate-determining step. The positive charge is delocalized over three carbons.",
           svg: createSimpleMechanismSVG("Step 2: Sigma Complex", "NO₂⁺ attacks benzene, sigma complex forms", "C₆H₆ + NO₂⁺ → Sigma complex", "Arenium ion intermediate"),
+          svgContent: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 140" role="img" aria-label="EAS curved arrows: benzene to sigma complex">
+  <text x="8" y="22" font-size="13" font-weight="800" fill="#111">Curved arrows (ionic)</text>
+  <polygon points="40,90 60,70 100,70 120,90 100,110 60,110" fill="none" stroke="#111" stroke-width="3"/>
+  <text x="75" y="95" text-anchor="middle" font-size="11" font-weight="700">ArH</text>
+  <path d="M 130 85 Q 170 40 210 85" fill="none" stroke="#007AFF" stroke-width="2.5" marker-end="url(#mE)"/>
+  <defs><marker id="mE" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#007AFF"/></marker></defs>
+  <text x="165" y="38" font-size="11" fill="#007AFF" font-weight="700">π → E⁺</text>
+  <rect x="230" y="65" width="140" height="52" rx="10" fill="#fff7e6" stroke="#FF9500" stroke-width="2"/>
+  <text x="300" y="96" text-anchor="middle" font-size="12" font-weight="800">σ complex (+)</text>
+  <path d="M 385 88 Q 430 125 475 88" fill="none" stroke="#FF3B30" stroke-width="2.5"/>
+  <text x="430" y="128" font-size="11" fill="#FF3B30" font-weight="700">B: removes H⁺</text>
+  <polygon points="500,90 520,70 560,70 580,90 560,110 520,110" fill="none" stroke="#111" stroke-width="3"/>
+  <text x="535" y="95" text-anchor="middle" font-size="11" font-weight="700">ArNO₂</text>
+</svg>`,
           example: { reactant: "C₆H₆ + NO₂⁺", product: "Sigma complex", conditions: "Rate-determining step" },
         },
         {

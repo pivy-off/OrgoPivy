@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" role="img" aria-label="Alkyne pi bond attacks proton in first HX addition">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1"><stop offset="0" stop-color="#e8f1ff"/><stop offset="1" stop-color="#f5e8ff"/></linearGradient>
+  </defs>
+  <rect width="800" height="400" fill="url(#bg)"/>
+  <text x="40" y="48" font-size="22" font-weight="800" fill="#1d1d1f">Alkyne + HBr  step 1 (schematic)</text>
+  <text x="40" y="78" font-size="14" fill="#555">À bond ’ electrophilic H (Markovnikov pathway)</text>
+  <line x1="120" y1="220" x2="260" y2="220" stroke="#1d1d1f" stroke-width="6"/>
+  <line x1="120" y1="208" x2="260" y2="208" stroke="#1d1d1f" stroke-width="6"/>
+  <text x="170" y="200" text-anchor="middle" font-size="14" font-weight="700">CaC</text>
+  <text x="300" y="228" font-size="28">+</text>
+  <text x="340" y="235" font-size="20" font-weight="800">HBr</text>
+  <path d="M 420 200 Q 500 120 580 200" fill="none" stroke="#007AFF" stroke-width="4"/>
+  <text x="480" y="130" font-size="13" fill="#007AFF" font-weight="700">À ’ H</text>
+  <rect x="620" y="170" width="140" height="100" rx="12" fill="#fff" stroke="#1d1d1f" stroke-width="2"/>
+  <text x="690" y="225" text-anchor="middle" font-size="13" font-weight="700">Vinyl</text>
+  <text x="690" y="248" text-anchor="middle" font-size="12" fill="#555">intermediate</text>
+</svg>

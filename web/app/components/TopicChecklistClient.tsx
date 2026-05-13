@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { ChemFormattedLine } from "../lib/chemTypography";
 
-export default function TopicChecklistClient({ items }: { items: string[] }) {
+export default function TopicChecklistClient({ items, chemPolish }: { items: string[]; chemPolish?: boolean }) {
   const [checked, setChecked] = useState<Record<number, boolean>>({});
 
   const toggle = useCallback((i: number) => {
@@ -28,8 +29,8 @@ export default function TopicChecklistClient({ items }: { items: string[] }) {
               {isOn ? "✓" : ""}
             </div>
             <div className="topicCheckText">
-              <div className="topicCheckHead">{head}</div>
-              {tail ? <div className="topicCheckTail">{tail}</div> : null}
+              <div className="topicCheckHead">{chemPolish ? <ChemFormattedLine text={head} /> : head}</div>
+              {tail ? <div className="topicCheckTail">{chemPolish ? <ChemFormattedLine text={tail} /> : tail}</div> : null}
             </div>
           </button>
         );

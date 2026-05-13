@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ChemFormattedLine } from "../lib/chemTypography";
 
 type Props = {
   items: string[];
   course: string;
   topic: string;
+  chemPolish?: boolean;
 };
 
-export default function StudyStepsChecklist({ items, course, topic }: Props) {
+export default function StudyStepsChecklist({ items, course, topic, chemPolish }: Props) {
   const storageKey = `orgopivy-study-steps-${course}-${topic}`;
   
   const [checked, setChecked] = useState<Set<number>>(new Set());
@@ -129,7 +131,7 @@ export default function StudyStepsChecklist({ items, course, topic }: Props) {
                   textDecoration: isChecked ? "line-through" : "none",
                   marginBottom: tail ? 4 : 0
                 }}>
-                  {head}
+                  {chemPolish ? <ChemFormattedLine text={head} /> : head}
                 </div>
                 {tail ? (
                   <div style={{
@@ -137,7 +139,7 @@ export default function StudyStepsChecklist({ items, course, topic }: Props) {
                     color: "rgba(0, 0, 0, 0.6)",
                     lineHeight: 1.5
                   }}>
-                    {tail}
+                    {chemPolish ? <ChemFormattedLine text={tail} /> : tail}
                   </div>
                 ) : null}
               </div>

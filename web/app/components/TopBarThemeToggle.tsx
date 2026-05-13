@@ -14,6 +14,10 @@ export default function TopBarThemeToggle() {
 
   useEffect(() => {
     setTheme(readTheme());
+    const el = document.documentElement;
+    const obs = new MutationObserver(() => setTheme(readTheme()));
+    obs.observe(el, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => obs.disconnect();
   }, []);
 
   const toggle = useCallback(() => {
