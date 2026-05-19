@@ -1,16 +1,20 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { findTopic } from "../../lib/curriculum";
-import MustKnowChecklist from "../../components/MustKnowChecklist";
-import StudyStepsChecklist from "../../components/StudyStepsChecklist";
-import TopicCurriculumImages from "../../components/TopicCurriculumImages";
-import OrgChem2MechanismStepCards from "../../components/OrgChem2MechanismStepCards";
-import OrgChem2ReactionTables from "../../components/OrgChem2ReactionTables";
-import { ChemFormattedLine } from "../../lib/chemTypography";
-import { getOrgChem2MechanismSupplementalSvg } from "../../lib/orgochem2MechanismSupplementalSvg";
-import TopicHeroDiagram from "../../components/TopicHeroDiagram";
-import TopicPracticeMcqs from "../../components/TopicPracticeMcqs";
+import { findTopic } from "@/app/lib/curriculum";
+import MustKnowChecklist from "@/app/components/MustKnowChecklist";
+import StudyStepsChecklist from "@/app/components/StudyStepsChecklist";
+import TopicCurriculumImages from "@/app/components/TopicCurriculumImages";
+import OrgChem2MechanismStepCards from "@/app/components/OrgChem2MechanismStepCards";
+import OrgChem2ReactionTables from "@/app/components/OrgChem2ReactionTables";
+import { ChemFormattedLine } from "@/app/lib/chemTypography";
+import { getOrgChem2MechanismSupplementalSvg } from "@/app/lib/orgochem2MechanismSupplementalSvg";
+import TopicHeroDiagramView from "@/app/components/TopicHeroDiagram";
+import TopicPracticeMcqs from "@/app/components/TopicPracticeMcqs";
+import TopicToolsGrid from "@/components/TopicToolsGrid";
+import TopicSubNav from "@/components/TopicSubNav";
+import YouTubeTutorialCard from "@/components/YouTubeTutorialCard";
+import { partitionHowToStudy } from "@/lib/studySteps";
 
 function TopicIllustration({ slug, title }: { slug: string; title: string }) {
   const common = {
@@ -529,6 +533,19 @@ export default async function OrgoChem2TopicPage({
   const mechTag = guessMechanismTag(topic.slug);
   const supplementalSvg = topic.hasMechanism ? getOrgChem2MechanismSupplementalSvg(topic.slug) : undefined;
   const hasSpectraImages = topic.images?.some((im) => im.section === "spectra") ?? false;
+  const { steps: studySteps, tips: extractedTips } = partitionHowToStudy(topic.howToStudy);
+  const tipItems = [
+    ...extractedTips,
+    ...(topic.tips ?? []),
+  ];
+  const displayTips =
+    tipItems.length > 0
+      ? tipItems
+      : [
+          "Keep Week 1–2 skills warm: resonance and acid–base arguments belong in every later mechanism",
+          "For aromatics, decide EAS vs NAS vs side-chain chemistry before drawing arrows",
+          "For carbonyls and derivatives, label addition vs acyl substitution before predicting products",
+        ];
 
   return (
     <main className="stack orgochem2-topic">
@@ -551,11 +568,13 @@ export default async function OrgoChem2TopicPage({
 
             <div className="topicHero">
               {topic.heroDiagram ? (
-                <TopicHeroDiagram diagram={topic.heroDiagram} />
+                <TopicHeroDiagramView diagram={topic.heroDiagram} />
               ) : (
                 <TopicIllustration slug={topic.slug} title={topic.title} />
               )}
             </div>
+
+            <TopicSubNav />
 
             <div className="divider" />
 
@@ -573,17 +592,12 @@ export default async function OrgoChem2TopicPage({
                 </div>
                 <TopicCurriculumImages images={topic.images} section="summary" />
                 {topic.overviewVideoId ? (
-                  <div style={{ marginTop: 16, maxWidth: 720 }}>
+                  <div style={{ marginTop: 16 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#007AFF" }}>Video tutorial</div>
-                    <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%", height: 0, borderRadius: 12, overflow: "hidden", border: "1px solid rgba(0,0,0,0.08)" }}>
-                      <iframe
-                        title={`${topic.title} tutorial`}
-                        src={`https://www.youtube.com/embed/${topic.overviewVideoId}`}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                        style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
-                      />
-                    </div>
+                    <YouTubeTutorialCard
+                      videoId={topic.overviewVideoId}
+                      title={`${topic.title} — overview`}
+                    />
                   </div>
                 ) : null}
                 <div style={{ marginTop: 16, padding: 16, background: "rgba(0, 122, 255, 0.04)", borderRadius: 12, border: "1px solid rgba(0, 122, 255, 0.1)" }}>
@@ -661,8 +675,18 @@ export default async function OrgoChem2TopicPage({
             </div>
 
             <Section title="Study steps">
-              <StudyStepsChecklist chemPolish items={topic.howToStudy} course="orgochem-2" topic={topic.slug} />
+              <StudyStepsChecklist chemPolish items={studySteps} course="orgochem-2" topic={topic.slug} />
             </Section>
+
+            <Section title="💡 Tips">
+                <div className="topicTips">
+                  {displayTips.map((t, i) => (
+                    <div key={i} className="topicTipItem">
+                      <ChemFormattedLine text={t} />
+                    </div>
+                  ))}
+                </div>
+              </Section>
 
             <Section title="Tools">
               <div className="topicToolRow">
@@ -675,11 +699,6 @@ export default async function OrgoChem2TopicPage({
                   <Link className="btn" href="/spectra">
                     NMR Studio (reference spectra)
                   </Link>
-                ) : null}
-                {!topic.hasMechanism &&
-                topic.slug !== "nmr-spectroscopy-review" &&
-                topic.slug !== "substitution-elimination-nmr-review" ? (
-                  <div className="subtle">No specialized tools needed for this topic</div>
                 ) : null}
               </div>
 
@@ -701,28 +720,31 @@ export default async function OrgoChem2TopicPage({
                   <TopicPracticeMcqs questions={topic.practiceMcqs} />
                 </div>
               ) : null}
-              <div className="topicPracticeRow" style={{ flexWrap: "wrap", gap: 12 }}>
-                <div className="topicPracticeText">
-                  {topic.practiceHref
-                    ? "Open the linked drill (interactive practice, NMR studio, quiz, or exam bank)."
-                    : "Use exam mode for uploaded materials and mixed review; topic-specific MCQs are listed above when available."}
-                </div>
-                <div className="topicToolRow" style={{ flexWrap: "wrap" }}>
-                  {topic.practiceHref ? (
-                    <Link className="btn btnPrimary" href={topic.practiceHref}>
-                      Open linked drill
-                    </Link>
-                  ) : null}
-                  <Link
-                    className={topic.practiceHref ? "btn" : "btn btnPrimary"}
-                    href={`/orgochem-2/exams?topic=${encodeURIComponent(topic.slug)}`}
-                  >
-                    Exam practice (this topic)
-                  </Link>
-                  <Link className="btn" href="/orgochem-2/exams">
-                    Exam hub
+              {topic.practiceHref ? (
+                <div className="topicPracticeRow" style={{ marginBottom: 12 }}>
+                  <div className="topicPracticeText">
+                    Open the linked drill (interactive practice, NMR studio, quiz, or exam bank).
+                  </div>
+                  <Link className="btn btnPrimary" href={topic.practiceHref}>
+                    Open linked drill
                   </Link>
                 </div>
+              ) : (
+                <div className="topicPracticeText" style={{ marginBottom: 12 }}>
+                  Use exam mode for uploaded materials and mixed review; topic-specific MCQs are listed above when available.
+                </div>
+              )}
+              <div style={{ fontWeight: 700, marginBottom: 8 }}>Exam practice</div>
+              <div className="topicToolRow" style={{ flexWrap: "wrap", gap: 8 }}>
+                <Link
+                  className="btn btnPrimary"
+                  href={`/orgochem-2/exams?topic=${encodeURIComponent(topic.slug)}`}
+                >
+                  Practice This Topic
+                </Link>
+                <Link className="btn" href="/orgochem-2/exams">
+                  Full Exam Hub
+                </Link>
               </div>
             </Section>
 
@@ -750,22 +772,10 @@ export default async function OrgoChem2TopicPage({
               </div>
             </Section>
 
-            <Section title="Tips">
-              <div className="topicTips">
-                {(topic.tips && topic.tips.length > 0
-                  ? topic.tips
-                  : [
-                      "Keep Week 1–2 skills warm: resonance and acid–base arguments belong in every later mechanism",
-                      "For aromatics, decide EAS vs NAS vs side-chain chemistry before drawing arrows",
-                      "For carbonyls and derivatives, label addition vs acyl substitution before predicting products",
-                    ]
-                ).map((t, i) => (
-                  <div key={i} className="topicTipItem">
-                    <ChemFormattedLine text={t} />
-                  </div>
-                ))}
-              </div>
+            <Section title="Resources">
+              <TopicToolsGrid slug={topic.slug} title={topic.title} />
             </Section>
+
           </div>
         </div>
       </div>

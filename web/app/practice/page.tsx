@@ -2,7 +2,35 @@
 
 import { Suspense, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import PracticeAchievements from "../components/PracticeAchievements";
+import PracticeAchievements from "@/app/components/PracticeAchievements";
+
+type SessionEntry = { score: number; date: string };
+
+function loadSessionHistory(): SessionEntry[] {
+  try {
+    const saved = localStorage.getItem("orgopivy-practice-history");
+    if (saved) return JSON.parse(saved) as SessionEntry[];
+  } catch (e) {
+    console.error("Failed to load practice history", e);
+  }
+  return [];
+}
+
+function loadPracticeStats(): { totalQuestions: number; correctAnswers: number } {
+  try {
+    const saved = localStorage.getItem("orgopivy-practice-stats");
+    if (saved) {
+      const stats = JSON.parse(saved) as { totalQuestions?: number; correctAnswers?: number };
+      return {
+        totalQuestions: stats.totalQuestions || 0,
+        correctAnswers: stats.correctAnswers || 0,
+      };
+    }
+  } catch (e) {
+    console.error("Failed to load practice stats", e);
+  }
+  return { totalQuestions: 0, correctAnswers: 0 };
+}
 
 type PracticePrompt = {
   substrate: string;
@@ -48,9 +76,15 @@ function PracticePageContent() {
 
   const [answer, setAnswer] = useState("");
   const [score, setScore] = useState(0);
-  const [totalQuestions, setTotalQuestions] = useState(0);
-  const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [sessionHistory, setSessionHistory] = useState<Array<{ score: number; date: string }>>([]);
+  const [totalQuestions, setTotalQuestions] = useState(() =>
+    typeof window !== "undefined" ? loadPracticeStats().totalQuestions : 0,
+  );
+  const [correctAnswers, setCorrectAnswers] = useState(() =>
+    typeof window !== "undefined" ? loadPracticeStats().correctAnswers : 0,
+  );
+  const [sessionHistory, setSessionHistory] = useState<SessionEntry[]>(() =>
+    typeof window !== "undefined" ? loadSessionHistory() : [],
+  );
 
   const [decision, setDecision] = useState<string>("");
   const [decisionReason, setDecisionReason] = useState<string>("");
@@ -58,32 +92,6 @@ function PracticePageContent() {
   const [message, setMessage] = useState("");
   const [correct, setCorrect] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
-
-  // Load session history
-  useEffect(() => {
-    const saved = localStorage.getItem("orgopivy-practice-history");
-    if (saved) {
-      try {
-        setSessionHistory(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to load practice history", e);
-      }
-    }
-  }, []);
-
-  // Load total stats
-  useEffect(() => {
-    const saved = localStorage.getItem("orgopivy-practice-stats");
-    if (saved) {
-      try {
-        const stats = JSON.parse(saved);
-        setTotalQuestions(stats.totalQuestions || 0);
-        setCorrectAnswers(stats.correctAnswers || 0);
-      } catch (e) {
-        console.error("Failed to load practice stats", e);
-      }
-    }
-  }, []);
 
   async function start() {
     setLoading(true);
@@ -330,7 +338,6 @@ function PracticePageContent() {
               <>
                 <div className="divider" />
                 <PracticeAchievements
-                  score={score}
                   totalQuestions={totalQuestions}
                   correctAnswers={correctAnswers}
                   sessionHistory={sessionHistory}

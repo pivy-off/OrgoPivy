@@ -1,8 +1,8 @@
 import Link from "next/link";
-import ExamVaultClient from "../../components/ExamVaultClient";
-import ExamPracticeMode from "../../components/ExamPracticeMode";
-import { getCourseTopics } from "../../lib/curriculum";
-import ExamPageClient from "../../components/ExamPageClient";
+import ExamVaultClient from "@/app/components/ExamVaultClient";
+import ExamPracticeMode from "@/app/components/ExamPracticeMode";
+import { getCourseTopics } from "@/app/lib/curriculum";
+import ExamPageClient from "@/app/components/ExamPageClient";
 
 export default function OrgoChem2ExamsPage() {
   const topics = getCourseTopics("orgochem-2");

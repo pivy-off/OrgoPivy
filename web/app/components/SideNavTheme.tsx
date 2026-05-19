@@ -10,10 +10,11 @@ function readTheme(): Theme {
 }
 
 export default function SideNavTheme() {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>(() =>
+    typeof window !== "undefined" ? readTheme() : "light",
+  );
 
   useEffect(() => {
-    setTheme(readTheme());
     const el = document.documentElement;
     const obs = new MutationObserver(() => setTheme(readTheme()));
     obs.observe(el, { attributes: true, attributeFilter: ["data-theme"] });

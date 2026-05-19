@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 type Achievement = {
   id: string;
@@ -13,14 +13,25 @@ type Achievement = {
 };
 
 type Props = {
-  score: number;
   totalQuestions: number;
   correctAnswers: number;
   sessionHistory: Array<{ score: number; date: string }>;
 };
 
-export default function PracticeAchievements({ score, totalQuestions, correctAnswers, sessionHistory }: Props) {
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
+const ACHIEVEMENTS_KEY = "orgopivy-practice-achievements";
+
+function loadSavedAchievements(): Achievement[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const saved = localStorage.getItem(ACHIEVEMENTS_KEY);
+    if (saved) return JSON.parse(saved) as Achievement[];
+  } catch (e) {
+    console.error("Failed to load achievements", e);
+  }
+  return [];
+}
+
+export default function PracticeAchievements({ totalQuestions, correctAnswers, sessionHistory }: Props) {
 
   const percentage = useMemo(() => {
     if (totalQuestions === 0) return 0;
@@ -33,91 +44,79 @@ export default function PracticeAchievements({ score, totalQuestions, correctAns
     return Math.round(sum / sessionHistory.length);
   }, [sessionHistory]);
 
-  useEffect(() => {
-    const storageKey = "orgopivy-practice-achievements";
-    const saved = localStorage.getItem(storageKey);
-    let savedAchievements: Achievement[] = [];
-    
-    if (saved) {
-      try {
-        savedAchievements = JSON.parse(saved);
-      } catch (e) {
-        console.error("Failed to load achievements", e);
-      }
-    }
-
-    const allAchievements: Achievement[] = [
+  const achievements = useMemo(() => {
+    const savedAchievements = typeof window !== "undefined" ? loadSavedAchievements() : [];
+    const wasUnlocked = (id: string) => savedAchievements.find((a) => a.id === id)?.unlocked ?? false;
+    return [
       {
         id: "first-correct",
         name: "First Steps",
         description: "Answer your first question correctly",
         icon: "🎯",
-        unlocked: savedAchievements.find(a => a.id === "first-correct")?.unlocked || correctAnswers >= 1,
+        unlocked: wasUnlocked("first-correct") || correctAnswers >= 1,
         progress: Math.min(correctAnswers, 1),
-        maxProgress: 1
+        maxProgress: 1,
       },
       {
         id: "perfect-10",
         name: "Perfect 10",
         description: "Get 10 questions correct in a row",
         icon: "🔥",
-        unlocked: savedAchievements.find(a => a.id === "perfect-10")?.unlocked || correctAnswers >= 10,
+        unlocked: wasUnlocked("perfect-10") || correctAnswers >= 10,
         progress: Math.min(correctAnswers, 10),
-        maxProgress: 10
+        maxProgress: 10,
       },
       {
         id: "century",
         name: "Century Club",
         description: "Answer 100 questions correctly",
         icon: "💯",
-        unlocked: savedAchievements.find(a => a.id === "century")?.unlocked || correctAnswers >= 100,
+        unlocked: wasUnlocked("century") || correctAnswers >= 100,
         progress: Math.min(correctAnswers, 100),
-        maxProgress: 100
+        maxProgress: 100,
       },
       {
         id: "perfect-score",
         name: "Perfect Score",
         description: "Achieve 100% on a practice session",
         icon: "⭐",
-        unlocked: savedAchievements.find(a => a.id === "perfect-score")?.unlocked || percentage === 100,
+        unlocked: wasUnlocked("perfect-score") || percentage === 100,
         progress: percentage >= 100 ? 1 : 0,
-        maxProgress: 1
+        maxProgress: 1,
       },
       {
         id: "consistent",
         name: "Consistent Performer",
         description: "Maintain 80%+ average across 5 sessions",
         icon: "📈",
-        unlocked: savedAchievements.find(a => a.id === "consistent")?.unlocked || (sessionHistory.length >= 5 && averageScore >= 80),
+        unlocked: wasUnlocked("consistent") || (sessionHistory.length >= 5 && averageScore >= 80),
         progress: Math.min(sessionHistory.length, 5),
-        maxProgress: 5
+        maxProgress: 5,
       },
       {
         id: "dedicated",
         name: "Dedicated Learner",
         description: "Complete 20 practice sessions",
         icon: "🏆",
-        unlocked: savedAchievements.find(a => a.id === "dedicated")?.unlocked || sessionHistory.length >= 20,
+        unlocked: wasUnlocked("dedicated") || sessionHistory.length >= 20,
         progress: Math.min(sessionHistory.length, 20),
-        maxProgress: 20
-      }
+        maxProgress: 20,
+      },
     ];
+  }, [correctAnswers, percentage, sessionHistory.length, averageScore]);
 
-    // Check for newly unlocked achievements
-    const newlyUnlocked = allAchievements.filter(a => {
-      const saved = savedAchievements.find(sa => sa.id === a.id);
-      return a.unlocked && (!saved || !saved.unlocked);
-    });
-
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = loadSavedAchievements();
+    const newlyUnlocked = achievements.filter(
+      (a) => a.unlocked && !saved.find((s) => s.id === a.id)?.unlocked,
+    );
     if (newlyUnlocked.length > 0) {
-      // Show notification for new achievements
       console.log("New achievements unlocked!", newlyUnlocked);
     }
+    localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(achievements));
+  }, [achievements]);
 
-    // Save updated achievements
-    localStorage.setItem(storageKey, JSON.stringify(allAchievements));
-    setAchievements(allAchievements);
-  }, [correctAnswers, percentage, sessionHistory.length, averageScore]);
 
   const unlockedCount = achievements.filter(a => a.unlocked).length;
   const totalCount = achievements.length;

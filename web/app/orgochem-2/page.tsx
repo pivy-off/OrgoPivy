@@ -1,7 +1,7 @@
 // app/orgochem-2/page.tsx
 import Link from "next/link";
-import { getCourseTopics } from "../lib/curriculum";
-import type { Topic } from "../lib/curriculum";
+import { getCourseTopics } from "@/app/lib/curriculum";
+import type { Topic } from "@/app/lib/curriculum";
 
 function weekSortKey(t: Topic) {
   return t.scheduleWeek ?? 999;

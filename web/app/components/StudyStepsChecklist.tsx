@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ChemFormattedLine } from "../lib/chemTypography";
+import { isStudyTip } from "@/lib/studySteps";
 
 type Props = {
   items: string[];
@@ -10,23 +11,22 @@ type Props = {
   chemPolish?: boolean;
 };
 
+function loadChecked(storageKey: string): Set<number> {
+  try {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) return new Set(JSON.parse(saved) as number[]);
+  } catch (e) {
+    console.error("Failed to load study steps progress", e);
+  }
+  return new Set();
+}
+
 export default function StudyStepsChecklist({ items, course, topic, chemPolish }: Props) {
   const storageKey = `orgopivy-study-steps-${course}-${topic}`;
-  
-  const [checked, setChecked] = useState<Set<number>>(new Set());
 
-  useEffect(() => {
-    // Load saved progress
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setChecked(new Set(parsed));
-      }
-    } catch (e) {
-      console.error("Failed to load study steps progress", e);
-    }
-  }, [storageKey]);
+  const [checked, setChecked] = useState<Set<number>>(() =>
+    typeof window !== "undefined" ? loadChecked(storageKey) : new Set(),
+  );
 
   const toggleItem = (index: number) => {
     setChecked((prev) => {
@@ -48,7 +48,8 @@ export default function StudyStepsChecklist({ items, course, topic, chemPolish }
     });
   };
 
-  const progress = items.length > 0 ? (checked.size / items.length) * 100 : 0;
+  const steps = items.filter((raw) => !isStudyTip(raw));
+  const progress = steps.length > 0 ? (checked.size / steps.length) * 100 : 0;
 
   return (
     <div>
@@ -59,7 +60,7 @@ export default function StudyStepsChecklist({ items, course, topic, chemPolish }
         marginBottom: 16
       }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(0, 0, 0, 0.6)" }}>
-          Progress: {checked.size} / {items.length}
+          Progress: {checked.size} / {steps.length}
         </div>
         <div style={{
           width: 120,
@@ -78,7 +79,7 @@ export default function StudyStepsChecklist({ items, course, topic, chemPolish }
       </div>
 
       <div style={{ display: "grid", gap: 12 }}>
-        {items.map((raw, i) => {
+        {steps.map((raw, i) => {
           const parts = raw.split(":");
           const head = (parts[0] || "").trim();
           const tail = parts.slice(1).join(":").trim();

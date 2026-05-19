@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CourseId, Topic } from "../lib/curriculum";
 
 type UploadItem = {
@@ -56,7 +56,9 @@ export default function ExamVaultClient({
   }, []);
 
   const [uploads, setUploads] = useState<UploadItem[]>([]);
-  const [meta, setMeta] = useState<MetaMap>({});
+  const [meta, setMeta] = useState<MetaMap>(() =>
+    typeof window !== "undefined" ? safeParse(localStorage.getItem(metaKey())) : {},
+  );
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
@@ -64,14 +66,10 @@ export default function ExamVaultClient({
   const [filterTopic, setFilterTopic] = useState<string>("all");
 
   useEffect(() => {
-    setMeta(safeParse(localStorage.getItem(metaKey())));
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem(metaKey(), JSON.stringify(meta));
   }, [meta]);
 
-  async function refresh() {
+  const refresh = useCallback(async () => {
     setLoading(true);
     setMsg("");
     try {
@@ -82,16 +80,16 @@ export default function ExamVaultClient({
       }
       const data = (await res.json()) as UploadsResponse;
       setUploads(data.items || []);
-    } catch (e: any) {
-      setMsg(e?.message || "Failed to load uploads");
+    } catch (e: unknown) {
+      setMsg(e instanceof Error ? e.message : "Failed to load uploads");
     } finally {
       setLoading(false);
     }
-  }
+  }, [apiBase]);
 
   useEffect(() => {
     refresh();
-  }, []);
+  }, [refresh]);
 
   function setField(stored: string, patch: Partial<ExamMeta>) {
     setMeta((m) => {

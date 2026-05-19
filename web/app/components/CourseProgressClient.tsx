@@ -28,12 +28,9 @@ export default function CourseProgressClient({
   course: CourseId;
   topics: Topic[];
 }) {
-  const [progress, setProgress] = useState<ProgressMap>({});
-
-  useEffect(() => {
-    const key = storageKey(course);
-    setProgress(safeParse(localStorage.getItem(key)));
-  }, [course]);
+  const [progress, setProgress] = useState<ProgressMap>(() =>
+    typeof window !== "undefined" ? safeParse(localStorage.getItem(storageKey(course))) : {},
+  );
 
   useEffect(() => {
     const key = storageKey(course);

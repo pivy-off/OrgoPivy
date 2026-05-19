@@ -10,6 +10,7 @@ import os
 
 from app.ingest import chunk_text, score, make_answer
 from app import admet_ai_service as admet_svc
+from app import gemini_ask as gemini_ask_module
 from app.security import (
     limiter,
     SecurityHeadersMiddleware,
@@ -30,6 +31,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 
 app = FastAPI(title="OrgoPivy API", version="0.3.0")
+app.include_router(gemini_ask_module.router)
 
 # Add security middleware (order matters - add before CORS)
 app.add_middleware(SecurityHeadersMiddleware)
@@ -46,7 +48,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[origin.strip() for origin in allowed_origins],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "DELETE"],  # Only allow needed methods
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],  # Only allow needed methods
     allow_headers=["Content-Type", "Authorization", "Accept"],  # Restrict headers but allow necessary ones
     expose_headers=["X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
     max_age=3600,  # Cache preflight requests for 1 hour

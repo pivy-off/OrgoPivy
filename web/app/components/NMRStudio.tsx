@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useRef } from "react";
 import SpectraReferencePanels from "./SpectraReferencePanels";
 
@@ -229,14 +230,17 @@ export default function NMRStudio() {
             />
             {spectrumPreview ? (
               <div>
-                <img
+                <Image
                   src={spectrumPreview}
                   alt="Spectrum preview"
+                  width={640}
+                  height={300}
+                  unoptimized
                   style={{
                     maxWidth: "100%",
-                    maxHeight: 300,
+                    height: "auto",
                     borderRadius: 8,
-                    marginBottom: 12
+                    marginBottom: 12,
                   }}
                 />
                 <div style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.6)" }}>

@@ -113,16 +113,96 @@ def gen_pack(slug, n):
     return out
 
 
-for slug, n in [
-    ("resonance-acid-base-review", 10),
-    ("substitution-elimination-nmr-review", 10),
-    ("alkynes", 10),
-    ("grignard-reaction", 10),
-    ("organohalides-radical", 10),
-    ("conjugated-compounds-diels-alder", 10),
-    ("nucleophilic-aromatic-substitution", 10),
-]:
-    PRACTICE[slug] = gen_pack(slug, n)
+PRACTICE["resonance-acid-base-review"] = [
+    mcq("Acetic acid (pKa 4.8) is mixed with water (pKa 15.7). Which side is favored at equilibrium?", ["Products (acetate + H3O+)", "Reactants (acetic acid + H2O)", "Equal mixture", "No reaction"], 0, "Lower pKa acid (acetic acid) is stronger; equilibrium favors the weaker acid side (higher pKa): water/conjugate base."),
+    mcq("In resonance, which of the following is NEVER allowed to move?", ["A pi bond", "A lone pair", "A sigma bond", "A formal charge"], 2, "Only pi bonds and lone pairs move; sigma framework and atom positions stay fixed."),
+    mcq("Adding a strong electron-withdrawing group (EWG) to benzoic acid will:", ["Decrease acidity by destabilizing the anion", "Increase acidity by stabilizing the carboxylate anion", "Have no effect on acidity", "Convert the acid to a base"], 1, "EWGs pull electron density away, stabilizing RCOO⁻ and lowering pKa (stronger acid)."),
+    mcq("Can NaOH (conjugate acid H2O, pKa 15.7) deprotonate a terminal alkyne (pKa ~25)?", ["Yes — OH⁻ is always strong enough", "No — the alkyne is a much weaker acid than water", "Yes — but only with heat", "Only if the alkyne is internal"], 1, "Equilibrium favors deprotonation only when the new acid is weaker (higher pKa). Water cannot pull H from terminal alkyne."),
+    mcq("Rank these from MOST acidic to LEAST acidic:", ["Ethanol < phenol < acetic acid", "Acetic acid < phenol < ethanol", "Phenol < ethanol < acetic acid", "Ethanol < acetic acid < phenol"], 1, "Typical pKa: RCOOH ~5, PhOH ~10, ROH ~16. Lower pKa = stronger acid."),
+    mcq("In the reaction HCl + NH3 → NH4+ + Cl⁻, the conjugate acid of NH3 is:", ["Cl⁻", "HCl", "NH4+", "NH3"], 2, "NH3 accepts H+ to become NH4+; NH4+ is the conjugate acid of base NH3."),
+    mcq("Which resonance contributor is most important for the acetate anion?", ["Structure with negative charge on carbon", "Structure with both oxygens bearing partial negative charge", "Structure with positive charge on oxygen", "Non-bonded carbon radical"], 1, "Negative charge on electronegative oxygens is best; both C=O and C–O⁻ forms are major contributors."),
+    mcq("An EDG (electron-donating group) on benzoic acid will:", ["Increase acidity", "Decrease acidity by destabilizing the anion", "Increase acidity by stabilizing the anion", "Stop resonance"], 1, "EDGs donate into the ring/anions, destabilizing RCOO⁻ → weaker acid (higher pKa)."),
+    mcq("For HA + B: ⇌ A: + HB+, equilibrium lies right when:", ["pKa(HA) > pKa(HB+)", "pKa(HA) < pKa(HB+)", "pKa values are equal", "B: is a weaker base than A:"], 1, "Equilibrium favors the weaker acid (higher pKa product side). Right if HA is stronger (lower pKa) than HB+."),
+    mcq("Which pair is a conjugate acid–base pair?", ["H2O and OH⁻", "HCl and NaOH", "CH4 and CH3⁻", "Benzene and toluene"], 0, "Conjugate pairs differ by one H+: H2O/OH⁻. HCl/NaOH are reactants, not a conjugate pair."),
+]
+
+PRACTICE["substitution-elimination-nmr-review"] = [
+    mcq("A 1° alkyl bromide in acetone with NaI (polar aprotic) undergoes:", ["SN1", "SN2", "E1", "E2"], 1, "1° + strong nucleophile + polar aprotic solvent → SN2 (backside attack, inversion)."),
+    mcq("tert-Butyl bromide in ethanol (weak nucleophile, protic) favors:", ["SN2", "SN1 and/or E1", "Only E2", "No reaction"], 1, "3° substrate + weak Nu, protic solvent → carbocation pathway (SN1/E1)."),
+    mcq("TsCl/pyridine on an alcohol gives –OTs. The C–O bond at carbon:", ["Breaks with inversion", "Breaks with retention", "Is retained (no cleavage at C)", "Is oxidized"], 2, "Tosylation replaces H on O; C–O bond to carbon stays intact → configuration retained."),
+    mcq("Carboxylic acid O–H in ¹H NMR appears at approximately:", ["2–3 ppm", "7 ppm", "10–13 ppm (broad)", "0 ppm"], 2, "Acid O–H is very deshielded and broad due to H-bonding (10–13 ppm)."),
+    mcq("IR: a strong broad band 2500–3500 cm⁻¹ plus C=O ~1710 cm⁻¹ suggests:", ["Ester", "Carboxylic acid", "Alkene", "Ether"], 1, "Broad O–H (acid dimer) + C=O ~1710 is classic carboxylic acid."),
+    mcq("SN2 stereochemistry at a chiral center:", ["Racemization", "Retention", "Inversion", "Syn addition"], 2, "Backside attack inverts configuration (Walden inversion)."),
+    mcq("E2 requires:", ["Carbocation intermediate", "Anti-periplanar H and leaving group", "Weak base only", "Protic solvent only"], 1, "Concerted elimination: H and LG anti-coplanar."),
+    mcq("Benzylic bromide + NaCN in DMSO — dominant pathway?", ["E2 only", "SN2 at benzylic carbon", "SN1 with rearrangement", "No reaction"], 1, "Benzylic/allylic positions undergo SN2 readily; CN⁻ is strong Nu."),
+    mcq("A triplet at ~1.1 ppm (3H) and quartet at ~3.4 ppm (2H) suggest:", ["Isopropyl group", "Ethyl group", "tert-Butyl", "Phenyl"], 1, "Ethyl: CH3 triplet (3H) coupled to CH2 quartet (2H) — n+1 rule."),
+    mcq("Why use tosylate before SN2 with a basic nucleophile (e.g. RO⁻)?", ["TsO⁻ is a better leaving group than OH⁻", "OH⁻ would protonate the nucleophile", "TsCl oxidizes the alcohol", "Ts groups block all reaction"], 0, "–OTs is an excellent LG; allows SN2/E2 under basic conditions that fail with –OH."),
+]
+
+PRACTICE["alkynes"] = [
+    mcq("Terminal alkyne RC≡CH + HgSO4/H2SO4/H2O gives (after tautomerization):", ["Aldehyde", "Methyl ketone", "Primary alcohol", "Alkane"], 1, "Markovnikov hydration → enol → keto tautomer → methyl ketone."),
+    mcq("Internal alkyne + Sia2BH then H2O2/NaOH gives:", ["Ketone", "cis diol", "Aldehyde (anti-Markovnikov)", "Trans alkene"], 2, "Hydroboration–oxidation on alkyne gives aldehyde (terminal) or ketone patterns; anti-Markovnikov vs acid-catalyzed Hg²⁺."),
+    mcq("Lindlar catalyst (H2, poisoned Pd) on an alkyne gives:", ["Trans alkene", "cis alkene", "Alkane", "Diol"], 1, "Lindlar stops at cis alkene; Na/NH3 gives trans."),
+    mcq("Terminal alkyne + NaNH2, then CH3CH2Br gives:", ["E2 alkene", "Internal alkyne from SN2", "Alkane", "Vinyl bromide"], 1, "NaNH2 → acetylide; SN2 on 1° halide extends the chain."),
+    mcq("Two equivalents of Br2 to an alkyne give:", ["Vinyl bromide", "Tetrahalide (geminal/tetrabromo)", "Bromohydrin", "No reaction"], 1, "Each π bond can add X2; 2 equiv → tetrahalogenated product."),
+    mcq("KMnO4 (hot) cleavage of RC≡CR (internal alkyne) gives:", ["Two aldehydes", "Two carboxylic acids", "CO2 only", "Ketone + acid"], 1, "Internal alkyne oxidative cleavage → two carboxylic acids."),
+    mcq("H2/Pt on an alkyne (excess) gives:", ["cis alkene", "trans alkene", "Fully hydrogenated alkane", "Enol"], 2, "Unpoisoned Pd/C reduces all the way to alkane."),
+    mcq("Why can't acetylide anions do SN2 on tert-butyl bromide?", ["Too weak nucleophile", "Steric hindrance prevents SN2 at 3°", "Br⁻ is too basic", "Alkynes are acids only"], 1, "Acetylide is strong Nu but 3° halides eliminate (E2) instead of SN2."),
+    mcq("HX (1 equiv) adds to 1-butyne to give major:", ["1-bromo-1-butene", "2-bromo-1-butene (Markovnikov)", "1,2-dibromobutane", "Butane"], 1, "First addition is Markovnikov: H to less substituted C, X to more substituted vinylic C."),
+    mcq("Terminal alkyne oxidative cleavage (O3 or hot KMnO4) also produces:", ["Ethene", "CO2 (from terminal carbon)", "Methanol", "Ester"], 1, "Terminal C≡CH → RCOOH + CO2."),
+]
+
+PRACTICE["grignard-reaction"] = [
+    mcq("Grignard reagents are typically prepared in:", ["Water", "Dry ether or THF", "Concentrated HCl", "Liquid NH3 only"], 1, "RMgX requires anhydrous ether/THF; water destroys the reagent."),
+    mcq("PhMgBr + benzaldehyde, then H3O+ workup gives:", ["Benzoic acid", "Diphenylmethanol (Ph-CH(OH)-Ph)", "Benzophenone", "Toluene"], 1, "Nucleophilic addition to aldehyde → secondary alcohol after protonation."),
+    mcq("Which substrate will DESTROY a Grignard reagent before it reaches the carbonyl?", ["Dry acetone", "Ester", "Terminal alkyne (acidic H)", "CO2"], 2, "Acidic C–H (terminal alkyne, alcohols, amines) protonates RMgX."),
+    mcq("RMgBr + CO2, then H3O+ gives:", ["Aldehyde", "Carboxylic acid (homologation)", "Ketone", "Ester"], 1, "CO2 acts as electrophile → carboxylate → acid after workup."),
+    mcq("Gilman reagents (R2CuLi) differ from Grignard because they often:", ["Add once to α,β-unsaturated carbonyls (1,4)", "Only reduce esters", "Require water", "Form radicals exclusively"], 0, "Organocuprates give conjugate (Michael-type) addition selectively vs simple 1,2 with many enones."),
+    mcq("Grignard + ester (2 equiv RMgX) after workup gives:", ["Tertiary alcohol", "Secondary alcohol", "Aldehyde", "Carboxylic acid"], 0, "Ester + 2 equiv Grignard → tertiary alcohol (two R groups from RMgX)."),
+    mcq("Why must the reaction flask be flame-dried for Grignard formation?", ["Mg is too reactive with O2 only", "Water quenches RMgX and can ignite", "Ether boils without drying", "CO2 is toxic"], 1, "Moisture protonates/carboxylates the organometallic; rigorously dry conditions required."),
+    mcq("Grignard + formaldehyde (H2CO) gives after H3O+:", ["Primary alcohol", "Secondary alcohol", "Tertiary alcohol", "Aldehyde"], 0, "Formaldehyde → 1° alcohol; one R from Grignard."),
+    mcq("Which carbonyl is MOST reactive toward Grignard addition?", ["Acetone", "Acetaldehyde", "Amide", "Carboxylate"], 1, "Aldehydes are less hindered and more electrophilic than ketones; amides/carboxylates are poor."),
+    mcq("A student has a molecule with –OH and –CHO. Grignard will:", ["Select only the alcohol", "Attack the carbonyl; –OH must be protected first if incompatible", "Reduce the alcohol", "Do nothing"], 1, "Grignard adds to C=O; acidic/alcoholic –OH also destroys RMgX — protect or use alternative."),
+]
+
+PRACTICE["organohalides-radical"] = [
+    mcq("Radical halogenation of methane with Cl2/light proceeds via:", ["SN2", "Carbocation", "Radical chain (initiation, propagation)", "E2"], 2, "Light/heat generates Cl·; radical chain mechanism."),
+    mcq("NBS + hν with cyclohexene gives allylic bromination because:", ["NBS is an electrophile only", "Low [Br2] favors allylic radical substitution", "It is SN2 at the double bond", "Benzene is formed"], 1, "NBS maintains low Br2 concentration → selective allylic/benzylic radical bromination."),
+    mcq("Radical stability order (most → least):", ["1° > 2° > 3°", "3° > 2° > 1° > methyl", "Methyl > 1°", "All equal"], 1, "Radicals stabilize with substitution: 3° > 2° > 1°; allylic/benzylic especially stable."),
+    mcq("PBr3 converts an alcohol to:", ["Alkyl chloride with inversion", "Alkyl bromide (C–O retained until substitution)", "Alkene", "Ether"], 1, "PBr3 → alkyl bromide; useful for 1°/2° alcohols."),
+    mcq("SOCl2/pyridine on a 2° alcohol gives:", ["Alkyl chloride with inversion", "Tosylate", "Ketone", "Ester"], 0, "SOCl2 converts ROH → RCl with inversion (SN2-like at carbon)."),
+    mcq("Anti-Markovnikov addition of HBr to an alkene uses:", ["HBr only", "HBr + peroxides (radical)", "Br2/H2O", "HgSO4"], 1, "Peroxides switch to radical addition → Br· adds to less substituted C."),
+    mcq("Which C–H is most likely abstracted in radical bromination of butane?", ["Terminal methyl (1°)", "Internal methylene (2°)", "Both equally", "None — only alkenes react"], 1, "2° C–H is weaker; bromination selectivity favors 2° > 1° (3° best when present)."),
+    mcq("Radical chain termination step is:", ["X· + RH → HX + R·", "R· + X· → R–X", "R· + R· → R–R", "Both B and C"], 3, "Termination: radical–radical coupling (R–R, R–X, X–X)."),
+    mcq("Why is fluorination of alkanes not used synthetically?", ["F2 too unreactive", "F· is too reactive and unselective", "No radicals form", "HF is the only product"], 1, "F· is extremely reactive; reactions are violent and unselective."),
+    mcq("Allylic bromination product of propene with NBS is:", ["1-bromopropane", "3-bromo-1-propene (allylic)", "2-bromopropane", "Propene dibromide"], 1, "Allylic position (CH2 next to C=C) is brominated."),
+]
+
+PRACTICE["conjugated-compounds-diels-alder"] = [
+    mcq("A conjugated diene is more stable than two isolated double bonds because:", ["Sigma bonds strengthen", "Pi electrons are delocalized", "It is antiaromatic", "Steric strain is higher"], 1, "Conjugation delocalizes π electrons → resonance stabilization."),
+    mcq("At low temperature, 1,3-butadiene + HBr gives mostly:", ["1,4-addition (thermodynamic)", "1,2-addition (kinetic)", "No reaction", "Diels–Alder product"], 1, "Kinetic control at low T → 1,2 (faster); high T favors 1,4 (more stable conjugated product)."),
+    mcq("Diels–Alder requires the diene in:", ["s-trans only", "s-cis conformation", "Non-planar boat", "Radical conditions"], 1, "Diene must be s-cis for [4+2] cycloaddition."),
+    mcq("A good dienophile for Diels–Alder typically has:", ["Electron-donating groups only", "Electron-withdrawing groups (activated alkene)", "No pi bonds", "Only alkyl groups"], 1, "EWG lowers LUMO of dienophile → faster cycloaddition."),
+    mcq("Diels–Alder stereochemistry with respect to the dienophile:", ["Racemizes the dienophile", "Suprafacial — cis substituents stay cis in product", "Inverts all stereocenters", "Random"], 1, "Concerted suprafacial [4+2] preserves dienophile cis/trans geometry in the ring."),
+    mcq("The Diels–Alder reaction is:", ["Stepwise ionic", "Concerted pericyclic", "Radical only", "SN2"], 1, "One-step concerted mechanism; no intermediates."),
+    mcq("1,3-butadiene + maleic anhydride (heat) gives:", ["Open-chain diol", "Cyclohexene derivative (adduct)", "Two alkenes", "Polymer only"], 1, "Classic Diels–Alder → substituted cyclohexene (here with anhydride bridge)."),
+    mcq("Why is 1,4-addition often favored at high temperature?", ["It is faster", "The conjugated 1,4 product is thermodynamically more stable", "1,2 is impossible", "Entropy only"], 1, "Thermodynamic control: more substituted/conjugated alkene is more stable."),
+    mcq("Which diene cannot undergo Diels–Alder easily?", ["Cyclopentadiene", "s-trans locked diene in a ring", "Isoprene (s-cis accessible)", "1,3-butadiene"], 1, "If s-cis is inaccessible (locked trans), [4+2] is slow or forbidden."),
+    mcq("Electron-rich diene + electron-poor dienophile is favored because:", ["HOMO–LUMO interaction is symmetry-allowed and energy-matched", "It is antiaromatic", "Only radicals react", "EDG blocks all reactivity"], 0, "Normal electron demand Diels–Alder: diene HOMO + dienophile LUMO."),
+]
+
+PRACTICE["nucleophilic-aromatic-substitution"] = [
+    mcq("NAS on chlorobenzene without EWGs is:", ["Very fast", "Essentially impossible under normal conditions", "Faster than EAS", "Radical only"], 1, "Simple aryl halides need strong EWGs ortho/para to halide for NAS."),
+    mcq("The NAS intermediate is called:", ["Carbocation", "Meisenheimer complex (anionic σ complex)", "Benzyne only", "Nitrene"], 1, "Nu attacks ipso → tetrahedral Meisenheimer; LG leaves."),
+    mcq("p-Nitrochlorobenzene + NaOH gives substitution because:", ["NO2 activates by resonance for NAS", "Chlorine is an EDG", "It is SN2 on sp3 carbon", "Only heat matters"], 0, "EWG ortho/para to Cl stabilizes Meisenheimer; enables NAS."),
+    mcq("Toluene side chain (benzylic CH3) + hot KMnO4 gives:", ["Benzyl alcohol", "Benzoic acid", "Toluene unchanged", "Benzaldehyde only"], 1, "Benzylic oxidation with KMnO4 → aromatic carboxylic acid (any alkyl side chain → COOH)."),
+    mcq("Benzylic bromination of toluene uses:", ["Br2/FeBr3 (EAS)", "NBS, hν (radical)", "NaOH", "SN2 with NaBr"], 1, "Radical allylic/benzylic: NBS + light."),
+    mcq("NAS differs from EAS because:", ["Electrophile attacks in NAS", "Nucleophile replaces leaving group on electron-poor ring", "It requires Lewis acid", "Aromaticity is never restored"], 1, "NAS: Nu replaces LG; ring must be activated by EWGs."),
+    mcq("Which is NOT required for aryl halide NAS?", ["EWG ortho or para to halide", "Strong nucleophile", "Meisenheimer intermediate", "Lewis acid catalyst like FeCl3"], 3, "FeCl3 is for EAS electrophile generation, not standard NAS."),
+    mcq("Chlorobenzene + NaNH2 (very strong base) can form benzyne. This is:", ["Standard NAS", "Elimination–addition (benzyne mechanism)", "EAS", "SN1"], 1, "Without EWG, strong base can eliminate to benzyne then add Nu."),
+    mcq("If both –NH2 and –NO2 are on the ring, which directs new NAS?", ["NH2 (ortho/para director)", "NO2 (meta, deactivating, but activates NAS when ortho/para to Cl)", "Neither", "Both equally for NAS"], 1, "For NAS, EWG like NO2 ortho/para to leaving group is key; NH2 is activating for EAS not NAS on halide."),
+    mcq("Product of NAS: p-chloronitrobenzene + methoxide:", ["Anisole (–OCH3 replaces Cl)", "Nitration product", "Reduction to aniline only", "No reaction"], 0, "Methoxide displaces Cl when NO2 activates ring → p-nitroanisole."),
+]
 
 
 def mki(title, desc, vid):

@@ -1836,9 +1836,10 @@ export default function ExamPracticeMode({ course, topic }: Props) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error downloading study guide:", error);
-      alert(`Error downloading study guide: ${error?.message || "Unknown error"}`);
+      const message = error instanceof Error ? error.message : "Unknown error";
+      alert(`Error downloading study guide: ${message}`);
     }
   };
 
@@ -1859,7 +1860,7 @@ export default function ExamPracticeMode({ course, topic }: Props) {
           <div style={{ marginBottom: 20 }}>
             <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Practice Mode</h2>
             <p style={{ fontSize: 15, color: "rgba(0, 0, 0, 0.6)", lineHeight: 1.6 }}>
-              Select an exam to practice. You'll receive immediate feedback on each problem and see your score at the end.
+              Select an exam to practice. You&apos;ll receive immediate feedback on each problem and see your score at the end.
             </p>
           </div>
 
