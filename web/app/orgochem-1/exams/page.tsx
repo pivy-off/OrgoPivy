@@ -1,6 +1,5 @@
 import Link from "next/link";
 import ExamVaultClient from "../../components/ExamVaultClient";
-import ExamPracticeMode from "../../components/ExamPracticeMode";
 import { getCourseTopics } from "../../lib/curriculum";
 import ExamPageClient from "../../components/ExamPageClient";
 

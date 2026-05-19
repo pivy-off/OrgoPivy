@@ -635,7 +635,6 @@ export default async function OrgoChem2TopicPage({
                 {supplementalSvg ? (
                   <div
                     className="orgochem2MechanismSupplemental"
-                    // eslint-disable-next-line react/no-danger -- static curriculum SVG only
                     dangerouslySetInnerHTML={{ __html: supplementalSvg }}
                   />
                 ) : null}

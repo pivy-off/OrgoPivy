@@ -435,11 +435,11 @@ export default function UploadsPage() {
               <div style={{ fontWeight: 850, marginBottom: 8 }}>Preview</div>
               <div className="card" style={{ boxShadow: "none", minHeight: 200 }}>
                 <div className="cardInner" style={{ padding: 12 }}>
-                  {busy && !previewText ? <OpSpinner label="Loading preview…" /> : null}
+                  {previewBusy && !previewText ? <OpSpinner label="Loading preview…" /> : null}
                   {previewText ? (
                     <pre style={{ whiteSpace: "pre-wrap", margin: 0, fontSize: 12, color: "var(--muted)", lineHeight: 1.55 }}>{previewText}</pre>
                   ) : (
-                    !busy && <div className="subtle">No text preview</div>
+                    !previewBusy && <div className="subtle">No text preview</div>
                   )}
                 </div>
               </div>

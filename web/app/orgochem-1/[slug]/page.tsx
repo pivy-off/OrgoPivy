@@ -272,25 +272,11 @@ function Section({
   );
 }
 
-function Checklist({ items }: { items: string[] }) {
-  return (
-    <div className="topicChecklist">
-      {items.map((raw, i) => {
-        const parts = raw.split(":");
-        const head = (parts[0] || "").trim();
-        const tail = parts.slice(1).join(":").trim();
-        return (
-          <div key={`${i}-${raw}`} className="topicCheckItem">
-            <div className="topicCheckBox" aria-hidden="true" />
-            <div className="topicCheckText">
-              <div className="topicCheckHead">{head}</div>
-              {tail ? <div className="topicCheckTail">{tail}</div> : null}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+function guessMechanismTag(slug: string) {
+  if (slug.includes("substitution")) return "substitution";
+  if (slug.includes("elimination")) return "elimination";
+  if (slug.includes("alkene")) return "alkene";
+  return slug;
 }
 
 function Mistakes({ items }: { items: string[] }) {
@@ -303,13 +289,6 @@ function Mistakes({ items }: { items: string[] }) {
       ))}
     </div>
   );
-}
-
-function guessMechanismTag(slug: string) {
-  if (slug.includes("substitution")) return "substitution";
-  if (slug.includes("elimination")) return "elimination";
-  if (slug.includes("alkene")) return "alkene";
-  return slug;
 }
 
 export default async function OrgoChem1TopicPage({
@@ -398,7 +377,7 @@ export default async function OrgoChem1TopicPage({
                     What you need to know:
                   </div>
                   <div style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.8)" }}>
-                    This topic covers {topic.title.toLowerCase()}. Focus on mastering the key concepts in the "Must know checklist" above. 
+                    This topic covers {topic.title.toLowerCase()}. Focus on mastering the key concepts in the &quot;Must know checklist&quot; above. 
                     Follow the study steps systematically, and use practice problems to reinforce your understanding. 
                     The external reference provides comprehensive coverage of all concepts.
                   </div>

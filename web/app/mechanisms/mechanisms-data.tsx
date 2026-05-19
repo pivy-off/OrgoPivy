@@ -41,57 +41,7 @@ export type Mechanism = {
 };
 
 // SVG Drawing Utilities
-function drawBond(x1: number, y1: number, x2: number, y2: number, type: "single" | "double" | "triple" = "single", color: string = "#111") {
-  const elements = [];
-  if (type === "single") {
-    elements.push(<line key="bond" x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="3" strokeLinecap="round" />);
-  } else if (type === "double") {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const len = Math.sqrt(dx * dx + dy * dy);
-    const perpX = -dy / len * 4;
-    const perpY = dx / len * 4;
-    elements.push(<line key="bond1" x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="3" strokeLinecap="round" />);
-    elements.push(<line key="bond2" x1={x1 + perpX} y1={y1 + perpY} x2={x2 + perpX} y2={y2 + perpY} stroke={color} strokeWidth="3" strokeLinecap="round" />);
-  } else if (type === "triple") {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const len = Math.sqrt(dx * dx + dy * dy);
-    const perpX = -dy / len * 5;
-    const perpY = dx / len * 5;
-    elements.push(<line key="bond1" x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="3" strokeLinecap="round" />);
-    elements.push(<line key="bond2" x1={x1 + perpX} y1={y1 + perpY} x2={x2 + perpX} y2={y2 + perpY} stroke={color} strokeWidth="3" strokeLinecap="round" />);
-    elements.push(<line key="bond3" x1={x1 - perpX} y1={y1 - perpY} x2={x2 - perpX} y2={y2 - perpY} stroke={color} strokeWidth="3" strokeLinecap="round" />);
-  }
-  return elements;
-}
 
-function drawAtom(x: number, y: number, label: string, charge?: string, lonePairs?: number, color: string = "#111") {
-  return (
-    <g key={`atom-${x}-${y}`}>
-      <circle cx={x} cy={y} r="20" fill="white" stroke={color} strokeWidth="2.5" />
-      <text x={x} y={y + 6} textAnchor="middle" fontSize="15" fontWeight="700" fill={color}>
-        {label}
-      </text>
-      {charge && (
-        <text x={x + 14} y={y - 10} fontSize="13" fontWeight="700" fill={charge === "+" ? "#FF3B30" : charge === "−" ? "#007AFF" : color}>
-          {charge}
-        </text>
-      )}
-      {lonePairs !== undefined && lonePairs > 0 && (
-        <g>
-          {[...Array(Math.min(lonePairs, 4))].map((_, i) => {
-            const angle = (i * 360) / (lonePairs * 2);
-            const rad = angle * (Math.PI / 180);
-            const px = x + Math.cos(rad) * 28;
-            const py = y + Math.sin(rad) * 28;
-            return <circle key={i} cx={px} cy={py} r="2.5" fill={color} />;
-          })}
-        </g>
-      )}
-    </g>
-  );
-}
 
 function drawCurvedArrow(x1: number, y1: number, x2: number, y2: number, color: string = "#007AFF", label?: string, animated: boolean = false) {
   const midX = (x1 + x2) / 2;
@@ -104,9 +54,6 @@ function drawCurvedArrow(x1: number, y1: number, x2: number, y2: number, color: 
   
   const cx1 = x1 + perpX;
   const cy1 = y1 + perpY;
-  const cx2 = x2 + perpX;
-  const cy2 = y2 + perpY;
-  
   const path = `M ${x1} ${y1} Q ${cx1} ${cy1} ${midX} ${midY} T ${x2} ${y2}`;
   
   // Arrowhead
@@ -213,23 +160,6 @@ function drawLineAngleAtom(x: number, y: number, label?: string, charge?: string
   return elements;
 }
 
-function drawLineAngleStructure(structure: { bonds: Array<{ x1: number; y1: number; x2: number; y2: number; type?: "single" | "double" | "triple" }>; atoms?: Array<{ x: number; y: number; label?: string; charge?: string }>; labels?: Array<{ x: number; y: number; text: string; offset?: { x: number; y: number } }> }, x: number, y: number) {
-  return (
-    <g transform={`translate(${x}, ${y})`}>
-      {structure.bonds.map((bond, i) => drawLineAngleBond(bond.x1, bond.y1, bond.x2, bond.y2, bond.type || "single"))}
-      {structure.atoms?.map((atom, i) => (
-        <g key={i}>
-          {drawLineAngleAtom(atom.x, atom.y, atom.label, atom.charge)}
-        </g>
-      ))}
-      {structure.labels?.map((label, i) => (
-        <text key={i} x={label.x + (label.offset?.x || 0)} y={label.y + (label.offset?.y || 0)} fontSize="14" fill="#666" fontWeight="600">
-          {label.text}
-        </text>
-      ))}
-    </g>
-  );
-}
 
 // Helper function to draw structure with both line-angle and condensed formula
 function drawStructureWithBoth(
@@ -924,7 +854,8 @@ function OxymercurationStep3() {
 
 // Additional mechanism SVG components
 function createSimpleMechanismSVG(title: string, description: string, structure: string, keyPoint: string) {
-  return () => (
+  function SimpleMechanismSvg() {
+    return (
     <svg width="100%" height="100%" viewBox="0 0 2200 1100" style={{ background: "white", borderRadius: 12 }} preserveAspectRatio="xMidYMid meet">
       <defs>
         <linearGradient id={`textGrad-${title.replace(/\s/g, "")}`} x1="0" x2="1" y1="0" y2="0">
@@ -939,7 +870,10 @@ function createSimpleMechanismSVG(title: string, description: string, structure:
       <text x="850" y="580" textAnchor="middle" fontSize="28" fill={`url(#textGrad-${title.replace(/\s/g, "")})`} fontWeight="700">{keyPoint}</text>
       <text x="850" y="700" textAnchor="middle" fontSize="22" fill="#666" fontWeight="600">Condensed formula</text>
     </svg>
-  );
+    );
+  }
+  SimpleMechanismSvg.displayName = `SimpleMechanismSvg_${title.replace(/\s/g, "_")}`;
+  return SimpleMechanismSvg;
 }
 
 // Export all mechanisms data

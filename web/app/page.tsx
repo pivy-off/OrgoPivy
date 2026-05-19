@@ -74,7 +74,9 @@ function courseLabel(course: CourseId) {
 export default function HomePage() {
   const [completedCount, setCompletedCount] = useState(0);
   const [totalTopics, setTotalTopics] = useState(0);
-  const [review, setReview] = useState<{ course: CourseId; topic: Topic } | null>(null);
+  const [review, setReview] = useState<{ course: CourseId; topic: Topic } | null>(() =>
+    typeof window !== "undefined" ? randomTopic() : null,
+  );
   const [studyMinutesToday, setStudyMinutesToday] = useState(0);
   const [dailyGoalMin, setDailyGoalMin] = useState(DEFAULT_GOAL_MIN);
   const [searchQuery, setSearchQuery] = useState("");
@@ -112,8 +114,7 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    setReview(randomTopic());
-    refreshFromStorage();
+    queueMicrotask(() => refreshFromStorage());
   }, [refreshFromStorage]);
 
   useEffect(() => {

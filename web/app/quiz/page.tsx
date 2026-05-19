@@ -15,6 +15,7 @@ function QuizCard({
 }) {
   const [picked, setPicked] = useState<number | null>(null);
   const [show, setShow] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
   if (item.mode === "mcq" && item.choices && typeof item.correctIndex === "number") {
     const done = picked !== null;
@@ -57,7 +58,6 @@ function QuizCard({
     );
   }
 
-  const [revealed, setRevealed] = useState(false);
   return (
     <OpPanel title={item.mode === "recall" ? "Rapid recall" : "Reaction reasoning"}>
       <div style={{ fontWeight: 800, marginBottom: 12 }}>{item.prompt}</div>
@@ -94,7 +94,7 @@ function QuizCard({
 export default function QuizPrepPage() {
   const [idx, setIdx] = useState(0);
   const item = QUIZ_SEED[idx % QUIZ_SEED.length];
-  const weak = useMemo(() => getWeakTopics(4), [idx]);
+  const weak = useMemo(() => getWeakTopics(4), []);
 
   return (
     <ToolPageLayout

@@ -15,9 +15,24 @@ type NodeT = {
 const W = 900;
 const H = 560;
 
-export default function ConceptMapD3({ slug, topic }: { slug: string; topic: Topic }) {
+function buildInitialNodes(baseNodes: NodeT[], slug: string) {
+  const saved = typeof window !== "undefined" ? getConceptMapLayout(slug) : null;
+  return baseNodes.map((n, i) => {
+    const s = saved?.nodes.find((x) => x.id === n.id);
+    const angle = (i / baseNodes.length) * Math.PI * 2;
+    const r = n.kind === "center" ? 0 : 160 + (i % 4) * 28;
+    return {
+      ...n,
+      x: s?.x ?? W / 2 + Math.cos(angle) * r,
+      y: s?.y ?? H / 2 + Math.sin(angle) * r,
+      vx: 0,
+      vy: 0,
+    };
+  });
+}
+
+function ConceptMapCanvas({ slug, topic }: { slug: string; topic: Topic }) {
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const [nodes, setNodes] = useState<Array<NodeT & { x: number; y: number; vx: number; vy: number }>>([]);
   const [sel, setSel] = useState<string | null>(null);
   const [pathPick, setPathPick] = useState<string[]>([]);
   const dragging = useRef<{ id: string } | null>(null);
@@ -55,22 +70,8 @@ export default function ConceptMapD3({ slug, topic }: { slug: string; topic: Top
     return [center, ...mk, ...mistakes];
   }, [topic]);
 
-  useEffect(() => {
-    const saved = getConceptMapLayout(slug);
-    const init = baseNodes.map((n, i) => {
-      const s = saved?.nodes.find((x) => x.id === n.id);
-      const angle = (i / baseNodes.length) * Math.PI * 2;
-      const r = n.kind === "center" ? 0 : 160 + (i % 4) * 28;
-      return {
-        ...n,
-        x: s?.x ?? W / 2 + Math.cos(angle) * r,
-        y: s?.y ?? H / 2 + Math.sin(angle) * r,
-        vx: 0,
-        vy: 0,
-      };
-    });
-    setNodes(init);
-  }, [baseNodes, slug]);
+  type SimNode = NodeT & { x: number; y: number; vx: number; vy: number };
+  const [nodes, setNodes] = useState<SimNode[]>(() => buildInitialNodes(baseNodes, slug));
 
   useEffect(() => {
     let frame = 0;
@@ -279,4 +280,8 @@ export default function ConceptMapD3({ slug, topic }: { slug: string; topic: Top
       ) : null}
     </div>
   );
+}
+
+export default function ConceptMapD3({ slug, topic }: { slug: string; topic: Topic }) {
+  return <ConceptMapCanvas key={slug} slug={slug} topic={topic} />;
 }

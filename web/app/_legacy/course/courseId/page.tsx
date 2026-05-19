@@ -5,7 +5,7 @@ type Props = {
   params: Record<string, string | string[] | undefined>
 }
 
-function resolveSingleParam(params: Record<string, any>, preferredKey: string) {
+function resolveSingleParam(params: Record<string, string | string[] | undefined>, preferredKey: string) {
   const direct = params?.[preferredKey]
   if (typeof direct === "string") return direct
   if (Array.isArray(direct) && typeof direct[0] === "string") return direct[0]

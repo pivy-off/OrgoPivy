@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState, useEffect } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import PracticeAchievements from "@/app/components/PracticeAchievements";
 
@@ -106,7 +106,7 @@ function PracticePageContent() {
     setQuestion(null);
 
     try {
-      const body: any = {};
+      const body: Record<string, string> = {};
       
       // Map topic to module name for backend
       if (topicParam) {
@@ -149,8 +149,8 @@ function PracticePageContent() {
       setPrompt(data.prompt);
       setQuestion(data.question);
       setLoading(false);
-    } catch (e: any) {
-      const errorMsg = e?.message || "Start failed";
+    } catch (e: unknown) {
+      const errorMsg = e instanceof Error ? e.message : "Start failed";
       // If module not supported or API error, show helpful message
       if (errorMsg.includes("module") || errorMsg.includes("not found") || errorMsg.includes("404") || errorMsg.includes("500") || errorMsg.includes("Failed to fetch")) {
         setMessage(`Practice mode for "${topicParam ? topicParam.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()) : "this topic"}" is coming soon. Currently available for: Substitution-Elimination (SN1/SN2/E1/E2). You can still use the Exam Practice Mode for practice problems.`);
@@ -232,8 +232,8 @@ function PracticePageContent() {
       }
 
       setAnswer("");
-    } catch (e: any) {
-      setMessage(e?.message || "Answer failed");
+    } catch (e: unknown) {
+      setMessage(e instanceof Error ? e.message : "Answer failed");
     } finally {
       setLoading(false);
     }

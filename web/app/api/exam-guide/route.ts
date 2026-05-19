@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { findTopic, getCourseTopics, type CourseId, type TopicPracticeMcq } from "../../lib/curriculum";
+import { findTopic, type CourseId, type Topic, type TopicPracticeMcq } from "../../lib/curriculum";
 import { Document, ExternalHyperlink, Packer, Paragraph, TextRun, HeadingLevel } from "docx";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
@@ -99,7 +99,14 @@ export async function GET(request: NextRequest) {
         const items = Array.isArray(uploadsData?.items) ? uploadsData.items : [];
         
         // Filter files for this course and topic
-        const relevantFiles = items.filter((item: any) => {
+        type UploadListItem = {
+          course?: string;
+          topic?: string;
+          indexed?: boolean;
+          upload_id?: string;
+          original_filename?: string;
+        };
+        const relevantFiles = (items as UploadListItem[]).filter((item) => {
           const itemCourse = item.course?.toLowerCase();
           const itemTopic = item.topic?.toLowerCase();
           return (
@@ -156,7 +163,7 @@ export async function GET(request: NextRequest) {
   });
 }
 
-function generateWordDoc(topic: any, course: CourseId, uploadedContent: string[]) {
+function generateWordDoc(topic: Topic, course: CourseId, uploadedContent: string[]) {
   const courseName = course === "orgochem-1" ? "OrgoChem I" : "OrgoChem II";
   
   const children: Paragraph[] = [

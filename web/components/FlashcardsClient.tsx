@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { Topic } from "@/app/lib/curriculum";
 import FlashCard, { FlashCardData, FlashCardRatingBar } from "@/components/FlashCard";
 import { getFlashcardMastery, setFlashcardMastery } from "@/lib/storage";
@@ -63,12 +63,9 @@ export default function FlashcardsClient({ slug, topic }: { slug: string; topic:
   const [sideOpen, setSideOpen] = useState(true);
   const [slideDir, setSlideDir] = useState<"left" | "right" | null>(null);
 
-  useEffect(() => {
-    setIdx((i) => Math.min(i, Math.max(0, queue.length - 1)));
-  }, [queue.length]);
-
   const byId = useMemo(() => Object.fromEntries(base.map((c) => [c.id, c])), [base]);
-  const currentId = queue[idx] ?? queue[0];
+  const safeIdx = queue.length ? Math.min(idx, queue.length - 1) : 0;
+  const currentId = queue[safeIdx] ?? queue[0];
   const card = byId[currentId];
 
   const pct = queue.length ? Math.round(((base.length - queue.length + (flipped ? 0.5 : 0)) / base.length) * 100) : 100;
@@ -90,6 +87,7 @@ export default function FlashcardsClient({ slug, topic }: { slug: string; topic:
 
   const rate = (r: "hard" | "ok" | "easy") => {
     if (!card) return;
+    const atIdx = safeIdx;
     const m = getFlashcardMastery(slug);
     if (r === "easy") {
       setFlashcardMastery(slug, { ...m, easy: [...new Set([...m.easy, card.id])] });
@@ -107,16 +105,16 @@ export default function FlashcardsClient({ slug, topic }: { slug: string; topic:
     }
 
     setQueue((q) => {
-      const id = q[idx];
-      const rest = q.filter((_, i) => i !== idx);
+      const id = q[atIdx];
+      const rest = q.filter((_, i) => i !== atIdx);
       if (r === "easy") return rest.length ? rest : base.map((c) => c.id);
       if (r === "ok") return [...rest, id];
-      const insertAt = Math.min(idx + 3, rest.length);
+      const insertAt = Math.min(atIdx + 3, rest.length);
       const next = [...rest.slice(0, insertAt), id, ...rest.slice(insertAt)];
       return next.length ? next : base.map((c) => c.id);
     });
     setFlipped(false);
-    setIdx((i) => 0);
+    setIdx(0);
     window.setTimeout(() => setSlideDir(null), 320);
   };
 
@@ -153,7 +151,7 @@ export default function FlashcardsClient({ slug, topic }: { slug: string; topic:
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
         <strong>{topic.title}</strong>
         <span>
-          Card {idx + 1} of {queue.length}
+          Card {safeIdx + 1} of {queue.length}
         </span>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <Link href={`/orgochem-2/${encodeURIComponent(slug)}`} className="op-btn-secondary" style={{ textDecoration: "none" }}>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getAllMechanisms, type ConditionState } from "../mechanisms-data";
 
@@ -83,7 +83,6 @@ function SvgStage({ children }: { children: React.ReactNode }) {
 
 export default function MechanismPage() {
   const params = useParams();
-  const router = useRouter();
   const mechanismId = (params?.id as string) || "";
 
   const mechanisms = useMemo(() => getAllMechanisms(), []);
@@ -93,7 +92,7 @@ export default function MechanismPage() {
   );
 
   const [stepIndex, setStepIndex] = useState<number>(0);
-  const [conditions, setConditions] = useState<ConditionState>({
+  const [conditions] = useState<ConditionState>({
     heat: false,
     acid: false,
     base: true,
@@ -107,7 +106,7 @@ export default function MechanismPage() {
           <div className="cardInner">
             <div>
               <div className="h1" style={{ fontSize: 32 }}>Mechanism not found</div>
-              <div className="subtle" style={{ fontSize: 16 }}>The mechanism you're looking for doesn't exist.</div>
+              <div className="subtle" style={{ fontSize: 16 }}>The mechanism you&apos;re looking for doesn&apos;t exist.</div>
             </div>
             <div style={{ marginTop: 20 }}>
               <Link className="btn btnPrimary" href="/mechanisms">
@@ -185,7 +184,6 @@ export default function MechanismPage() {
             {step.svgContent ? (
               <div
                 className="mechanismSupplementalSvg"
-                // eslint-disable-next-line react/no-danger -- trusted curriculum SVG only
                 dangerouslySetInnerHTML={{ __html: step.svgContent }}
               />
             ) : null}

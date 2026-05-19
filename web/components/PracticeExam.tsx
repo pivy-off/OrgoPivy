@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Topic, TopicPracticeMcq } from "@/app/lib/curriculum";
 import { geminiFreshQuestions, type FreshMcq } from "@/lib/gemini";
 import { getExamScores, setExamScores } from "@/lib/storage";
@@ -82,21 +82,6 @@ export default function PracticeExam({
     setQuestions(pool);
   }, [seedMcqs, title]);
 
-  useEffect(() => {
-    if (phase !== "exam" || !timed) return;
-    const t = window.setInterval(() => {
-      setSecondsLeft((s) => {
-        if (s <= 1) {
-          window.clearInterval(t);
-          setPhase("results");
-          return 0;
-        }
-        return s - 1;
-      });
-    }, 1000);
-    return () => window.clearInterval(t);
-  }, [phase, timed]);
-
   const start = () => {
     buildFromSeed();
     setAnswers({});
@@ -113,36 +98,65 @@ export default function PracticeExam({
     return { ok, total: questions.length };
   }, [questions, answers]);
 
-  useEffect(() => {
-    if (phase !== "results" || !questions.length) return;
-    const pct = Math.round((score.ok / score.total) * 100);
-    const id = window.requestAnimationFrame(() => {
-      let startT: number | null = null;
-      const dur = 1200;
-      const tick = (now: number) => {
-        if (startT === null) startT = now;
-        const p = Math.min(1, (now - startT) / dur);
-        const ease = 1 - (1 - p) ** 2;
-        setRingPct(pct * ease);
-        if (p < 1) window.requestAnimationFrame(tick);
-      };
-      window.requestAnimationFrame(tick);
+  const enterResultsRef = useRef<() => void>(() => {});
+
+  const enterResults = useCallback(() => {
+    let ok = 0;
+    questions.forEach((q) => {
+      if (answers[q.id] === q.answerIndex) ok += 1;
     });
+    const total = questions.length;
     const prev = getExamScores(slug);
-    const best = Math.max(prev.best, score.ok);
     setExamScores(slug, {
-      best,
+      best: Math.max(prev.best, ok),
       attempts: prev.attempts + 1,
       lastDate: new Date().toISOString(),
     });
-    if (score.ok === score.total && score.total > 0) {
+    if (ok === total && total > 0) {
       setConfetti(true);
       window.setTimeout(() => setConfetti(false), 3000);
     }
-    return () => cancelAnimationFrame(id);
-  }, [phase, questions.length, score.ok, score.total, slug]);
+    setRingPct(0);
+    setPhase("results");
+  }, [answers, questions, slug]);
 
-  const submit = () => setPhase("results");
+  useEffect(() => {
+    enterResultsRef.current = enterResults;
+  }, [enterResults]);
+
+  useEffect(() => {
+    if (phase !== "exam" || !timed) return;
+    const t = window.setInterval(() => {
+      setSecondsLeft((s) => {
+        if (s <= 1) {
+          window.clearInterval(t);
+          window.setTimeout(() => enterResultsRef.current(), 0);
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(t);
+  }, [phase, timed]);
+
+  useEffect(() => {
+    if (phase !== "results" || !questions.length) return;
+    const pct = Math.round((score.ok / score.total) * 100);
+    let frame = 0;
+    let startT: number | null = null;
+    const dur = 1200;
+    const tick = (now: number) => {
+      if (startT === null) startT = now;
+      const p = Math.min(1, (now - startT) / dur);
+      const ease = 1 - (1 - p) ** 2;
+      setRingPct(pct * ease);
+      if (p < 1) frame = window.requestAnimationFrame(tick);
+    };
+    frame = window.requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [phase, questions.length, score.ok, score.total]);
+
+  const submit = () => enterResults();
 
   const gradeLetter = (pct: number) => {
     if (pct >= 90) return "A";

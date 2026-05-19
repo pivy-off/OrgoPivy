@@ -123,7 +123,7 @@ function buildLocalConceptMapSvg(title: string, concepts: string[]): string {
     .join("");
   const circles = nodes
     .map(
-      (n, i) => `
+      (n) => `
   <g transform="translate(${n.x},${n.y})">
     <circle r="38" fill="#EEF1FF" stroke="#4F6EF7" stroke-width="2"/>
     <text text-anchor="middle" y="4" font-size="10" font-family="sans-serif" fill="#111">${escapeXml(n.c).slice(0, 18)}</text>

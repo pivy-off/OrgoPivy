@@ -24,7 +24,7 @@ export default function TopBarThemeToggle() {
   const toggle = useCallback(() => {
     const next = theme === "dark" ? "light" : "dark";
     try {
-      // @ts-ignore ThemeBootScript
+      // @ts-expect-error ThemeBootScript global
       window.__setTheme?.(next);
     } catch {
       // ignore

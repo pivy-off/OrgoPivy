@@ -28,27 +28,13 @@ export default function MechanismViewer({
   mechanisms: MechanismDef[];
 }) {
   const [mid, setMid] = useState(mechanisms[0]?.id ?? "");
-  const [stepIdx, setStepIdx] = useState(0);
-  const [showAll, setShowAll] = useState(false);
-  const [testMode, setTestMode] = useState(false);
-  const [guess, setGuess] = useState("");
-  const [revealed, setRevealed] = useState(false);
-
   const m = useMemo(() => mechanisms.find((x) => x.id === mid) ?? mechanisms[0], [mechanisms, mid]);
-  const step = m?.steps[stepIdx];
-
-  useEffect(() => {
-    setStepIdx(0);
-    setTestMode(false);
-    setGuess("");
-    setRevealed(false);
-  }, [mid]);
 
   useEffect(() => {
     if (m?.id) addMechanismViewed(slug, m.id);
   }, [slug, m?.id]);
 
-  if (!m || !step) {
+  if (!m) {
     return (
       <div className="op-fade-in" style={{ padding: 40, textAlign: "center" }}>
         <div style={{ fontSize: 48 }}>⚗️</div>
@@ -102,127 +88,7 @@ export default function MechanismViewer({
         <h1 style={{ fontSize: 22, margin: "0 0 4px" }}>{m.title}</h1>
         <p style={{ color: "var(--op-text-secondary)", marginTop: 0 }}>{m.subtitle}</p>
 
-        <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, fontSize: 14 }}>
-          <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
-          Show all steps at once
-        </label>
-
-        {showAll ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {m.steps.map((s, i) => (
-              <StepCard key={i} step={s} stepNo={i + 1} total={m.steps.length} testMode={false} revealed />
-            ))}
-          </div>
-        ) : (
-          <StepCard
-            step={step}
-            stepNo={stepIdx + 1}
-            total={m.steps.length}
-            testMode={testMode}
-            revealed={revealed}
-          />
-        )}
-
-        {!showAll ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: 16,
-              flexWrap: "wrap",
-              gap: 8,
-            }}
-          >
-            <button
-              type="button"
-              className="op-btn-secondary"
-              disabled={stepIdx === 0}
-              onClick={() => setStepIdx((i) => Math.max(0, i - 1))}
-            >
-              ← Previous
-            </button>
-            <div style={{ display: "flex", gap: 6 }}>
-              {m.steps.map((_, i) => (
-                <span
-                  key={i}
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: "50%",
-                    background: i === stepIdx ? "var(--op-indigo)" : i < stepIdx ? "var(--op-green)" : "#ddd",
-                  }}
-                />
-              ))}
-            </div>
-            <button
-              type="button"
-              className="op-btn-secondary"
-              disabled={stepIdx >= m.steps.length - 1}
-              onClick={() => setStepIdx((i) => Math.min(m.steps.length - 1, i + 1))}
-            >
-              Next →
-            </button>
-          </div>
-        ) : null}
-
-        {!showAll ? (
-          <div style={{ marginTop: 20 }}>
-            <button
-              type="button"
-              className="op-btn-primary"
-              onClick={() => {
-                setTestMode((t) => !t);
-                setRevealed(false);
-                setGuess("");
-              }}
-            >
-              ⚡ Test yourself
-            </button>
-            {testMode ? (
-              <div className="op-fade-in" style={{ marginTop: 12 }}>
-                {!revealed ? (
-                  <>
-                    <p style={{ fontSize: 14 }}>Describe what happens in this step:</p>
-                    <textarea
-                      value={guess}
-                      onChange={(e) => setGuess(e.target.value)}
-                      rows={3}
-                      style={{ width: "100%", borderRadius: 8, padding: 10, border: "1px solid var(--op-border)" }}
-                    />
-                    <button
-                      type="button"
-                      className="op-btn-secondary"
-                      style={{ marginTop: 8 }}
-                      onClick={() => setRevealed(true)}
-                    >
-                      Reveal answer
-                    </button>
-                  </>
-                ) : (
-                  <div style={{ background: "var(--op-indigo-light)", padding: 14, borderRadius: 12, marginTop: 8 }}>
-                    <strong>Answer:</strong> {step.narration}
-                  </div>
-                )}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-
-        {!showAll && !testMode ? (
-          <div
-            style={{
-              marginTop: 16,
-              padding: 14,
-              borderRadius: 12,
-              background: "var(--op-orange-light)",
-              border: "1px solid var(--op-orange)",
-              fontSize: 14,
-            }}
-          >
-            <strong>🎯 Common error at this step:</strong> {step.commonError}
-          </div>
-        ) : null}
+        <MechanismStepPanel key={mid} mechanism={m} />
       </div>
 
       <style jsx global>{`
@@ -240,6 +106,143 @@ export default function MechanismViewer({
         }
       `}</style>
     </div>
+  );
+}
+
+function MechanismStepPanel({ mechanism }: { mechanism: MechanismDef }) {
+  const [stepIdx, setStepIdx] = useState(0);
+  const [showAll, setShowAll] = useState(false);
+  const [testMode, setTestMode] = useState(false);
+  const [guess, setGuess] = useState("");
+  const [revealed, setRevealed] = useState(false);
+  const step = mechanism.steps[stepIdx];
+
+  if (!step) return null;
+
+  return (
+    <>
+      <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, fontSize: 14 }}>
+        <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
+        Show all steps at once
+      </label>
+
+      {showAll ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {mechanism.steps.map((s, i) => (
+            <StepCard key={i} step={s} stepNo={i + 1} total={mechanism.steps.length} testMode={false} revealed />
+          ))}
+        </div>
+      ) : (
+        <StepCard
+          step={step}
+          stepNo={stepIdx + 1}
+          total={mechanism.steps.length}
+          testMode={testMode}
+          revealed={revealed}
+        />
+      )}
+
+      {!showAll ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: 16,
+            flexWrap: "wrap",
+            gap: 8,
+          }}
+        >
+          <button
+            type="button"
+            className="op-btn-secondary"
+            disabled={stepIdx === 0}
+            onClick={() => setStepIdx((i) => Math.max(0, i - 1))}
+          >
+            ← Previous
+          </button>
+          <div style={{ display: "flex", gap: 6 }}>
+            {mechanism.steps.map((_, i) => (
+              <span
+                key={i}
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background: i === stepIdx ? "var(--op-indigo)" : i < stepIdx ? "var(--op-green)" : "#ddd",
+                }}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            className="op-btn-secondary"
+            disabled={stepIdx >= mechanism.steps.length - 1}
+            onClick={() => setStepIdx((i) => Math.min(mechanism.steps.length - 1, i + 1))}
+          >
+            Next →
+          </button>
+        </div>
+      ) : null}
+
+      {!showAll ? (
+        <div style={{ marginTop: 20 }}>
+          <button
+            type="button"
+            className="op-btn-primary"
+            onClick={() => {
+              setTestMode((t) => !t);
+              setRevealed(false);
+              setGuess("");
+            }}
+          >
+            ⚡ Test yourself
+          </button>
+          {testMode ? (
+            <div className="op-fade-in" style={{ marginTop: 12 }}>
+              {!revealed ? (
+                <>
+                  <p style={{ fontSize: 14 }}>Describe what happens in this step:</p>
+                  <textarea
+                    value={guess}
+                    onChange={(e) => setGuess(e.target.value)}
+                    rows={3}
+                    style={{ width: "100%", borderRadius: 8, padding: 10, border: "1px solid var(--op-border)" }}
+                  />
+                  <button
+                    type="button"
+                    className="op-btn-secondary"
+                    style={{ marginTop: 8 }}
+                    onClick={() => setRevealed(true)}
+                  >
+                    Reveal answer
+                  </button>
+                </>
+              ) : (
+                <div style={{ background: "var(--op-indigo-light)", padding: 14, borderRadius: 12, marginTop: 8 }}>
+                  <strong>Answer:</strong> {step.narration}
+                </div>
+              )}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {!showAll && !testMode ? (
+        <div
+          style={{
+            marginTop: 16,
+            padding: 14,
+            borderRadius: 12,
+            background: "var(--op-orange-light)",
+            border: "1px solid var(--op-orange)",
+            fontSize: 14,
+          }}
+        >
+          <strong>🎯 Common error at this step:</strong> {step.commonError}
+        </div>
+      ) : null}
+    </>
   );
 }
 
