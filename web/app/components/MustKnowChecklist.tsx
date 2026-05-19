@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { ChemFormattedLine } from "../lib/chemTypography";
 import type { TopicMustKnowItem } from "../lib/curriculum";
@@ -88,7 +89,7 @@ export default function MustKnowChecklist({ items, course, topic, chemPolish, st
           const tail = row.description;
           const isChecked = checked.has(i);
           const vid = row.videoId;
-          const watch = `https://www.youtube.com/watch?v=${vid}`;
+          const watch = `https://youtube.com/watch?v=${vid}`;
           const thumb = `https://img.youtube.com/vi/${vid}/maxresdefault.jpg`;
           return (
             <label
@@ -156,30 +157,37 @@ export default function MustKnowChecklist({ items, course, topic, chemPolish, st
                   </div>
                 ) : null}
                 {vid ? (
-                  <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginTop: 10 }}>
-                    <a href={watch} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={thumb}
-                        alt={`${head} video thumbnail`}
-                        width={120}
-                        height={68}
-                        style={{ borderRadius: 8, objectFit: "cover", border: "1px solid rgba(0,0,0,0.08)" }}
-                      />
-                    </a>
-                    <div>
+                  <a
+                    href={watch}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      display: "block",
+                      marginTop: 10,
+                      textDecoration: "none",
+                      color: "inherit",
+                      borderRadius: 10,
+                      overflow: "hidden",
+                      border: "1px solid rgba(0,0,0,0.08)",
+                      maxWidth: 320,
+                    }}
+                  >
+                    <Image
+                      src={thumb}
+                      alt={`${head} video thumbnail`}
+                      width={480}
+                      height={270}
+                      unoptimized
+                      style={{ width: "100%", height: "auto", display: "block" }}
+                    />
+                    <div style={{ padding: "8px 10px" }}>
                       <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{head}</div>
-                      <a
-                        href={watch}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{ fontSize: 12, fontWeight: 600, color: "var(--op-indigo, #4F6EF7)" }}
-                        onClick={(e) => e.stopPropagation()}
-                      >
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--op-indigo, #4F6EF7)" }}>
                         Click to watch on YouTube →
-                      </a>
+                      </div>
                     </div>
-                  </div>
+                  </a>
                 ) : null}
               </div>
             </label>

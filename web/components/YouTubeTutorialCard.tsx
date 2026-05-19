@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 type Props = {
@@ -6,14 +7,14 @@ type Props = {
 };
 
 export default function YouTubeTutorialCard({ videoId, title }: Props) {
-  const watch = `https://www.youtube.com/watch?v=${videoId}`;
+  const watch = `https://youtube.com/watch?v=${videoId}`;
   const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 
   return (
     <Link
       href={watch}
       target="_blank"
-      rel="noreferrer"
+      rel="noopener noreferrer"
       style={{
         display: "block",
         textDecoration: "none",
@@ -26,18 +27,14 @@ export default function YouTubeTutorialCard({ videoId, title }: Props) {
         transition: "var(--op-transition, all 0.2s ease)",
       }}
     >
-      <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%", background: "#111" }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+      <div style={{ position: "relative", width: "100%", aspectRatio: "16 / 9", background: "#111" }}>
+        <Image
           src={thumb}
-          alt=""
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
+          alt={title}
+          width={480}
+          height={270}
+          unoptimized
+          style={{ width: "100%", height: "auto", display: "block" }}
         />
       </div>
       <div style={{ padding: "12px 14px" }}>

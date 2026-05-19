@@ -728,13 +728,9 @@ export default async function OrgoChem2TopicPage({
                     Open linked drill
                   </Link>
                 </div>
-              ) : (
-                <div className="topicPracticeText" style={{ marginBottom: 12 }}>
-                  Use exam mode for uploaded materials and mixed review; topic-specific MCQs are listed above when available.
-                </div>
-              )}
+              ) : null}
               <div style={{ fontWeight: 700, marginBottom: 8 }}>Exam practice</div>
-              <div className="topicToolRow" style={{ flexWrap: "wrap", gap: 8 }}>
+              <div className="topicToolRow" style={{ flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
                 <Link
                   className="btn btnPrimary"
                   href={`/orgochem-2/exams?topic=${encodeURIComponent(topic.slug)}`}
@@ -744,31 +740,17 @@ export default async function OrgoChem2TopicPage({
                 <Link className="btn" href="/orgochem-2/exams">
                   Full Exam Hub
                 </Link>
-              </div>
-            </Section>
-
-            <Section title="Exam prep">
-              <div className="topicSummaryText" style={{ marginBottom: 12 }}>
-                Download study guides and practice exam problems for this specific topic.
-              </div>
-              <div className="topicToolRow">
-                <a 
-                  className="btn btnPrimary" 
+                <a
+                  className="btn"
                   href={`/api/exam-guide?course=orgochem-2&topic=${encodeURIComponent(topic.slug)}`}
                   download
                 >
                   Download study guide
                 </a>
-                <Link 
-                  className="btn" 
-                  href={`/orgochem-2/exams?topic=${encodeURIComponent(topic.slug)}`}
-                >
-                  Practice exam problems
-                </Link>
               </div>
-              <div className="subtle" style={{ marginTop: 8, fontSize: 13 }}>
-                OrgoChem II generates study guides automatically from topic content. Guides are organized by topic for focused exam preparation.
-              </div>
+              <p className="subtle" style={{ margin: 0, fontSize: 13, lineHeight: 1.5 }}>
+                Timed practice exams use the MCQs above. Download a Word study guide generated from this topic&apos;s content and your uploads.
+              </p>
             </Section>
 
             <Section title="Resources">

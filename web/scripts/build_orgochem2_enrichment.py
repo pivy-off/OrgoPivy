@@ -445,6 +445,15 @@ ENRICH["carboxylic-acids-derivatives"] = {
     },
 }
 
+# User-provided practice + video overrides (content quality pass)
+from orgochem2_content_overrides import PRACTICE_OVERRIDES, ENRICH_VIDEO_PATCHES
+
+PRACTICE.update(PRACTICE_OVERRIDES)
+for slug, patch in ENRICH_VIDEO_PATCHES.items():
+    if slug in ENRICH:
+        ENRICH[slug]["overviewVideoId"] = patch["overviewVideoId"]
+        ENRICH[slug]["mustKnowItems"] = patch["mustKnowItems"]
+
 # attach practice arrays
 for slug in ENRICH:
     ENRICH[slug]["practiceMcqs"] = PRACTICE[slug]
