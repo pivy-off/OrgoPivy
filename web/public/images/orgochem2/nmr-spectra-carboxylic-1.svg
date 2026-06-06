@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Schematic IR and 1H regions for carboxylic acid">
   <rect width="600" height="400" fill="#fafafa"/>
-  <text x="24" y="40" font-size="18" font-weight="800" fill="#1d1d1f">Carboxylic acid  schematic traces</text>
-  <text x="24" y="64" font-size="12" fill="#666">IR (cm{¹) and ¹H ´ (not to scale numerically)</text>
+  <text x="24" y="40" font-size="18" font-weight="800" fill="#1d1d1f">Carboxylic acid — schematic traces</text>
+  <text x="24" y="64" font-size="12" fill="#666">IR (cm&#x207B;&#x00B9;) and &#x00B9;H &#x3B4; (not to scale numerically)</text>
   <text x="24" y="110" font-size="13" font-weight="700">IR</text>
   <line x1="40" y1="200" x2="560" y2="200" stroke="#ccc"/>
   <ellipse cx="140" cy="200" rx="70" ry="45" fill="rgba(0,122,255,0.12)" stroke="#007AFF" stroke-width="2"/>
-  <text x="140" y="265" text-anchor="middle" font-size="11" fill="#007AFF" font-weight="700">OH broad</text>
+  <text x="140" y="265" text-anchor="middle" font-size="11" fill="#007AFF" font-weight="700">O&#x2013;H broad</text>
   <line x1="380" y1="200" x2="400" y2="120" stroke="#007AFF" stroke-width="4"/>
   <text x="390" y="280" text-anchor="middle" font-size="11" font-weight="700">C=O ~1710</text>
-  <text x="24" y="310" font-size="13" font-weight="700">¹H</text>
+  <text x="24" y="310" font-size="13" font-weight="700">&#x00B9;H</text>
   <rect x="40" y="320" width="520" height="50" rx="8" fill="#fff" stroke="#ddd"/>
-  <text x="420" y="352" font-size="12" font-weight="800" fill="#5856D6">´ 1013 broad</text>
+  <text x="420" y="352" font-size="12" font-weight="800" fill="#5856D6">&#x3B4; 10&#x2013;13 broad</text>
 </svg>

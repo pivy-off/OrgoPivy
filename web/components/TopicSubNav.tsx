@@ -5,7 +5,7 @@ import { useParams, usePathname } from "next/navigation";
 import { findTopic } from "@/app/lib/curriculum";
 
 const SPECTRA_SLUGS = new Set([
-  "nmr-spectroscopy-review",
+  "substitution-elimination-nmr-review",
   "alcohols-phenols",
   "carboxylic-acids-derivatives",
   "aldehydes-ketones",

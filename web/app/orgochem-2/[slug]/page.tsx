@@ -422,7 +422,7 @@ function TopicIllustration({ slug, title }: { slug: string; title: string }) {
     );
   }
 
-  if (slug === "proton-nmr-review" || slug === "nmr-spectroscopy-review") {
+  if (slug === "substitution-elimination-nmr-review") {
     return (
       <svg {...common}>
         {bg}
@@ -739,7 +739,7 @@ export default async function OrgoChem2TopicPage({
                     Mechanism viewer
                   </Link>
                 ) : null}
-                {topic.slug === "nmr-spectroscopy-review" || topic.slug === "substitution-elimination-nmr-review" ? (
+                {topic.slug === "substitution-elimination-nmr-review" ? (
                   <Link className="btn" href="/spectra">
                     NMR Studio (reference spectra)
                   </Link>

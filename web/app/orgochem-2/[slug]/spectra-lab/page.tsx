@@ -4,7 +4,7 @@ import SpectraLab from "@/components/SpectraLab";
 
 /** Eligible topics for Spectra Lab (exact list). */
 const SPECTRA_LAB_SLUGS = new Set([
-  "nmr-spectroscopy-review",
+  "substitution-elimination-nmr-review",
   "alcohols-phenols",
   "carboxylic-acids-derivatives",
   "aldehydes-ketones",

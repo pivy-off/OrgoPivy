@@ -33,7 +33,7 @@ export default function YouTubeThumbnail({
       height={height}
       unoptimized
       className={className}
-      style={style}
+      style={{ objectFit: "cover", ...style }}
       onError={() => {
         setQualityIdx((i) => (i < YOUTUBE_THUMB_QUALITIES.length - 1 ? i + 1 : i));
       }}
