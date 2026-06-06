@@ -1,0 +1,278 @@
+/**
+ * Apple-style vibrancy / glass surfaces (light + dark via data-theme).
+ * Loaded after globals.css — overrides shared components.
+ */
+
+:root {
+  --glass-blur: 40px;
+  --glass-blur-sm: 20px;
+  --glass-saturate: 180%;
+
+  --glass-surface: rgba(255, 255, 255, 0.68);
+  --glass-surface-elevated: rgba(255, 255, 255, 0.82);
+  --glass-surface-muted: rgba(255, 255, 255, 0.45);
+
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --glass-border-subtle: rgba(0, 0, 0, 0.06);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+
+  --glass-shadow:
+    0 0 0 1px var(--glass-border-subtle),
+    0 1px 0 var(--glass-highlight) inset,
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.03);
+
+  --glass-shadow-lg:
+    0 0 0 1px var(--glass-border-subtle),
+    0 1px 0 var(--glass-highlight) inset,
+    0 16px 48px rgba(0, 0, 0, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.04);
+
+  --panel: var(--glass-surface);
+  --panel-2: var(--glass-surface-muted);
+  --shadow: var(--glass-shadow);
+}
+
+[data-theme="dark"] {
+  --glass-surface: rgba(28, 28, 30, 0.72);
+  --glass-surface-elevated: rgba(44, 44, 46, 0.85);
+  --glass-surface-muted: rgba(28, 28, 30, 0.55);
+
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-subtle: rgba(255, 255, 255, 0.06);
+  --glass-highlight: rgba(255, 255, 255, 0.08);
+
+  --glass-shadow:
+    0 0 0 1px var(--glass-border-subtle),
+    0 1px 0 var(--glass-highlight) inset,
+    0 12px 40px rgba(0, 0, 0, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.25);
+
+  --glass-shadow-lg:
+    0 0 0 1px var(--glass-border-subtle),
+    0 1px 0 var(--glass-highlight) inset,
+    0 20px 56px rgba(0, 0, 0, 0.55),
+    0 8px 24px rgba(0, 0, 0, 0.35);
+
+  --panel: var(--glass-surface);
+  --panel-2: var(--glass-surface-muted);
+  --shadow: var(--glass-shadow);
+}
+
+/* Ambient mesh behind content (macOS-style) */
+body {
+  background: var(--bg);
+  min-height: 100%;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 60% at 8% -15%, rgba(0, 122, 255, 0.14), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 95% 5%, rgba(88, 86, 214, 0.12), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 105%, rgba(52, 199, 89, 0.08), transparent 55%),
+    var(--bg);
+}
+
+[data-theme="dark"] body::before {
+  background:
+    radial-gradient(ellipse 90% 60% at 8% -15%, rgba(10, 132, 255, 0.18), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 95% 5%, rgba(94, 92, 230, 0.14), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 105%, rgba(50, 215, 75, 0.06), transparent 55%),
+    var(--bg);
+}
+
+/* ——— Glass surfaces ——— */
+.card,
+.workspaceSidebarCard {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border-subtle);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+.topbar {
+  background: var(--glass-surface-elevated);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border-bottom: 1px solid var(--glass-border-subtle);
+  box-shadow:
+    0 1px 0 var(--glass-highlight) inset,
+    0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .topbar {
+  box-shadow:
+    0 1px 0 var(--glass-highlight) inset,
+    0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.pill,
+.topbarThemePill {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border-subtle);
+  backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+  box-shadow: 0 1px 0 var(--glass-highlight) inset;
+}
+
+.pill:hover {
+  background: var(--glass-surface-elevated);
+}
+
+.topNav .pill:not(.pillActive) {
+  background: transparent;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.topNav .pillActive {
+  background: var(--glass-surface-elevated);
+  border: 1px solid var(--glass-border-subtle);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+}
+
+.btn {
+  background: var(--glass-surface-muted);
+  border: 1px solid var(--glass-border-subtle);
+  box-shadow: 0 1px 0 var(--glass-highlight) inset;
+  backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+}
+
+[data-theme="dark"] .btn {
+  background: var(--glass-surface-muted);
+}
+
+.btn:hover {
+  background: var(--glass-surface-elevated);
+}
+
+.btnPrimary {
+  background: linear-gradient(180deg, #3b9eff 0%, var(--blue) 45%, var(--blue-2) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.35) inset,
+    0 4px 16px rgba(0, 122, 255, 0.35);
+}
+
+.btnPrimary:hover {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 8px 24px rgba(0, 122, 255, 0.4);
+}
+
+.input,
+.select {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border-subtle);
+  backdrop-filter: blur(var(--glass-blur-sm));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+}
+
+.navLink,
+.topicCheckItemBtn,
+.topicSection,
+.badge,
+.kbd {
+  background: var(--glass-surface);
+  border-color: var(--glass-border-subtle);
+  backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+}
+
+.navLink:hover,
+.topicCheckItemBtn:hover {
+  background: var(--glass-surface-elevated);
+}
+
+.homeCourseCard {
+  box-shadow: var(--glass-shadow-lg);
+}
+
+/* OrgoChem II sub-nav + design-system cards */
+.op-topic-subnav {
+  font-family: var(--font);
+  background: var(--glass-surface-elevated) !important;
+  border-bottom: 1px solid var(--glass-border-subtle) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: 0 1px 0 var(--glass-highlight) inset;
+}
+
+.op-card,
+.op-btn-secondary,
+.op-chip {
+  backdrop-filter: blur(var(--glass-blur-sm, 20px)) saturate(var(--glass-saturate, 180%));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm, 20px)) saturate(var(--glass-saturate, 180%));
+}
+
+.brandMark {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 4px 12px rgba(79, 110, 247, 0.35);
+}
+
+.mech-step-card,
+.mech-schematic,
+.mechanism-diagram-frame {
+  background: var(--glass-surface) !important;
+  border-color: var(--glass-border-subtle) !important;
+  backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+  box-shadow: var(--glass-shadow);
+}
+
+.mech-schematic__species {
+  background: var(--glass-surface-elevated) !important;
+}
+
+.mech-viewer__sidebar {
+  background: var(--glass-surface-muted) !important;
+  border-color: var(--glass-border-subtle) !important;
+  backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+}
+
+.mech-viewer__path-btn {
+  background: var(--glass-surface) !important;
+  border-color: var(--glass-border-subtle) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.topicPracticePartIntro {
+  border-left-color: var(--blue) !important;
+}
+
+/* Smooth Apple-like transitions */
+.card,
+.pill,
+.btn,
+.navLink,
+.topbar,
+.mech-step-card {
+  transition:
+    background 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .pill,
+  .btn,
+  .navLink,
+  .topbar,
+  .mech-step-card {
+    transition: none;
+  }
+}

@@ -10,11 +10,11 @@ function readTheme(): Theme {
 }
 
 export default function TopBarThemeToggle() {
-  const [theme, setTheme] = useState<Theme>(() =>
-    typeof window !== "undefined" ? readTheme() : "light",
-  );
+  // Always start "light" so SSR matches first client paint (boot script may set dark before hydrate).
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
+    setTheme(readTheme());
     const el = document.documentElement;
     const obs = new MutationObserver(() => setTheme(readTheme()));
     obs.observe(el, { attributes: true, attributeFilter: ["data-theme"] });

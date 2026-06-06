@@ -1,5 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
+import YouTubeThumbnail from "@/components/YouTubeThumbnail";
+import { youtubeWatchUrl } from "@/lib/youtube";
 
 type Props = {
   videoId: string;
@@ -7,8 +8,7 @@ type Props = {
 };
 
 export default function YouTubeTutorialCard({ videoId, title }: Props) {
-  const watch = `https://youtube.com/watch?v=${videoId}`;
-  const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+  const watch = youtubeWatchUrl(videoId);
 
   return (
     <Link
@@ -28,19 +28,16 @@ export default function YouTubeTutorialCard({ videoId, title }: Props) {
       }}
     >
       <div style={{ position: "relative", width: "100%", aspectRatio: "16 / 9", background: "#111" }}>
-        <Image
-          src={thumb}
+        <YouTubeThumbnail
+          videoId={videoId}
           alt={title}
           width={480}
           height={270}
-          unoptimized
           style={{ width: "100%", height: "auto", display: "block" }}
         />
       </div>
       <div style={{ padding: "12px 14px" }}>
-        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4, color: "var(--op-text-primary, inherit)" }}>
-          {title}
-        </div>
+        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4, color: "var(--op-text-primary, inherit)" }}>{title}</div>
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--op-indigo, #4F6EF7)" }}>
           Click to watch on YouTube →
         </div>

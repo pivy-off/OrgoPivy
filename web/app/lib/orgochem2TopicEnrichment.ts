@@ -18,7 +18,7 @@ function mcq(question: string, options: [string, string, string, string], answer
 
 function mainVideo(topicTitle: string, id: string): TopicVideo[] {
   const url = `https://www.youtube.com/watch?v=${id}`;
-  const thumbnail = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+  const thumbnail = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
   return [{
     topic: topicTitle,
     subtopic: "Video tutorial",
@@ -37,10 +37,10 @@ function mainVideo(topicTitle: string, id: string): TopicVideo[] {
 export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
   "resonance-acid-base-review": {
     mustKnowItems: [
-      m("Resonance basics", "Only \u03c0 bonds and lone pairs move; atoms stay fixed.", "_S-Dxnv-VLs"),
-      m("Drawing resonance structures", "Practice curved arrows without moving \u03c3 bonds.", "4G_jHoFMRpA"),
-      m("pKa and acid strength", "Lower pKa = stronger acid; use tables to set equilibrium.", "MnWWJVRbdXg"),
-      m("EWG/EDG effects on acidity", "Withdrawers stabilize anions; donors destabilize them.", "9N4AuX5oK-o"),
+      m("Resonance basics", "Only \u03c0 bonds and lone pairs move; atoms stay fixed.", "OqsOIp5UuME"),
+      m("Drawing resonance structures", "Practice curved arrows without moving \u03c3 bonds.", "klAT2MACt4Q"),
+      m("pKa and acid strength", "Lower pKa = stronger acid; use tables to set equilibrium.", "IQ6gHQAg_Nk"),
+      m("EWG/EDG effects on acidity", "Withdrawers stabilize anions; donors destabilize them.", "F7mbfPmOugY"),
     ],
     practiceMcqs: [
       mcq("Which bonds are allowed to move in resonance structures?", ["Sigma bonds only", "Pi bonds and lone pairs only", "All bonds including sigma", "Only lone pairs, never pi bonds"] as [string, string, string, string], 1, "Resonance involves the delocalization of pi electrons and lone pairs only. Sigma bonds form the fixed framework of a molecule and never move in resonance structures. Atoms also stay in the same positions."),
@@ -62,14 +62,16 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Key",
       reagentBold: "pKa table",
     },
-    overviewVideoId: "_S-Dxnv-VLs",
+    overviewVideoId: "OqsOIp5UuME",
   },
   "substitution-elimination-nmr-review": {
     mustKnowItems: [
-      m("SN2 requirements", "1\u00b0 substrate, strong Nu, polar aprotic solvent.", "5EGnJiLtfPs"),
-      m("SN1 requirements", "3\u00b0 substrate, weak Nu, protic solvent.", "5EGnJiLtfPs"),
-      m("Tosylate strategy", "TsCl activates \u2013OH without breaking C\u2013O at carbon.", "Z-nVfpJ6gls"),
-      m("NMR key shifts", "\u03b4, integration, and splitting for exam spectra.", "SBir5wUS3Bo"),
+      m("SN2 requirements", "1\u00b0 substrate, strong Nu, polar aprotic solvent.", "yrvV85H737o"),
+      m("SN1 requirements", "3\u00b0 substrate, weak Nu, protic solvent.", "qTc2uud7TVU"),
+      m("Tosylate strategy", "TsCl activates \u2013OH without breaking C\u2013O at carbon.", "4PDs3ygNsv4"),
+      m("NMR key shifts", "\u03b4, integration, and splitting for exam spectra.", "MhiiIKpm5Xw"),
+      m("Chemical shift", "Electron density and functional group trends.", "2QBDNxiGsAY"),
+      m("Spin-spin splitting", "n+1 rule and coupling patterns.", "WJKfl3w52Mk"),
     ],
     practiceMcqs: [
       mcq("A 1\u00b0 alkyl bromide in acetone with NaI (polar aprotic) undergoes:", ["SN1", "SN2", "E1", "E2"] as [string, string, string, string], 1, "1\u00b0 + strong nucleophile + polar aprotic solvent \u2192 SN2 (backside attack, inversion)."),
@@ -91,16 +93,16 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Reagent",
       reagentBold: "Strong Nu, 1\u00b0 substrate",
     },
-    overviewVideoId: "5EGnJiLtfPs",
+    overviewVideoId: "yrvV85H737o",
   },
   "alkynes": {
     mustKnowItems: [
-      m("Double addition of Br2", "One equiv \u2192 vinyl dibromide; two equiv \u2192 tetrahalide.", "K07VceUan0k"),
-      m("Hydration (Markovnikov)", "Hg\u00b2\u207a/H\u2082SO\u2084/H\u2082O \u2192 enol \u2192 ketone.", "Yd9MFqJmyas"),
-      m("Hydration (anti-Markovnikov)", "Hydroboration\u2013oxidation \u2192 aldehyde from terminal alkyne.", "Yd9MFqJmyas"),
-      m("Reduction to alkenes", "Lindlar (cis) vs Na/NH\u2083 (trans).", "vJPKfTSJQaM"),
-      m("Acetylide alkylation", "NaNH\u2082 then 1\u00b0 alkyl halide only.", "hS4WWJWQ3_Y"),
-      m("Oxidative cleavage", "KMnO\u2084 cleavage patterns.", "K07VceUan0k"),
+      m("Double addition of Br2", "One equiv \u2192 vinyl dibromide; two equiv \u2192 tetrahalide.", "zFSHoaScfwY"),
+      m("Hydration (Markovnikov)", "Hg\u00b2\u207a/H\u2082SO\u2084/H\u2082O \u2192 enol \u2192 ketone.", "zFSHoaScfwY"),
+      m("Hydration (anti-Markovnikov)", "Hydroboration\u2013oxidation \u2192 aldehyde from terminal alkyne.", "zFSHoaScfwY"),
+      m("Reduction to alkenes", "Lindlar (cis) vs Na/NH\u2083 (trans).", "zFSHoaScfwY"),
+      m("Acetylide alkylation", "NaNH\u2082 then 1\u00b0 alkyl halide only.", "I85LgmfkJ0o"),
+      m("Oxidative cleavage", "KMnO\u2084 cleavage patterns.", "zFSHoaScfwY"),
     ],
     practiceMcqs: [
       mcq("Propyne reacts with 1 equivalent of Br2. What is the major product?", ["1,1-dibromopropane", "1,2-dibromoprop-1-ene (vinyl dibromide)", "1,1,2,2-tetrabromopropane", "Propane"] as [string, string, string, string], 1, "One equivalent of Br2 adds across one pi bond to give a vinyl dibromide (anti addition)."),
@@ -121,15 +123,15 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Reagent",
       reagentBold: "HgSO\u2084, H\u2082SO\u2084, H\u2082O",
     },
-    overviewVideoId: "K07VceUan0k",
+    overviewVideoId: "zFSHoaScfwY",
   },
   "grignard-reaction": {
     mustKnowItems: [
-      m("Grignard formation", "Mg, dry ether; handle under anhydrous conditions.", "Y9jAMdA7C1c"),
-      m("Addition to carbonyls", "RMgX + carbonyl \u2192 alcohol after H\u2083O\u207a.", "8wXaRfFsRPs"),
-      m("Incompatible groups", "Protic acids and O\u2013H destroy the reagent.", "Y9jAMdA7C1c"),
-      m("Gilman reagent", "R\u2082CuLi: selective 1,4 and ketone from acid chloride.", "6oOomzJzP6M"),
-      m("Suzuki-Miyaura", "Pd-catalyzed C\u2013C coupling overview.", "6oOomzJzP6M"),
+      m("Grignard formation", "Mg, dry ether; handle under anhydrous conditions.", "X5I2vG576QA"),
+      m("Addition to carbonyls", "RMgX + carbonyl \u2192 alcohol after H\u2083O\u207a.", "X5I2vG576QA"),
+      m("Incompatible groups", "Protic acids and O\u2013H destroy the reagent.", "X5I2vG576QA"),
+      m("Gilman reagent", "R\u2082CuLi: selective 1,4 and ketone from acid chloride.", "I85LgmfkJ0o"),
+      m("Suzuki-Miyaura", "Pd-catalyzed C\u2013C coupling overview.", "I85LgmfkJ0o"),
     ],
     practiceMcqs: [
       mcq("PhMgBr is added to acetone, then H3O+. What is the product?", ["Benzaldehyde", "2-phenyl-2-propanol (a tertiary alcohol)", "Isopropyl benzene", "Benzoic acid"] as [string, string, string, string], 1, "Grignard adds to the carbonyl \u2192 tertiary alcohol after protonation."),
@@ -150,14 +152,15 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Reagent",
       reagentBold: "Mg, ether; then H\u2083O\u207a",
     },
-    overviewVideoId: "Y9jAMdA7C1c",
+    overviewVideoId: "X5I2vG576QA",
   },
   "organohalides-radical": {
     mustKnowItems: [
-      m("Alcohol to alkyl halide", "PBr\u2083, SOCl\u2082, and HX tradeoffs.", "3_kVUkXS2ds"),
-      m("Radical mechanism", "Initiation \u2192 propagation \u2192 termination.", "rWoaT2NLQLA"),
-      m("NBS allylic bromination", "Selective allylic/benzylic positions.", "vJPKfTSJQaM"),
-      m("Radical stability", "Allylic/benzylic > 3\u00b0 > 2\u00b0 > 1\u00b0.", "rWoaT2NLQLA"),
+      m("Alcohol to alkyl halide", "PBr\u2083, SOCl\u2082, and HX tradeoffs.", "4PDs3ygNsv4"),
+      m("Radical mechanism", "Initiation \u2192 propagation \u2192 termination.", "T_FcOcX3wsQ"),
+      m("NBS allylic bromination", "Selective allylic/benzylic positions.", "T_FcOcX3wsQ"),
+      m("Radical stability", "Allylic/benzylic > 3\u00b0 > 2\u00b0 > 1\u00b0.", "T_FcOcX3wsQ"),
+      m("Peroxide effect (HBr)", "Anti-Markovnikov radical addition.", "ZMcCvD5dDMU"),
     ],
     practiceMcqs: [
       mcq("Radical chlorination of butane with Cl2/h\u03bd gives multiple products. Which is the MAJOR product?", ["1-chlorobutane", "2-chlorobutane", "Equal amounts of both", "1,2-dichlorobutane"] as [string, string, string, string], 1, "2\u00b0 C\u2013H abstraction is favored \u2192 2-chlorobutane major."),
@@ -178,14 +181,14 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Reagent",
       reagentBold: "NBS, h\u03bd, CCl\u2084",
     },
-    overviewVideoId: "rWoaT2NLQLA",
+    overviewVideoId: "T_FcOcX3wsQ",
   },
   "conjugated-compounds-diels-alder": {
     mustKnowItems: [
-      m("Conjugated vs isolated", "\u03c0 overlap lowers energy vs isolated dienes.", "6QLnXPF16dA"),
-      m("1,2 vs 1,4 addition", "Kinetic (low T) vs thermodynamic (high T) control.", "bVbNRKkbVSA"),
-      m("Diels-Alder reaction", "s-cis diene + electron-deficient dienophile.", "Uy8A0SZZD_g"),
-      m("Stereochemistry", "Suprafacial [4+2] preserves dienophile geometry.", "3N5mM5HI-es"),
+      m("Conjugated vs isolated", "\u03c0 overlap lowers energy vs isolated dienes.", "sBmoP6KwK-8"),
+      m("1,2 vs 1,4 addition", "Kinetic (low T) vs thermodynamic (high T) control.", "BlTDF_7IaBA"),
+      m("Diels-Alder reaction", "s-cis diene + electron-deficient dienophile.", "sBmoP6KwK-8"),
+      m("Stereochemistry", "Suprafacial [4+2] preserves dienophile geometry.", "ak-6eMoxRSg"),
     ],
     practiceMcqs: [
       mcq("1,3-butadiene reacts with HBr at \u221280\u00b0C. What is the major product?", ["3-bromobut-1-ene (1,4-addition product)", "3,4-dibromobutane", "3-bromobut-1-ene (1,2-addition product)", "No reaction at low temperature"] as [string, string, string, string], 2, "Low temperature \u2192 kinetic 1,2-addition product."),
@@ -206,14 +209,14 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Mechanism",
       reagentBold: "Concerted \u00b7 heat \u00b7 stereospecific",
     },
-    overviewVideoId: "Uy8A0SZZD_g",
+    overviewVideoId: "sBmoP6KwK-8",
   },
   "aromaticity": {
     mustKnowItems: [
-      m("4 criteria for aromaticity", "Cyclic, planar, conjugated, 4n+2 \u03c0 e\u207b.", "MFABFiMEGqQ"),
-      m("Aromatic vs antiaromatic", "H\u00fcckel rule and planarity.", "gRm-A7SdNT0"),
-      m("Pyridine vs pyrrole basicity", "Where the lone pair lives relative to \u03c0.", "y4L97H_3lT4"),
-      m("Heterocycles", "Electron counting in furan, thiophene, pyrrole.", "y4L97H_3lT4"),
+      m("4 criteria for aromaticity", "Cyclic, planar, conjugated, 4n+2 \u03c0 e\u207b.", "1841E4NmsHQ"),
+      m("Aromatic vs antiaromatic", "H\u00fcckel rule and planarity.", "7-BguH4_WBQ"),
+      m("Pyridine vs pyrrole basicity", "Where the lone pair lives relative to \u03c0.", "s4dSPIhK_ZI"),
+      m("Heterocycles", "Electron counting in furan, thiophene, pyrrole.", "ZztpEXSAVrM"),
     ],
     practiceMcqs: [
       mcq("Cyclopentadienyl anion \u03c0 count and aromaticity?", ["4\u03c0 anti", "6\u03c0 aromatic", "6\u03c0 nonaromatic", "4\u03c0 nonaromatic"] as [string, string, string, string], 1, "6\u03c0 = 4n+2; cyclic planar conjugated."),
@@ -232,15 +235,15 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Rule",
       reagentBold: "4n+2 \u03c0 electrons",
     },
-    overviewVideoId: "MFABFiMEGqQ",
+    overviewVideoId: "1841E4NmsHQ",
   },
   "electrophilic-aromatic-substitution": {
     mustKnowItems: [
-      m("EAS two steps", "\u03c3 complex then deprotonation restores aromaticity.", "B8bQBLHkBiQ"),
-      m("5 EAS reactions", "Halogenation, nitration, sulfonation, FC alkylation/acylation.", "K_5B0TBUOQA"),
-      m("Directing effects", "Ortho/para vs meta from resonance.", "V0bdQFrUzgE"),
-      m("Friedel-Crafts alkylation", "Carbocation chemistry; rearrangement risk.", "SxGWnfFMrq4"),
-      m("Friedel-Crafts acylation", "Ketone product; no rearrangement.", "9G5nQi4kD0g"),
+      m("EAS two steps", "\u03c3 complex then deprotonation restores aromaticity.", "ubtvxTvdWjA"),
+      m("5 EAS reactions", "Halogenation, nitration, sulfonation, FC alkylation/acylation.", "ubtvxTvdWjA"),
+      m("Directing effects", "Ortho/para vs meta from resonance.", "ubtvxTvdWjA"),
+      m("Friedel-Crafts alkylation", "Carbocation chemistry; rearrangement risk.", "ubtvxTvdWjA"),
+      m("Friedel-Crafts acylation", "Ketone product; no rearrangement.", "ubtvxTvdWjA"),
     ],
     practiceMcqs: [
       mcq("Rate-determining step in EAS?", ["Deprotonation", "Electrophile attack forming \u03c3 complex", "Electrophile generation", "Diffusion"] as [string, string, string, string], 1, "Loss of aromaticity in step 1 has highest Ea."),
@@ -261,14 +264,14 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Catalyst",
       reagentBold: "Lewis acid generates E\u207a",
     },
-    overviewVideoId: "B8bQBLHkBiQ",
+    overviewVideoId: "ubtvxTvdWjA",
   },
   "nucleophilic-aromatic-substitution": {
     mustKnowItems: [
-      m("NAS requirements", "EWG ortho/para to leaving group.", "DAbRxRV-3-4"),
-      m("NAS vs EAS", "When the ring is electron-poor.", "DAbRxRV-3-4"),
-      m("Benzyne mechanism", "Strong base on simple aryl halides.", "DAbRxRV-3-4"),
-      m("Side-chain reactions", "Benzylic oxidation and halogenation.", "lBJc9ij5ZLU"),
+      m("NAS requirements", "EWG ortho/para to leaving group.", "eQzbpL0uWVA"),
+      m("NAS vs EAS", "Electron-rich vs electron-poor aromatic rings.", "ubtvxTvdWjA"),
+      m("Benzyne mechanism", "Strong base on unactivated aryl halides.", "H7l7Prf5cjc"),
+      m("Side-chain reactions", "Benzylic oxidation and halogenation.", "T_FcOcX3wsQ"),
     ],
     practiceMcqs: [
       mcq("NAS on chlorobenzene without EWGs is:", ["Very fast", "Essentially impossible under normal conditions", "Faster than EAS", "Radical only"] as [string, string, string, string], 1, "Simple aryl halides need strong EWGs ortho/para to halide for NAS."),
@@ -289,14 +292,14 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Requirement",
       reagentBold: "EWG ortho/para to X",
     },
-    overviewVideoId: "DAbRxRV-3-4",
+    overviewVideoId: "eQzbpL0uWVA",
   },
   "alcohols-phenols": {
     mustKnowItems: [
-      m("Reducing agents", "NaBH\u2084 vs LiAlH\u2084 scope.", "PJ4Kq3GXOOU"),
+      m("Reducing agents", "NaBH\u2084 vs LiAlH\u2084 scope.", "5MboymSRLn4"),
       m("Oxidation levels", "1\u00b0 \u2192 aldehyde \u2192 acid; 2\u00b0 \u2192 ketone.", "K07VceUan0k"),
-      m("Tosylate strategy", "TsCl/pyridine; retention at stereocenter.", "Z-nVfpJ6gls"),
-      m("Phenol acidity", "Resonance stabilization of phenoxide.", "2IKb_yVhL3E"),
+      m("Tosylate strategy", "TsCl/pyridine; retention at stereocenter.", "4PDs3ygNsv4"),
+      m("Phenol acidity", "Resonance stabilization of phenoxide.", "MAjy2WMkPHc"),
     ],
     practiceMcqs: [
       mcq("Which reagent oxidizes a primary alcohol to an aldehyde WITHOUT going all the way to carboxylic acid?", ["Na2Cr2O7/H2SO4", "KMnO4", "PCC", "O3"] as [string, string, string, string], 2, "PCC stops at the aldehyde. Chromic acid reagents and KMnO4 continue to carboxylic acid."),
@@ -321,10 +324,10 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
   },
   "ethers-epoxides": {
     mustKnowItems: [
-      m("Williamson synthesis", "Alkoxide + 1\u00b0 RX; avoid 3\u00b0 halide.", "ojVhITKMtSA"),
-      m("Ether cleavage", "HBr/HI mechanisms.", "0fNuDJPIiPA"),
-      m("Epoxide synthesis", "mCPBA syn epoxidation.", "8Ydm-HHJoF0"),
-      m("Ring opening acid/base", "Acid: more substituted C; base: less substituted.", "0fNuDJPIiPA"),
+      m("Williamson synthesis", "Alkoxide + 1\u00b0 RX; avoid 3\u00b0 halide.", "mNOYdafN5TI"),
+      m("Ether cleavage", "HBr/HI mechanisms.", "NpABmoc8MJY"),
+      m("Epoxide synthesis", "mCPBA syn epoxidation.", "Uq532aH3OTY"),
+      m("Ring opening acid/base", "Acid: more substituted C; base: less substituted.", "9zsJhrG-9WY"),
     ],
     practiceMcqs: [
       mcq("Best reagent pair for unsymmetrical ether from tert-butanol and methanol?", ["H2SO4, heat", "(CH3)3CO\u207bNa\u207a + CH3I", "CH3O\u207bNa\u207a + (CH3)3CBr", "NaH + (CH3)3CBr"] as [string, string, string, string], 1, "Williamson: alkyl halide must be methyl (1\u00b0). Use bulky alkoxide + CH3I."),
@@ -345,15 +348,15 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Epoxide prep",
       reagentBold: "mCPBA on alkene",
     },
-    overviewVideoId: "ojVhITKMtSA",
+    overviewVideoId: "mNOYdafN5TI",
   },
   "aldehydes-ketones": {
     mustKnowItems: [
-      m("Cyanohydrin", "CN\u207b addition to carbonyl.", "pTLM_5RJCQ4"),
-      m("Imine and enamine", "1\u00b0 vs 2\u00b0 amine outcomes; pH window.", "TZtkZRsXkc8"),
-      m("Wolff-Kishner", "Hydrazone then strong base/heat.", "T4r7eBpwsQk"),
-      m("Acetal formation", "Protection/deprotection equilibrium.", "nC5XJLN3WjE"),
-      m("Wittig reaction", "Phosphonium ylide forms new C=C.", "xHfb0dRBDRs"),
+      m("Cyanohydrin", "CN\u207b addition to carbonyl.", "wmXxrxZ6PVU"),
+      m("Imine and enamine", "1\u00b0 vs 2\u00b0 amine outcomes; pH window.", "_0C7XXWjOpQ"),
+      m("Wolff-Kishner", "Hydrazone then strong base/heat.", "yUefif10Z_M"),
+      m("Acetal formation", "Protection/deprotection equilibrium.", "wmXxrxZ6PVU"),
+      m("Wittig reaction", "Phosphonium ylide forms new C=C.", "jxUXIHG1zGc"),
     ],
     practiceMcqs: [
       mcq("Benzaldehyde + HCN (cat. base) product?", ["Benzyl alcohol", "Mandelonitrile (PhCH(OH)CN)", "Benzoic acid", "Phenylacetaldehyde"] as [string, string, string, string], 1, "Cyanohydrin: CN\u207b adds to carbonyl carbon."),
@@ -374,16 +377,16 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Selectivity",
       reagentBold: "Aldehyde > ketone",
     },
-    overviewVideoId: "MQsPeQBjqmM",
+    overviewVideoId: "wmXxrxZ6PVU",
   },
   "carboxylic-acids-derivatives": {
     mustKnowItems: [
-      m("Reactivity order", "Acid chloride > anhydride > ester > amide.", "jSCQpMmDzrE"),
-      m("Acyl substitution", "Tetrahedral intermediate; LG basicity.", "jSCQpMmDzrE"),
-      m("Fischer esterification", "Equilibrium with water/alcohol.", "B28_pfN_4l8"),
-      m("Acid chloride SOCl2", "\u2013COOH \u2192 \u2013COCl.", "cSmKPsJebbU"),
-      m("Ester reactions", "Hydrolysis, transesterification, reduction.", "ZApKjLKKXvk"),
-      m("Amide reactions", "Hydrolysis difficulty vs esters.", "R_L_mJTrLvQ"),
+      m("Reactivity order", "Acid chloride > anhydride > ester > amide.", "5PK63QjP03k"),
+      m("Acyl substitution", "Tetrahedral intermediate; LG basicity.", "5PK63QjP03k"),
+      m("Fischer esterification", "Equilibrium with water/alcohol.", "l_WuC4vpTsY"),
+      m("Acid chloride SOCl2", "\u2013COOH \u2192 \u2013COCl.", "5PK63QjP03k"),
+      m("Ester reactions", "Hydrolysis, transesterification, reduction.", "l_WuC4vpTsY"),
+      m("Amide reactions", "Hydrolysis difficulty vs esters.", "5PK63QjP03k"),
     ],
     practiceMcqs: [
       mcq("Reactivity toward acyl substitution (most \u2192 least): ester, acid chloride, amide, anhydride?", ["Ester > chloride > amide > anhydride", "Chloride > anhydride > ester > amide", "Amide > ester > chloride > anhydride", "Anhydride > amide > ester > chloride"] as [string, string, string, string], 1, "Leaving group basicity ladder: Cl\u207b best LG."),
@@ -404,7 +407,7 @@ export const ORGOCHEM2_ENRICHMENT: Record<string, OrgChem2Enrichment> = {
       reagentCaption: "Key idea",
       reagentBold: "Weaker base LG \u2192 faster",
     },
-    overviewVideoId: "zWJ3_3hVxb8",
+    overviewVideoId: "5PK63QjP03k",
   },
 };
 

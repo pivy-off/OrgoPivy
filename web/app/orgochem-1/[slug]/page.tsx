@@ -369,7 +369,7 @@ export default async function OrgoChem1TopicPage({
               }
             >
               <div className="topicSummaryText">
-                <div style={{ marginBottom: 16, fontSize: 16, lineHeight: 1.7, fontWeight: 500 }}>
+                <div className="orgochem2SummaryBody">
                   {topic.summary}
                 </div>
                 <div style={{ marginTop: 16, padding: 16, background: "rgba(0, 122, 255, 0.04)", borderRadius: 12, border: "1px solid rgba(0, 122, 255, 0.1)" }}>

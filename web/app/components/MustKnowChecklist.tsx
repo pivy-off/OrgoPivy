@@ -1,7 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import YouTubeThumbnail from "@/components/YouTubeThumbnail";
+import { youtubeWatchUrl } from "@/lib/youtube";
 import { ChemFormattedLine } from "../lib/chemTypography";
 import type { TopicMustKnowItem } from "../lib/curriculum";
 
@@ -64,8 +65,8 @@ export default function MustKnowChecklist({ items, course, topic, chemPolish, st
         justifyContent: "space-between",
         marginBottom: 16
       }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(0, 0, 0, 0.6)" }}>
-          Progress: {checked.size} / {total}
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)" }}>
+          {checked.size} / {total} complete
         </div>
         <div style={{
           width: 120,
@@ -89,8 +90,7 @@ export default function MustKnowChecklist({ items, course, topic, chemPolish, st
           const tail = row.description;
           const isChecked = checked.has(i);
           const vid = row.videoId;
-          const watch = `https://youtube.com/watch?v=${vid}`;
-          const thumb = `https://img.youtube.com/vi/${vid}/maxresdefault.jpg`;
+          const watch = youtubeWatchUrl(vid);
           return (
             <label
               key={`${i}-${head}`}
@@ -173,12 +173,11 @@ export default function MustKnowChecklist({ items, course, topic, chemPolish, st
                       maxWidth: 320,
                     }}
                   >
-                    <Image
-                      src={thumb}
+                    <YouTubeThumbnail
+                      videoId={vid}
                       alt={`${head} video thumbnail`}
                       width={480}
                       height={270}
-                      unoptimized
                       style={{ width: "100%", height: "auto", display: "block" }}
                     />
                     <div style={{ padding: "8px 10px" }}>

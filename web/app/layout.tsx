@@ -1,11 +1,18 @@
 // app/layout.tsx
 import "./globals.css";
+import "../styles/apple-glass.css";
+import { Inter } from "next/font/google";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import TopNavClient from "./components/TopNavClient";
 import TopBarThemeToggle from "./components/TopBarThemeToggle";
 import TraduireButton from "./components/TraduireButton";
 import WorkspaceSidebar from "./components/WorkspaceSidebar";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata = {
   title: "OrgoPivy",
@@ -41,7 +48,7 @@ function ThemeBootScript() {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={inter.className} suppressHydrationWarning>
       <body>
         <ThemeBootScript />
 

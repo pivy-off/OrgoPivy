@@ -10,9 +10,9 @@ import OrgChem2ReactionTables from "@/app/components/OrgChem2ReactionTables";
 import { ChemFormattedLine } from "@/app/lib/chemTypography";
 import { getOrgChem2MechanismSupplementalSvg } from "@/app/lib/orgochem2MechanismSupplementalSvg";
 import TopicHeroDiagramView from "@/app/components/TopicHeroDiagram";
-import TopicPracticeMcqs from "@/app/components/TopicPracticeMcqs";
 import TopicToolsGrid from "@/components/TopicToolsGrid";
-import TopicSubNav from "@/components/TopicSubNav";
+import TopicBookmarkButton from "@/app/components/TopicBookmarkButton";
+import { TopicTabbedLayout, TopicTabPanel } from "@/app/components/TopicTabbedLayout";
 import YouTubeTutorialCard from "@/components/YouTubeTutorialCard";
 import { partitionHowToStudy } from "@/lib/studySteps";
 
@@ -493,34 +493,6 @@ function Mistakes({ items }: { items: string[] }) {
   );
 }
 
-function guessMechanismTag(slug: string) {
-  if (slug === "substitution-elimination-nmr-review" || slug === "substitution-elimination-review" || slug === "organohalides-radical") return "substitution";
-  if (slug === "alcohols-phenols" || slug.includes("alcohol")) return "alcohol";
-  if (slug === "ethers-epoxides" || slug.includes("ether") || slug.includes("epoxide") || slug.includes("thiols")) return "ether";
-  if (slug === "aldehydes-ketones" || slug === "grignard-reaction" || slug.includes("organometallic")) return "carbonyl";
-  if (slug.includes("carboxylic")) return "carboxylic";
-  if (slug.includes("enolate") || slug.includes("aldol")) return "enolate";
-  if (
-    slug === "electrophilic-aromatic-substitution" ||
-    slug === "nucleophilic-aromatic-substitution" ||
-    slug.includes("eas-substituent") ||
-    slug.includes("aromatic-side")
-  ) {
-    return "aromatic";
-  }
-  if (slug.includes("amine")) return "amine";
-  if (slug === "alkynes" || slug === "conjugated-compounds-diels-alder" || slug === "radical-reactions" || slug === "conjugated-systems" || slug === "diels-alder-reaction") {
-    return "alkene";
-  }
-  if (
-    slug === "nmr-spectroscopy-review" ||
-    slug === "proton-nmr-review" ||
-    slug === "substitution-elimination-nmr-review"
-  )
-    return "spectroscopy";
-  return slug;
-}
-
 export default async function OrgoChem2TopicPage({
   params,
 }: {
@@ -530,7 +502,6 @@ export default async function OrgoChem2TopicPage({
   const topic = findTopic("orgochem-2", slug);
   if (!topic) return notFound();
 
-  const mechTag = guessMechanismTag(topic.slug);
   const supplementalSvg = topic.hasMechanism ? getOrgChem2MechanismSupplementalSvg(topic.slug) : undefined;
   const hasSpectraImages = topic.images?.some((im) => im.section === "spectra") ?? false;
   const { steps: studySteps, tips: extractedTips } = partitionHowToStudy(topic.howToStudy);
@@ -554,12 +525,13 @@ export default async function OrgoChem2TopicPage({
           <div className="stack">
             <div className="topicTopRow">
               <div className="topicTopLeft">
-                <div className="subtle">OrgoChem II · CHM 222 (Dr. Garrett, Spring 2026)</div>
+                <div className="subtle">OrgoChem II</div>
                 <h1 className="h1">{topic.title}</h1>
                 <div className="subtle">{topic.shortDesc}</div>
               </div>
 
               <div className="topicTopActions">
+                <TopicBookmarkButton course="orgochem-2" topic={topic.slug} />
                 <Link className="btn" href="/orgochem-2">
                   Back
                 </Link>
@@ -574,10 +546,8 @@ export default async function OrgoChem2TopicPage({
               )}
             </div>
 
-            <TopicSubNav />
-
-            <div className="divider" />
-
+            <TopicTabbedLayout>
+            <TopicTabPanel id="overview">
             <Section
               title="Summary"
               right={
@@ -587,65 +557,32 @@ export default async function OrgoChem2TopicPage({
               }
             >
               <div className="topicSummaryText">
-                <div className="orgochem2SummaryBody" style={{ marginBottom: 16, fontSize: 16, lineHeight: 1.7, fontWeight: 500 }}>
+                <div className="orgochem2SummaryBody">
                   <ChemFormattedLine text={topic.summary} />
                 </div>
                 <TopicCurriculumImages images={topic.images} section="summary" />
                 {topic.overviewVideoId ? (
                   <div style={{ marginTop: 16 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#007AFF" }}>Video tutorial</div>
+                    <div className="topicVideoLabel">Video Tutorial</div>
                     <YouTubeTutorialCard
                       videoId={topic.overviewVideoId}
                       title={`${topic.title} — overview`}
                     />
                   </div>
                 ) : null}
-                <div style={{ marginTop: 16, padding: 16, background: "rgba(0, 122, 255, 0.04)", borderRadius: 12, border: "1px solid rgba(0, 122, 255, 0.1)" }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: "#007AFF" }}>
-                    What you need to know:
-                  </div>
-                  <div style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(0, 0, 0, 0.8)" }}>
-                    This topic covers {topic.title.toLowerCase()}. Focus on the must-know checklist and study steps below. Use the mechanism and spectra panels when present, then open the full reference for depth.
+                <div className="topicCallout">
+                  <div className="topicCalloutTitle">What you need to know:</div>
+                  <div className="topicCalloutBody">
+                    This topic covers {topic.title.toLowerCase()}. Focus on mastering the key concepts in the
+                    &quot;Must know checklist&quot; below. Follow the study steps systematically, and use practice
+                    problems to reinforce your understanding. The external reference provides comprehensive coverage of
+                    all concepts.
                   </div>
                 </div>
               </div>
             </Section>
 
             <OrgChem2ReactionTables slug={topic.slug} />
-
-            {topic.hasMechanism ? (
-              <Section title="Mechanism steps">
-                <OrgChem2MechanismStepCards slug={topic.slug} />
-              </Section>
-            ) : null}
-
-            {topic.hasMechanism ? (
-              <Section
-                title="Mechanism visuals"
-                right={
-                  <Link className="btn btnPrimary" href={`/mechanisms?topic=${encodeURIComponent(mechTag)}`}>
-                    Open mechanism viewer
-                  </Link>
-                }
-              >
-                <p className="subtle" style={{ marginBottom: 12, lineHeight: 1.55 }}>
-                  Labels: <strong>Nu</strong> = nucleophile (lone pair or π bond), <strong>E⁺</strong> = electrophile, <strong>LG</strong> = leaving group. The interactive viewer uses step-by-step diagrams; supplemental SVG below sketches electron flow for this topic.
-                </p>
-                <TopicCurriculumImages images={topic.images} section="mechanism" />
-                {supplementalSvg ? (
-                  <div
-                    className="orgochem2MechanismSupplemental"
-                    dangerouslySetInnerHTML={{ __html: supplementalSvg }}
-                  />
-                ) : null}
-              </Section>
-            ) : null}
-
-            {hasSpectraImages ? (
-              <Section title="Spectra" right={topic.practiceHref === "/spectra" ? <Link className="btn" href="/spectra">NMR Studio</Link> : null}>
-                <TopicCurriculumImages images={topic.images} section="spectra" />
-              </Section>
-            ) : null}
 
             <div className="topicTwoCol">
               <Section title="Must know checklist">
@@ -672,6 +609,43 @@ export default async function OrgoChem2TopicPage({
                 />
               </Section>
             </div>
+            </TopicTabPanel>
+
+            <TopicTabPanel id="study">
+            {topic.hasMechanism ? (
+              <Section title="Mechanism steps">
+                <OrgChem2MechanismStepCards slug={topic.slug} />
+              </Section>
+            ) : null}
+
+            {topic.hasMechanism ? (
+              <Section
+                title="Mechanism visuals"
+                right={
+                  <Link className="btn btnPrimary" href={`/orgochem-2/${encodeURIComponent(topic.slug)}/mechanisms`}>
+                    Open step-by-step viewer
+                  </Link>
+                }
+              >
+                <p className="topicReadable" style={{ marginBottom: 12 }}>
+                  Each step shows <strong>reactants → products</strong> in line notation with curved-arrow electron flow.
+                  Open the viewer for pathway tabs (SN₂ vs E₂, acid vs base epoxide opening, etc.).
+                </p>
+                <TopicCurriculumImages images={topic.images} section="mechanism" />
+                {supplementalSvg ? (
+                  <div className="orgochem2MechanismSupplemental" style={{ marginTop: 16 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Arrow-pushing summary</div>
+                    <div dangerouslySetInnerHTML={{ __html: supplementalSvg }} />
+                  </div>
+                ) : null}
+              </Section>
+            ) : null}
+
+            {hasSpectraImages ? (
+              <Section title="Spectra" right={topic.practiceHref === "/spectra" ? <Link className="btn" href="/spectra">NMR Studio</Link> : null}>
+                <TopicCurriculumImages images={topic.images} section="spectra" />
+              </Section>
+            ) : null}
 
             <Section title="Study steps">
               <StudyStepsChecklist chemPolish items={studySteps} course="orgochem-2" topic={topic.slug} />
@@ -680,18 +654,89 @@ export default async function OrgoChem2TopicPage({
             <Section title="💡 Tips">
                 <div className="topicTips">
                   {displayTips.map((t, i) => (
-                    <div key={i} className="topicTipItem">
+                    <div key={i} className="topicTipItem topicReadable">
                       <ChemFormattedLine text={t} />
                     </div>
                   ))}
                 </div>
               </Section>
+            </TopicTabPanel>
 
+            <TopicTabPanel id="practice">
+            {topic.practiceMcqs && topic.practiceMcqs.length > 0 ? (
+              <Section
+                title="Practice questions"
+                right={
+                  <Link
+                    className="btn btnPrimary"
+                    href={`/orgochem-2/${encodeURIComponent(topic.slug)}/practice`}
+                  >
+                    Open practice hub
+                  </Link>
+                }
+              >
+                <p className="topicReadable" style={{ margin: "0 0 12px" }}>
+                  {topic.practiceMcqs.length} multiple-choice questions — each on its own page for focused study.
+                </p>
+                <div className="topicToolRow" style={{ flexWrap: "wrap", gap: 8 }}>
+                  {topic.practiceMcqs.map((_, i) => (
+                    <Link
+                      key={i}
+                      className="btn"
+                      href={`/orgochem-2/${encodeURIComponent(topic.slug)}/practice/${i + 1}`}
+                    >
+                      Question {i + 1}
+                    </Link>
+                  ))}
+                </div>
+              </Section>
+            ) : null}
+
+            <Section title="Exam practice & drills">
+              <TopicCurriculumImages images={topic.images} section="practice" />
+              {topic.practiceHref ? (
+                <div className="topicPracticeRow" style={{ marginBottom: 12 }}>
+                  <div className="topicPracticeText">
+                    Open the linked drill (interactive practice, NMR studio, quiz, or exam bank).
+                  </div>
+                  <Link className="btn btnPrimary" href={topic.practiceHref}>
+                    Open linked drill
+                  </Link>
+                </div>
+              ) : null}
+              <div className="topicToolRow" style={{ flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                <Link
+                  className="btn btnPrimary"
+                  href={`/orgochem-2/exams?topic=${encodeURIComponent(topic.slug)}`}
+                >
+                  Practice This Topic
+                </Link>
+                <Link className="btn" href="/orgochem-2/exams">
+                  Full Exam Hub
+                </Link>
+                <Link className="btn" href={`/orgochem-2/${encodeURIComponent(topic.slug)}/practice-exam`}>
+                  Timed practice exam
+                </Link>
+                <a
+                  className="btn"
+                  href={`/api/exam-guide?course=orgochem-2&topic=${encodeURIComponent(topic.slug)}`}
+                  download
+                >
+                  Download study guide
+                </a>
+              </div>
+              <p className="subtle" style={{ margin: 0, fontSize: 13, lineHeight: 1.5 }}>
+                Timed mode uses the same question bank as above. Download a Word study guide generated from this topic&apos;s content.
+              </p>
+            </Section>
+            </TopicTabPanel>
+
+            <TopicTabPanel id="resources">
             <Section title="Tools">
               <div className="topicToolRow">
                 {topic.hasMechanism ? (
-                  <Link className="btn btnPrimary" href={`/mechanisms?topic=${encodeURIComponent(mechTag)}`}>
-                    Mechanism tool
+                  <Link className="btn btnPrimary" href={`/orgochem-2/${encodeURIComponent(topic.slug)}/mechanisms`}>
+                    Mechanism viewer
                   </Link>
                 ) : null}
                 {topic.slug === "nmr-spectroscopy-review" || topic.slug === "substitution-elimination-nmr-review" ? (
@@ -711,51 +756,11 @@ export default async function OrgoChem2TopicPage({
               </div>
             </Section>
 
-            <Section title="Practice">
-              <TopicCurriculumImages images={topic.images} section="practice" />
-              {topic.practiceMcqs && topic.practiceMcqs.length > 0 ? (
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontWeight: 800, marginBottom: 8 }}>Multiple choice (exam-style)</div>
-                  <TopicPracticeMcqs questions={topic.practiceMcqs} />
-                </div>
-              ) : null}
-              {topic.practiceHref ? (
-                <div className="topicPracticeRow" style={{ marginBottom: 12 }}>
-                  <div className="topicPracticeText">
-                    Open the linked drill (interactive practice, NMR studio, quiz, or exam bank).
-                  </div>
-                  <Link className="btn btnPrimary" href={topic.practiceHref}>
-                    Open linked drill
-                  </Link>
-                </div>
-              ) : null}
-              <div style={{ fontWeight: 700, marginBottom: 8 }}>Exam practice</div>
-              <div className="topicToolRow" style={{ flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-                <Link
-                  className="btn btnPrimary"
-                  href={`/orgochem-2/exams?topic=${encodeURIComponent(topic.slug)}`}
-                >
-                  Practice This Topic
-                </Link>
-                <Link className="btn" href="/orgochem-2/exams">
-                  Full Exam Hub
-                </Link>
-                <a
-                  className="btn"
-                  href={`/api/exam-guide?course=orgochem-2&topic=${encodeURIComponent(topic.slug)}`}
-                  download
-                >
-                  Download study guide
-                </a>
-              </div>
-              <p className="subtle" style={{ margin: 0, fontSize: 13, lineHeight: 1.5 }}>
-                Timed practice exams use the MCQs above. Download a Word study guide generated from this topic&apos;s content and your uploads.
-              </p>
-            </Section>
-
-            <Section title="Resources">
+            <Section title="Deep study tools">
               <TopicToolsGrid slug={topic.slug} title={topic.title} />
             </Section>
+            </TopicTabPanel>
+            </TopicTabbedLayout>
 
           </div>
         </div>

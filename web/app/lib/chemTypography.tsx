@@ -42,7 +42,7 @@ export function ChemFormattedLine({ text }: { text: string }): ReactNode {
   while ((m = re.exec(u)) !== null) {
     if (m.index > last) {
       nodes.push(
-        <span key={key++} className="chem-mono-inline">
+        <span key={key++} className="chem-prose-inline">
           {u.slice(last, m.index)}
         </span>
       );
@@ -56,7 +56,7 @@ export function ChemFormattedLine({ text }: { text: string }): ReactNode {
   }
   if (last < u.length) {
     nodes.push(
-      <span key={key++} className="chem-mono-inline">
+      <span key={key++} className="chem-prose-inline">
         {u.slice(last)}
       </span>
     );

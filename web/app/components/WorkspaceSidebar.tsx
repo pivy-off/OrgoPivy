@@ -22,6 +22,10 @@ function isActive(path: string, href: string) {
 export default function WorkspaceSidebar() {
   const path = usePathname() || "/";
 
+  if (path === "/" || path === "") {
+    return null;
+  }
+
   return (
     <aside className="workspaceSidebar">
       <div className="workspaceSidebarCard card">

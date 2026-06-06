@@ -10,7 +10,7 @@ import os
 
 from app.ingest import chunk_text, score, make_answer
 from app import admet_ai_service as admet_svc
-from app import gemini_ask as gemini_ask_module
+from app import ai_study as ai_study_module
 from app.security import (
     limiter,
     SecurityHeadersMiddleware,
@@ -31,7 +31,8 @@ from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 
 app = FastAPI(title="OrgoPivy API", version="0.3.0")
-app.include_router(gemini_ask_module.router)
+app.include_router(ai_study_module.router)
+app.include_router(ai_study_module.legacy_router)
 
 # Add security middleware (order matters - add before CORS)
 app.add_middleware(SecurityHeadersMiddleware)

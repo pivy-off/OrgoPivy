@@ -49,15 +49,11 @@ export default function TopNavClient() {
       </Link>
 
       <Link className={pillClass("/studio")} href="/studio">
-        Assignments
-      </Link>
-
-      <Link className={pillClass("/studio")} href="/studio">
-        Professor
+        Studio
       </Link>
 
       <Link className={pillClass("/mechanisms")} href="/mechanisms">
-        Tools
+        Mechanisms
       </Link>
     </div>
   );

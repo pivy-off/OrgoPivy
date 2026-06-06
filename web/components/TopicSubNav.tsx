@@ -23,24 +23,23 @@ export default function TopicSubNav() {
     { href: `${base}/notebook`, label: "AI", icon: "🧠", key: "notebook" },
     { href: `${base}/flashcards`, label: "Cards", icon: "🃏", key: "flashcards" },
     { href: `${base}/mechanisms`, label: "Mechs", icon: "⚗️", key: "mechanisms" },
-    { href: `${base}/practice-exam`, label: "Exam", icon: "📝", key: "practice-exam" },
+    { href: `${base}/practice`, label: "Practice", icon: "✓", key: "practice" },
+    { href: `${base}/practice-exam`, label: "Timed", icon: "📝", key: "practice-exam" },
     { href: `${base}/concept-map`, label: "Map", icon: "🗺️", key: "concept-map" },
   ];
   if (SPECTRA_SLUGS.has(slug)) {
     items.push({ href: `${base}/spectra-lab`, label: "Spectra", icon: "🔬", key: "spectra-lab" });
   }
 
-  const active = (href: string) => pathname === href || pathname?.startsWith(href + "/");
+  const active = (href: string, key: string) => {
+    if (key === "practice") {
+      return pathname === href || (pathname?.startsWith(`${base}/practice`) ?? false);
+    }
+    return pathname === href || (pathname?.startsWith(href + "/") ?? false);
+  };
 
   return (
-    <nav
-      className="op-topic-subnav"
-      style={{
-        borderBottom: "1px solid var(--op-border, #e5e7eb)",
-        background: "var(--op-card-bg, #fff)",
-        fontFamily: "var(--op-font-sans, sans-serif)",
-      }}
-    >
+    <nav className="op-topic-subnav">
       <div
         style={{
           display: "flex",
@@ -69,7 +68,7 @@ export default function TopicSubNav() {
         </Link>
         <div style={{ width: 1, height: 22, background: "var(--op-border)", flexShrink: 0 }} />
         {items.map((it) => {
-          const on = active(it.href);
+          const on = active(it.href, it.key);
           return (
             <Link
               key={it.key}

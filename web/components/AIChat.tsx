@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Topic } from "@/app/lib/curriculum";
-import { geminiAsk, type ChatTurn } from "@/lib/gemini";
+import { aiAsk, fetchAiStatus, type AiStatus, type ChatTurn } from "@/lib/ai";
 import { getNotebookSession, pushNotebookStarter, setNotebookSession } from "@/lib/storage";
 
 export type ChatMsg = {
@@ -18,6 +18,11 @@ export default function AIChat({ slug, topicTitle, topic }: { slug: string; topi
   const [loading, setLoading] = useState(false);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [aiStatus, setAiStatus] = useState<AiStatus | null>(null);
+
+  useEffect(() => {
+    fetchAiStatus().then(setAiStatus).catch(() => setAiStatus({ configured: false, provider: null, display_name: null }));
+  }, []);
 
   const chips = useMemo(() => {
     const mk = topic?.mustKnowItems?.slice(0, 4).map((m) => `Explain: ${m.title}`) ??
@@ -42,7 +47,7 @@ export default function AIChat({ slug, topicTitle, topic }: { slug: string; topi
     setInput("");
     const history: ChatTurn[] = nextThread.map((x) => ({ role: x.role, content: x.text }));
     try {
-      const res = await geminiAsk(q, {
+      const res = await aiAsk(q, {
         topicSlug: slug,
         course: "orgochem-2",
         history: history.slice(0, -1),
@@ -73,8 +78,24 @@ export default function AIChat({ slug, topicTitle, topic }: { slug: string; topi
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 420, fontFamily: "var(--op-font-sans)" }}>
-      <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--op-border)", background: "#fff" }}>
+      <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--op-border)", background: "var(--glass-surface-elevated, #fff)" }}>
         <strong>🧠 Ask AI</strong>
+        {aiStatus?.display_name ? (
+          <span
+            style={{
+              marginLeft: 8,
+              fontSize: 11,
+              fontWeight: 700,
+              padding: "2px 8px",
+              borderRadius: 999,
+              background: "var(--op-indigo-light)",
+              color: "var(--op-indigo)",
+            }}
+          >
+            {aiStatus.display_name}
+            {aiStatus.provider === "deepseek" ? " · free credits" : ""}
+          </span>
+        ) : null}
         {remaining !== null ? (
           <span style={{ marginLeft: 8, color: "var(--op-text-secondary)", fontSize: 13 }}>{remaining} questions left</span>
         ) : null}

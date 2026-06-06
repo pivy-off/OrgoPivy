@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import HomePressable from "./components/HomePressable";
 import { getCourseTopics, type CourseId, type Topic } from "./lib/curriculum";
 
 type ProgressMap = Record<string, boolean>;
@@ -11,7 +10,6 @@ const GOAL_STORAGE = "orgopivy-daily-goal-minutes";
 const TOTAL_STUDY_MIN_KEY = "orgopivy-total-study-minutes";
 const BOOKMARKS_KEY = "orgopivy-bookmarks";
 const STREAK_DAYS_KEY = "orgopivy-streak-days";
-const ACHIEVEMENTS_KEY = "orgopivy-achievements-count";
 const DEFAULT_GOAL_MIN = 30;
 
 function storageKey(course: CourseId) {
@@ -68,15 +66,13 @@ function randomTopic(): { course: CourseId; topic: Topic } {
 }
 
 function courseLabel(course: CourseId) {
-  return course === "orgochem-1" ? "ORGOCHEM I" : "ORGOCHEM II";
+  return course === "orgochem-1" ? "OrgoChem I" : "OrgoChem II";
 }
 
 export default function HomePage() {
   const [completedCount, setCompletedCount] = useState(0);
   const [totalTopics, setTotalTopics] = useState(0);
-  const [review, setReview] = useState<{ course: CourseId; topic: Topic } | null>(() =>
-    typeof window !== "undefined" ? randomTopic() : null,
-  );
+  const [review, setReview] = useState<{ course: CourseId; topic: Topic } | null>(null);
   const [studyMinutesToday, setStudyMinutesToday] = useState(0);
   const [dailyGoalMin, setDailyGoalMin] = useState(DEFAULT_GOAL_MIN);
   const [searchQuery, setSearchQuery] = useState("");
@@ -84,8 +80,6 @@ export default function HomePage() {
   const [totalStudyMinutes, setTotalStudyMinutes] = useState(0);
   const [bookmarksCount, setBookmarksCount] = useState(0);
   const [streakDays, setStreakDays] = useState(0);
-  const [achievementsCount, setAchievementsCount] = useState(0);
-
   const refreshFromStorage = useCallback(() => {
     const all = [...getCourseTopics("orgochem-1"), ...getCourseTopics("orgochem-2")];
     setTotalTopics(all.length);
@@ -108,12 +102,12 @@ export default function HomePage() {
       setTotalStudyMinutes(readNumber(TOTAL_STUDY_MIN_KEY));
       setBookmarksCount(readBookmarksCount());
       setStreakDays(readNumber(STREAK_DAYS_KEY));
-      setAchievementsCount(readNumber(ACHIEVEMENTS_KEY));
     }
     setCompletedCount(done);
   }, []);
 
   useEffect(() => {
+    setReview(randomTopic());
     queueMicrotask(() => refreshFromStorage());
   }, [refreshFromStorage]);
 
@@ -126,8 +120,7 @@ export default function HomePage() {
         e.key === GOAL_STORAGE ||
         e.key === TOTAL_STUDY_MIN_KEY ||
         e.key === BOOKMARKS_KEY ||
-        e.key === STREAK_DAYS_KEY ||
-        e.key === ACHIEVEMENTS_KEY
+        e.key === STREAK_DAYS_KEY
       ) {
         refreshFromStorage();
       }
@@ -151,7 +144,6 @@ export default function HomePage() {
     dailyGoalMin > 0 ? Math.min(100, Math.round((studyMinutesToday / dailyGoalMin) * 100)) : 0;
 
   const studyTimeLabel = formatStudyHM(totalStudyMinutes);
-  const totalStudyH = Math.floor(totalStudyMinutes / 60);
 
   const searchResults = useMemo(() => {
     const needle = searchQuery.trim().toLowerCase();
@@ -197,59 +189,77 @@ export default function HomePage() {
     window.setTimeout(() => setDicePulse(false), 280);
   }
 
+  const stats = [
+    { label: "Topics completed", value: String(completedCount) },
+    { label: "Study time", value: studyTimeLabel },
+    { label: "Day streak", value: String(streakDays) },
+    { label: "Bookmarks", value: String(bookmarksCount) },
+  ];
+
   return (
     <main className="homeMain">
-      <form
-        className="homeSearchWrap"
-        role="search"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const first = searchResults[0];
-          if (first) window.location.assign(`/${first.course}/${first.topic.slug}`);
-        }}
-      >
-        <input
-          type="search"
-          className="homeSearchInput"
-          placeholder="Search topics, chapters, concepts..."
-          aria-label="Search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          autoComplete="off"
-        />
-        <span className="homeSearchIcon" aria-hidden>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-4.2-4.2" />
-          </svg>
-        </span>
-        {searchQuery.trim().length >= 2 ? (
-          <div className="homeSearchResults card">
-            <div className="cardInner homeSearchResultsInner">
-              {searchResults.length === 0 ? (
-                <div className="subtle homeSearchEmpty">No topics match. Try another term.</div>
-              ) : (
-                <ul className="homeSearchList">
-                  {searchResults.map(({ course, topic: t }) => (
-                    <li key={`${course}-${t.slug}`}>
-                      <Link className="homeSearchHit" href={`/${course}/${t.slug}`}>
-                        <span className="homeSearchHitCourse">{courseLabel(course)}</span>
-                        <span className="homeSearchHitTitle">{t.title}</span>
-                        <span className="subtle homeSearchHitDesc">{t.shortDesc}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {searchResults.length > 0 ? (
-                <div className="subtle homeSearchHint">Enter opens the first result</div>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
-      </form>
+      <header className="homeHero">
+        <div className="homeHeroIntro">
+          <h1 className="homeHeroTitle">Dashboard</h1>
+          <p className="subtle homeHeroSub">Search topics or open a course to continue studying.</p>
+        </div>
 
-      <div className="homeCourseGrid">
+        <form
+          className="homeSearchWrap"
+          role="search"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const first = searchResults[0];
+            if (first) window.location.assign(`/${first.course}/${first.topic.slug}`);
+          }}
+        >
+          <input
+            type="search"
+            className="homeSearchInput"
+            placeholder="Search topics, chapters, concepts…"
+            aria-label="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            autoComplete="off"
+          />
+          <span className="homeSearchIcon" aria-hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-4.2-4.2" />
+            </svg>
+          </span>
+          {searchQuery.trim().length >= 2 ? (
+            <div className="homeSearchResults card">
+              <div className="cardInner homeSearchResultsInner">
+                {searchResults.length === 0 ? (
+                  <div className="subtle homeSearchEmpty">No topics match. Try another term.</div>
+                ) : (
+                  <ul className="homeSearchList">
+                    {searchResults.map(({ course, topic: t }) => (
+                      <li key={`${course}-${t.slug}`}>
+                        <Link className="homeSearchHit" href={`/${course}/${t.slug}`}>
+                          <span className="homeSearchHitCourse">{courseLabel(course)}</span>
+                          <span className="homeSearchHitTitle">{t.title}</span>
+                          <span className="subtle homeSearchHitDesc">{t.shortDesc}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {searchResults.length > 0 ? (
+                  <div className="subtle homeSearchHint">Press Enter to open the first result</div>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
+        </form>
+      </header>
+
+      <section className="homeSection" aria-labelledby="home-courses-heading">
+        <h2 id="home-courses-heading" className="homeSectionTitle">
+          Courses
+        </h2>
+        <div className="homeCourseGrid">
         <Link href="/orgochem-1" className="card homeCourseCard homeCardMotion">
           <div className="homeCourseBlob" aria-hidden />
           <div className="cardInner homeCourseCardInner">
@@ -279,156 +289,97 @@ export default function HomePage() {
             </span>
           </div>
         </Link>
-      </div>
+        </div>
+      </section>
 
-      <div className="homeMetricsRow homeMetricsRow3">
-        <HomePressable className="card homeMetricCard homeCardMotion">
-          <div className="cardInner homeMetricInner">
-            <div className="homeMetricSplit">
-              <span className="homeMetricPrefix">{completedCount}</span>
-              <span className="homeMetricSlash"> / </span>
-              <span className="homeMetricTail">Topics Completed</span>
+      <section className="homeSection" aria-labelledby="home-progress-heading">
+        <div className="homeSectionHead">
+          <h2 id="home-progress-heading" className="homeSectionTitle">
+            Progress
+          </h2>
+          <span className="subtle homeSectionMeta">
+            {completedCount} of {totalTopics || 0} topics · {pct}%
+          </span>
+        </div>
+        <div className="homeProgressTrack homeProgressTrackLg" role="presentation" aria-hidden>
+          <div className="homeProgressFill homeProgressFillAccent" style={{ width: `${pct}%` }} />
+        </div>
+        <div className="homeStatsGrid">
+          {stats.map((stat) => (
+            <div key={stat.label} className="homeStatCard">
+              <div className="homeStatValue">{stat.value}</div>
+              <div className="homeStatLabel">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="homeSection" aria-labelledby="home-study-heading">
+        <h2 id="home-study-heading" className="homeSectionTitle">
+          Study today
+        </h2>
+        <div className="homeStudyGrid">
+          <div className="card homeStudyCard">
+            <div className="cardInner homePanelInner">
+              <h3 className="homeCardTitle">Quick review</h3>
+              <p className="subtle homeCardSub">Pick a random topic for spaced repetition.</p>
+
+              {review ? (
+                <div className="homeQuickInset">
+                  <span className="homeQuickBadge">{courseLabel(review.course)}</span>
+                  <div className="homeQuickTopicTitle">{review.topic.title}</div>
+                  <p className="subtle homeQuickTopicDesc">{review.topic.shortDesc}</p>
+                  <Link
+                    href={`/${review.course}/${review.topic.slug}`}
+                    className="btn btnPrimary homeReviewCta homeBtnMotion homeAccentBtn"
+                  >
+                    Open topic
+                  </Link>
+                </div>
+              ) : null}
+
+              <button
+                type="button"
+                className={`homeDiceBtn homeBtnMotion${dicePulse ? " homeDiceBtnPulse" : ""}`}
+                onClick={pickAnotherTopic}
+              >
+                Shuffle topic
+              </button>
             </div>
           </div>
-        </HomePressable>
-        <HomePressable className="card homeMetricCard homeCardMotion">
-          <div className="cardInner homeMetricInner">
-            <div className="homeMetricSplit">
-              <span className="homeMetricPrefix">{studyTimeLabel}</span>
-              <span className="homeMetricSlash"> / </span>
-              <span className="homeMetricTail">Study Time</span>
-            </div>
-          </div>
-        </HomePressable>
-        <HomePressable className="card homeMetricCard homeCardMotion">
-          <div className="cardInner homeMetricInner">
-            <div className="homeMetricSplit">
-              <span className="homeMetricPrefix">{bookmarksCount}</span>
-              <span className="homeMetricSlash"> / </span>
-              <span className="homeMetricTail">Bookmarks</span>
-            </div>
-          </div>
-        </HomePressable>
-      </div>
 
-      <div className="homeStreakReviewGrid">
-        <HomePressable className="card homeCardMotion">
-          <div className="cardInner homePanelInner">
-            <div className="homePanelHead">
-              <div className="homePanelTitle">Study Streak</div>
-              <div className="subtle homePanelSub">Keep your momentum going!</div>
-            </div>
+          <div className="card homeStudyCard">
+            <div className="cardInner homePanelInner">
+              <h3 className="homeCardTitle">Daily goal</h3>
+              <p className="subtle homeCardSub">
+                {streakDays > 0
+                  ? `${streakDays}-day streak — keep it going.`
+                  : "Set a daily target to build a streak."}
+              </p>
 
-            <div className="homeInsetBox homeStreakCounter">
-              <div className="homeStreakBig">{streakDays}</div>
-              <div className="subtle homeStreakCaption">Days Streak</div>
-            </div>
-
-            <div className="homeDailyGoal">
-              <div className="homeDailyGoalTop">
-                <span className="homeDailyGoalLabel">Daily Goal</span>
-                <button type="button" className="homeEditBtn homeBtnMotion" onClick={editDailyGoal}>
-                  Edit
-                </button>
+              <div className="homeDailyGoal">
+                <div className="homeDailyGoalTop">
+                  <span className="homeDailyGoalLabel">
+                    {studyMinutesToday} / {dailyGoalMin} min
+                  </span>
+                  <button type="button" className="homeEditBtn homeBtnMotion" onClick={editDailyGoal}>
+                    Edit goal
+                  </button>
+                </div>
+                <div className="homeProgressTrack" role="presentation" aria-hidden>
+                  <div className="homeProgressFill homeProgressFillAccent" style={{ width: `${dailyPct}%` }} />
+                </div>
+                <p className="subtle homeDailyLeft">{dailyLeft} minutes left today</p>
               </div>
-              <div className="homeDailyGoalMeta">
-                <span>
-                  {studyMinutesToday} / {dailyGoalMin} minutes
-                </span>
-                <span className="subtle">{dailyLeft} min left</span>
-              </div>
-              <div className="homeProgressTrack" role="presentation">
-                <div className="homeProgressFill homeProgressFillAccent" style={{ width: `${dailyPct}%` }} />
-              </div>
-            </div>
-
-            <div className="homeStreakFoot">
-              <div className="homeStreakFootCell">
-                <div className="homeStreakFootVal">{streakDays}</div>
-                <div className="subtle homeStreakFootLbl">Total Days</div>
-              </div>
-              <div className="homeStreakFootCell">
-                <div className="homeStreakFootVal">{totalStudyH}h</div>
-                <div className="subtle homeStreakFootLbl">Total Time</div>
-              </div>
-            </div>
-          </div>
-        </HomePressable>
-
-        <HomePressable className="card homeCardMotion">
-          <div className="cardInner homePanelInner">
-            <div className="homePanelHead">
-              <div className="homePanelTitle">Quick Review</div>
-              <div className="subtle homePanelSub">Random topic for spaced repetition</div>
-            </div>
-
-            {review && (
-              <div className="homeInsetBox homeQuickInset">
-                <div className="homeQuickBadge">{courseLabel(review.course)}</div>
-                <div className="homeQuickTopicTitle">{review.topic.title}</div>
-                <div className="subtle homeQuickTopicDesc">{review.topic.shortDesc}</div>
-                <Link
-                  href={`/${review.course}/${review.topic.slug}`}
-                  className="btn btnPrimary homeReviewCta homeBtnMotion homeAccentBtn"
-                >
-                  Review Topic
-                </Link>
-              </div>
-            )}
-
-            <button
-              type="button"
-              className={`homeDiceBtn homeBtnMotion${dicePulse ? " homeDiceBtnPulse" : ""}`}
-              onClick={pickAnotherTopic}
-            >
-              <span className="homeDiceEmoji" aria-hidden>
-                🎲
-              </span>{" "}
-              Get Another Topic
-            </button>
-          </div>
-        </HomePressable>
-      </div>
-
-      <HomePressable className="card homeProgressCard homeCardMotion">
-        <div className="cardInner homeProgressInner">
-          <div className="homePanelHead">
-            <div className="homePanelTitle">Progress Overview</div>
-            <div className="subtle homePanelSub">Your learning journey</div>
-          </div>
-
-          <div className="homeProgressBarRow">
-            <span className="homeProgressBarLbl">Topics Completed</span>
-            <span className="homeProgressBarFrac">
-              {completedCount} / {totalTopics || 0}
-            </span>
-          </div>
-          <div className="homeProgressTrack homeProgressTrackLg" role="presentation">
-            <div className="homeProgressFill homeProgressFillAccent" style={{ width: `${pct}%` }} />
-          </div>
-          <div className="homeProgressPct">{pct}%</div>
-
-          <div className="homeProgressGrid">
-            <div className="homeProgressStat">
-              <div className="homeProgressStatVal">{studyTimeLabel}</div>
-              <div className="subtle homeProgressStatLbl">Total Study Time</div>
-            </div>
-            <div className="homeProgressStat">
-              <div className="homeProgressStatVal">{streakDays}</div>
-              <div className="subtle homeProgressStatLbl">Day Streak</div>
-            </div>
-            <div className="homeProgressStat">
-              <div className="homeProgressStatVal">{bookmarksCount}</div>
-              <div className="subtle homeProgressStatLbl">Bookmarks</div>
-            </div>
-            <div className="homeProgressStat">
-              <div className="homeProgressStatVal">{achievementsCount}</div>
-              <div className="subtle homeProgressStatLbl">Achievements</div>
             </div>
           </div>
         </div>
-      </HomePressable>
+      </section>
 
+      <section className="homeSection homeSectionLast" aria-labelledby="home-tools-heading">
+        <h2 id="home-tools-heading" className="homeSectionTitle">
+          For instructors
+        </h2>
       <Link href="/studio" className="homeProfessorBar homeCardMotion">
         <span className="homeProfessorIcon" aria-hidden>
           📝
@@ -443,6 +394,7 @@ export default function HomePage() {
           →
         </span>
       </Link>
+      </section>
     </main>
   );
 }

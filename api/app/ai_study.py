@@ -1,27 +1,23 @@
 """
-Gemini-backed study endpoints. Uses REST (urllib) — no extra Python deps.
+AI study endpoints (DeepSeek preferred, Gemini fallback). OpenAI-compatible REST only.
 """
 from __future__ import annotations
 
 import json
 import os
-import urllib.error
-import urllib.request
 from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-router = APIRouter(prefix="/gemini", tags=["gemini"])
+from app import llm_client
 
-_MODEL = "gemini-1.5-flash"
-_GEN_URL = (
-    f"https://generativelanguage.googleapis.com/v1beta/models/{_MODEL}:generateContent"
-)
+router = APIRouter(prefix="/ai", tags=["ai"])
+legacy_router = APIRouter(prefix="/gemini", tags=["gemini"])
 
-# session_token -> count (resets on restart)
+# DeepSeek free-tier friendly: more questions per session when using cheap model
+_MAX_ASK_PER_SESSION = 40
 _ask_counts: dict[str, int] = {}
-_MAX_ASK_PER_SESSION = 20
 
 
 class ChatTurn(BaseModel):
@@ -36,7 +32,6 @@ class AskBody(BaseModel):
     context_chunks: list[str] = Field(default_factory=list)
     history: list[ChatTurn] = Field(default_factory=list)
     session_token: str
-    # Client supplies curriculum fields (not in original minimal spec but required for tutor quality)
     topic_title: str | None = None
     topic_summary: str | None = None
     must_know_concepts: list[str] | None = None
@@ -77,62 +72,6 @@ class ExplainMistakeBody(BaseModel):
     topic_title: str | None = None
 
 
-def _api_key() -> str:
-    key = (os.environ.get("GEMINI_API_KEY") or "").strip()
-    if not key:
-        raise HTTPException(
-            status_code=503,
-            detail="GEMINI_API_KEY is not configured on the server.",
-        )
-    return key
-
-
-def _gemini_post(
-    *,
-    system_instruction: str,
-    contents: list[dict[str, Any]],
-    response_mime_type: str | None = None,
-    temperature: float = 0.4,
-) -> str:
-    body: dict[str, Any] = {
-        "systemInstruction": {"parts": [{"text": system_instruction}]},
-        "contents": contents,
-        "generationConfig": {
-            "temperature": temperature,
-            "topP": 0.95,
-            "maxOutputTokens": 8192,
-        },
-    }
-    if response_mime_type:
-        body["generationConfig"]["responseMimeType"] = response_mime_type
-
-    data = json.dumps(body).encode("utf-8")
-    url = f"{_GEN_URL}?key={_api_key()}"
-    req = urllib.request.Request(
-        url,
-        data=data,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            raw = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        try:
-            err_body = e.read().decode("utf-8", errors="replace")
-        except Exception:
-            err_body = str(e)
-        raise HTTPException(status_code=502, detail=f"Gemini HTTP error: {e.code} {err_body}") from e
-    except urllib.error.URLError as e:
-        raise HTTPException(status_code=502, detail=f"Gemini network error: {e!s}") from e
-
-    try:
-        parts = raw["candidates"][0]["content"]["parts"]
-        return "".join(p.get("text", "") for p in parts)
-    except (KeyError, IndexError, TypeError) as e:
-        raise HTTPException(status_code=502, detail="Unexpected Gemini response shape") from e
-
-
 def _fmt_list(xs: list[str] | None, fallback: str = "(none provided)") -> str:
     if not xs:
         return fallback
@@ -167,14 +106,53 @@ def _topic_title_default(slug: str, title: str | None) -> str:
     return (title or "").strip() or slug.replace("-", " ").title()
 
 
-@router.post("/ask")
-def gemini_ask(body: AskBody) -> dict[str, Any]:
+def _llm_post(
+    *,
+    system_instruction: str,
+    contents: list[dict[str, Any]],
+    response_json: bool = False,
+    temperature: float = 0.4,
+) -> str:
+    return llm_client.complete_chat(
+        system_instruction=system_instruction,
+        contents=contents,
+        response_json=response_json,
+        temperature=temperature,
+    )
+
+
+@router.get("/status")
+def ai_status() -> dict[str, Any]:
+    """Which provider is active (for UI badges)."""
+    try:
+        provider = llm_client.active_provider()
+        name = llm_client.provider_display_name()
+        return {
+            "configured": True,
+            "provider": provider,
+            "display_name": name,
+            "model": (
+                os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+                if provider == "deepseek"
+                else os.environ.get("GEMINI_MODEL", "gemini-1.5-flash")
+            ),
+            "free_tier_note": (
+                "DeepSeek API includes free credits for new accounts at platform.deepseek.com"
+                if provider == "deepseek"
+                else None
+            ),
+        }
+    except HTTPException:
+        return {"configured": False, "provider": None, "display_name": None}
+
+
+def ask_handler(body: AskBody) -> dict[str, Any]:
     token = (body.session_token or "anonymous").strip() or "anonymous"
     used = _ask_counts.get(token, 0)
     if used >= _MAX_ASK_PER_SESSION:
         raise HTTPException(
             status_code=429,
-            detail="Session limit reached. Upload your notes to unlock more questions.",
+            detail="Session limit reached. Try again later or upload notes for grounded /ask search.",
         )
 
     title = _topic_title_default(body.topic_slug, body.topic_title)
@@ -209,10 +187,10 @@ def gemini_ask(body: AskBody) -> dict[str, Any]:
     remaining = _MAX_ASK_PER_SESSION - _ask_counts[token]
 
     try:
-        raw_text = _gemini_post(
+        raw_text = _llm_post(
             system_instruction=system + "\n\n" + json_schema_hint,
             contents=contents,
-            response_mime_type="application/json",
+            response_json=True,
             temperature=0.35,
         )
         data = json.loads(raw_text)
@@ -221,7 +199,7 @@ def gemini_ask(body: AskBody) -> dict[str, Any]:
         raise
     except json.JSONDecodeError:
         _ask_counts[token] = max(0, _ask_counts[token] - 1)
-        raise HTTPException(status_code=502, detail="Gemini returned invalid JSON") from None
+        raise HTTPException(status_code=502, detail="Model returned invalid JSON") from None
 
     answer = str(data.get("answer", "")).strip()
     if not answer:
@@ -247,11 +225,11 @@ def gemini_ask(body: AskBody) -> dict[str, Any]:
         "related_concepts": related,
         "suggested_video": vid,
         "remaining_questions": remaining,
+        "provider": llm_client.active_provider(),
     }
 
 
-@router.post("/study-guide")
-def gemini_study_guide(body: StudyGuideBody) -> dict[str, Any]:
+def study_guide_handler(body: StudyGuideBody) -> dict[str, Any]:
     title = _topic_title_default(body.topic_slug, body.topic_title)
     summary = (body.topic_summary or "").strip() or "Not provided."
     must = _fmt_list(body.must_know_concepts)
@@ -268,7 +246,7 @@ def gemini_study_guide(body: StudyGuideBody) -> dict[str, Any]:
         f"Summary:\n{summary}\n\nMust know:\n{must}\n\nCommon mistakes:\n{mistakes}\n\n"
         f"Extra context:\n{chunks}\n"
     )
-    text = _gemini_post(
+    text = _llm_post(
         system_instruction=system,
         contents=[{"role": "user", "parts": [{"text": prompt}]}],
         temperature=0.45,
@@ -276,8 +254,7 @@ def gemini_study_guide(body: StudyGuideBody) -> dict[str, Any]:
     return {"markdown": text.strip()}
 
 
-@router.post("/audio-brief")
-def gemini_audio_brief(body: AudioBriefBody) -> dict[str, Any]:
+def audio_brief_handler(body: AudioBriefBody) -> dict[str, Any]:
     title = _topic_title_default(body.topic_slug, body.topic_title)
     summary = (body.topic_summary or "").strip() or "Not provided."
     must = _fmt_list(body.must_know_concepts)
@@ -292,7 +269,7 @@ def gemini_audio_brief(body: AudioBriefBody) -> dict[str, Any]:
         f"Episode topic: {title}. Course: {body.course}. Slug: {body.topic_slug}.\n\n"
         f"Summary:\n{summary}\n\nMust know:\n{must}\n\nContext:\n{chunks}\n"
     )
-    text = _gemini_post(
+    text = _llm_post(
         system_instruction=system,
         contents=[{"role": "user", "parts": [{"text": prompt}]}],
         temperature=0.55,
@@ -300,8 +277,7 @@ def gemini_audio_brief(body: AudioBriefBody) -> dict[str, Any]:
     return {"transcript": text.strip()}
 
 
-@router.post("/fresh-questions")
-def gemini_fresh_questions(body: FreshQuestionsBody) -> dict[str, Any]:
+def fresh_questions_handler(body: FreshQuestionsBody) -> dict[str, Any]:
     title = _topic_title_default(body.topic_slug, body.topic_title)
     summary = (body.topic_summary or "").strip() or "Not provided."
     must = _fmt_list(body.must_know_concepts)
@@ -318,10 +294,10 @@ def gemini_fresh_questions(body: FreshQuestionsBody) -> dict[str, Any]:
         f"Topic: {title}. Slug: {body.topic_slug}. Course: {body.course}.\n\n"
         f"Summary:\n{summary}\n\nMust know:\n{must}\n\nContext:\n{chunks}\n"
     )
-    raw_text = _gemini_post(
+    raw_text = _llm_post(
         system_instruction=system,
         contents=[{"role": "user", "parts": [{"text": prompt}]}],
-        response_mime_type="application/json",
+        response_json=True,
         temperature=0.55,
     )
     try:
@@ -333,12 +309,11 @@ def gemini_fresh_questions(body: FreshQuestionsBody) -> dict[str, Any]:
     return {"questions": qs[:5]}
 
 
-@router.post("/explain-mistake")
-def gemini_explain_mistake(body: ExplainMistakeBody) -> dict[str, Any]:
+def explain_mistake_handler(body: ExplainMistakeBody) -> dict[str, Any]:
     title = _topic_title_default(body.topic_slug, body.topic_title)
     system = (
         "You explain why a student's MCQ answer was wrong, gently and clearly, for Dr. Garrett's CHM 222 course. "
-        "Return JSON only: {\"explanation\": string, \"key_concept\": string}"
+        'Return JSON only: {"explanation": string, "key_concept": string}'
     )
     prompt = (
         f"Topic: {title} ({body.topic_slug})\n"
@@ -346,10 +321,10 @@ def gemini_explain_mistake(body: ExplainMistakeBody) -> dict[str, Any]:
         f"Student chose: {body.wrong_answer}\n"
         f"Correct answer: {body.correct_answer}\n"
     )
-    raw_text = _gemini_post(
+    raw_text = _llm_post(
         system_instruction=system,
         contents=[{"role": "user", "parts": [{"text": prompt}]}],
-        response_mime_type="application/json",
+        response_json=True,
         temperature=0.35,
     )
     try:
@@ -360,3 +335,16 @@ def gemini_explain_mistake(body: ExplainMistakeBody) -> dict[str, Any]:
         "explanation": str(data.get("explanation", "")).strip(),
         "key_concept": str(data.get("key_concept", "")).strip(),
     }
+
+
+def _register(r: APIRouter) -> None:
+    r.add_api_route("/status", ai_status, methods=["GET"])
+    r.add_api_route("/ask", ask_handler, methods=["POST"])
+    r.add_api_route("/study-guide", study_guide_handler, methods=["POST"])
+    r.add_api_route("/audio-brief", audio_brief_handler, methods=["POST"])
+    r.add_api_route("/fresh-questions", fresh_questions_handler, methods=["POST"])
+    r.add_api_route("/explain-mistake", explain_mistake_handler, methods=["POST"])
+
+
+_register(router)
+_register(legacy_router)

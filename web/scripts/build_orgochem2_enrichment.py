@@ -490,7 +490,7 @@ lines += [
     "",
     "function mainVideo(topicTitle: string, id: string): TopicVideo[] {",
     "  const url = `https://www.youtube.com/watch?v=${id}`;",
-    "  const thumbnail = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;",
+    "  const thumbnail = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;",
     "  return [{",
     "    topic: topicTitle,",
     '    subtopic: "Video tutorial",',

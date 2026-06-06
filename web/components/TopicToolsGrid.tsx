@@ -31,10 +31,16 @@ export default function TopicToolsGrid({ slug, title }: { slug: string; title: s
       desc: "Step-by-step arrow-pushing interactive viewer.",
     },
     {
+      href: `${base}/practice`,
+      icon: "✓",
+      name: "Practice Questions",
+      desc: "Exam-style MCQs — one section per question with explanations.",
+    },
+    {
       href: `${base}/practice-exam`,
       icon: "📝",
-      name: "Practice Exam",
-      desc: "Timed, scored, with instant feedback.",
+      name: "Timed Exam",
+      desc: "Timed, scored mode using the same question bank.",
     },
     {
       href: `${base}/concept-map`,
